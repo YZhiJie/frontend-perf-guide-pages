@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>第 6 章 · Vue 专项优化方案 · 前端性能优化完全学习指南</title>
+<style>
+:root{--fg:#1f2328;--muted:#57606a;--line:#d0d7de;--accent:#f97316;--link:#0969da;--code-bg:#f6f8fa}
+*{box-sizing:border-box}
+body{margin:0;font-family:-apple-system,BlinkMacSystemFont,'PingFang SC','Microsoft YaHei',sans-serif;color:var(--fg);background:#fff;line-height:1.75}
+header.top{position:sticky;top:0;background:#0f172a;color:#e2e8f0;padding:12px 20px;display:flex;align-items:center;gap:16px;flex-wrap:wrap;z-index:10}
+header.top .brand{font-weight:700;color:#fff}
+header.top .brand em{color:var(--accent);font-style:normal}
+header.top nav{margin-left:auto;display:flex;gap:16px;flex-wrap:wrap}
+header.top nav a{color:#cbd5e1;text-decoration:none;font-size:14px}
+header.top nav a:hover{color:var(--accent)}
+header.top nav a.active{color:#fff;border-bottom:2px solid var(--accent);padding-bottom:2px}
+main{max-width:880px;margin:0 auto;padding:28px 20px 64px}
+main h1{font-size:28px;border-bottom:1px solid var(--line);padding-bottom:.3em}
+main h2{font-size:22px;border-bottom:1px solid var(--line);padding-bottom:.3em;margin-top:2em}
+main h3{font-size:18px;margin-top:1.6em}
+main img{max-width:100%}
+a{color:var(--link)}
+code{background:var(--code-bg);padding:.15em .35em;border-radius:4px;font-size:.9em;font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}
+pre{background:#0f172a;color:#e2e8f0;padding:14px 16px;border-radius:8px;overflow:auto}
+pre code{background:none;color:inherit;padding:0;font-size:13px}
+table{border-collapse:collapse;width:100%;margin:1em 0;display:block;overflow:auto}
+th,td{border:1px solid var(--line);padding:6px 12px;text-align:left}
+th{background:var(--code-bg)}
+blockquote{border-left:4px solid var(--accent);margin:1em 0;padding:.3em 1em;color:var(--muted);background:#fff7ed}
+hr{border:none;border-top:1px solid var(--line);margin:2em 0}
+footer{border-top:1px solid var(--line);color:var(--muted);font-size:13px;text-align:center;padding:20px 16px}
+footer a{color:var(--link);text-decoration:none}
+</style>
+</head>
+<body>
+<header class="top">
+  <span class="brand"><em>前端性能</em>完全指南</span>
+  <nav>
+    <a href="../index.html">首页</a>
+    <a href="../docs/README.html" class="active">标准文档</a>
+    <a href="../comics/index.html">漫画剧场</a>
+    <a href="https://github.com/YZhiJie/frontend-perf-guide">源码仓库</a>
+  </nav>
+</header>
+<main>
+<h1 id="第-6-章-vue-专项优化方案">第 6 章 · Vue 专项优化方案</h1>
+<blockquote>
+<p>🎬 本章配套漫画：<a href="../comics/EP.06.svg">EP.06《Vue 后厨的智慧》</a> ｜ <a href="../comics/EP.06.html">漫画讲解稿</a></p>
+<p>学习目标：理解 Vue 响应式的更新粒度与开销来源，掌握渲染控制、大列表、按需加载、状态管理四大场景的落地优化。
+前置知识：<a href="./04-rendering.html">第 4 章</a> 渲染控制概念、Vue 3 Composition API 基础。</p>
+</blockquote>
+<h2 id="0-本章学习地图">0. 本章学习地图</h2>
+<ol>
+<li><a href="#1-%E5%93%8D%E5%BA%94%E5%BC%8F%E7%9A%84%E4%BB%A3%E4%BB%B7%E4%B8%8E%E4%BE%9D%E8%B5%96%E8%BF%BD%E8%B8%AA">响应式的代价与依赖追踪</a></li>
+<li><a href="#2-%E6%B8%B2%E6%9F%93%E6%8E%A7%E5%88%B6v-if-v-show-computed-%E4%B8%8E-v-memo">渲染控制：v-if v-show computed 与 v-memo</a></li>
+<li><a href="#3-%E5%A4%A7%E5%88%97%E8%A1%A8%E8%99%9A%E6%8B%9F%E6%BB%9A%E5%8A%A8%E5%AE%9E%E6%88%98">大列表：虚拟滚动实战</a></li>
+<li><a href="#4-%E7%BB%84%E4%BB%B6%E5%A4%8D%E7%94%A8%E4%B8%8E-keepalive">组件复用与 KeepAlive</a></li>
+<li><a href="#5-%E6%8C%89%E9%9C%80%E5%8A%A0%E8%BD%BD%E8%B7%AF%E7%94%B1%E5%88%86%E5%89%B2%E4%B8%8E%E7%BB%84%E4%BB%B6%E5%BA%93%E6%8C%89%E9%9C%80%E5%BC%95%E5%85%A5">按需加载：路由分割与组件库按需引入</a></li>
+<li><a href="#6-%E7%8A%B6%E6%80%81%E7%AE%A1%E7%90%86pinia-%E7%9A%84%E6%80%A7%E8%83%BD%E5%A7%BF%E5%8A%BF">状态管理：Pinia 的性能姿势</a></li>
+<li><a href="#7-%E5%93%8D%E5%BA%94%E5%BC%8F%E9%99%8D%E8%80%97shallowref-%E4%B8%8E-markraw">响应式降耗：shallowRef 与 markRaw</a></li>
+<li><a href="#8-%E6%9E%84%E5%BB%BA%E4%B8%8E%E4%BA%A7%E7%89%A9%E4%BC%98%E5%8C%96">构建与产物优化</a></li>
+<li><a href="#9-%E6%9C%80%E4%BD%B3%E5%AE%9E%E8%B7%B5%E6%B8%85%E5%8D%95">最佳实践清单</a></li>
+</ol>
+<h2 id="1-响应式的代价与依赖追踪">1. 响应式的代价与依赖追踪</h2>
+<p>Vue 3 用 <code>Proxy</code> 实现响应式：<code>get</code> 拦截时<strong>收集依赖</strong>（谁在用这个属性），<code>set</code> 拦截时<strong>触发更新</strong>（通知这些地方重跑）。</p>
+<p>两个决定性能的关键事实：</p>
+<ol>
+<li><strong>更新粒度是「组件级」</strong>：一个响应式数据变化，触发的是<strong>引用它的组件</strong>的渲染 effect 重跑（重新执行整个 <code>&lt;script setup&gt;</code> 的模板渲染），而不是只更新 DOM 上那一小格。组件越大、越重，一次更新的代价越大——<strong>拆组件就是拆更新范围</strong>。</li>
+<li><strong>深层响应式有代理成本</strong>：<code>reactive()</code> 会递归代理嵌套对象。给几万条的列表套深层响应式，光代理就吃掉可观内存与 CPU。</li>
+</ol>
+<pre><code class="language-js">// 文件: 示例片段 —— 常见的响应性丢失坑（性能问题的伪装者）
+import { reactive, toRefs } from &#39;vue&#39;;
+
+// ❌ 解构 reactive 对象：解构出的变量断开响应式连接，后续更新视图不动
+const state = reactive({ count: 0, user: {} });
+let { count } = state;
+
+// ✅ 用 toRefs 保持每个属性的响应式连接
+const { count: countRef } = toRefs(state);
+
+// ❌ reactive 整体替换：Proxy 代理的是原对象，重新赋值引用不会触发更新
+state.user = { ...state.user, name: &#39;新名字&#39; }; // ✅ 改属性可以
+// state = reactive({...})                      // ❌ 这样做不会更新视图
+</code></pre>
+<blockquote>
+<p>运行方式：Vue 3 项目内直接验证；配合 Vue DevTools 的「渲染高亮」观察组件更新范围。</p>
+</blockquote>
+<h2 id="2-渲染控制v-if-v-show-computed-与-v-memo">2. 渲染控制：v-if v-show computed 与 v-memo</h2>
+<p>四个工具各管一件事，选错就是性能坑：</p>
+<table>
+<thead>
+<tr>
+<th>工具</th>
+<th>机制</th>
+<th>用在</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>v-if</code></td>
+<td>条件为假时<strong>不渲染</strong>（切换有创建/销毁开销）</td>
+<td>初始为假、切换少的场景</td>
+</tr>
+<tr>
+<td><code>v-show</code></td>
+<td>始终渲染，只切 <code>display</code>（初始开销大）</td>
+<td>频繁切换的显隐（Tab、悬浮层）</td>
+</tr>
+<tr>
+<td><code>computed</code></td>
+<td><strong>缓存</strong>：依赖不变直接返回上次结果</td>
+<td>派生数据（过滤、排序、格式化）</td>
+</tr>
+<tr>
+<td><code>v-memo</code></td>
+<td>依赖数组不变时<strong>跳过整段子树渲染</strong></td>
+<td>大列表行、重组件的渲染热点</td>
+</tr>
+</tbody></table>
+<pre><code class="language-vue">&lt;!-- 文件: src/components/GoodList.vue —— v-memo 与 computed 组合的标准写法 --&gt;
+&lt;script setup&gt;
+import { computed, ref } from &#39;vue&#39;;
+const props = defineProps({ items: { type: Array, default: () =&gt; [] } });
+const selectedId = ref(null);
+
+// computed 缓存派生数据：items 不变时反复访问零成本
+const sorted = computed(() =&gt;
+  [...props.items].sort((a, b) =&gt; b.score - a.score)
+);
+&lt;/script&gt;
+
+&lt;template&gt;
+  &lt;!-- v-memo：依赖只有「是否选中」，未选中的行在 selectedId 变化时不再重渲染 --&gt;
+  &lt;div v-for=&quot;item in sorted&quot; :key=&quot;item.id&quot; v-memo=&quot;[item.id === selectedId]&quot;&gt;
+    &lt;span&gt;{{ item.name }}&lt;/span&gt;
+    &lt;span&gt;{{ item.score }}&lt;/span&gt;
+    &lt;button v-if=&quot;item.id === selectedId&quot; @click=&quot;selectedId = null&quot;&gt;取消&lt;/button&gt;
+  &lt;/div&gt;
+&lt;/template&gt;
+</code></pre>
+<blockquote>
+<p>运行方式：Vue DevTools 开启渲染高亮，点击行切换选中，观察只有相关行重渲染。</p>
+</blockquote>
+<blockquote>
+<p>⚠️ <code>v-memo</code> 的依赖数组必须<strong>覆盖模板中用到的所有响应式值</strong>，漏写会导致视图不更新——这是正确性问题，比性能问题更严重。</p>
+</blockquote>
+<h2 id="3-大列表虚拟滚动实战">3. 大列表：虚拟滚动实战</h2>
+<p>千行级列表直接 <code>v-for</code>，DOM 规模会让滚动与更新双双崩溃（第 4 章第 7 节的原理）。Vue 生态用 <code>vue-virtual-scroller</code>：</p>
+<pre><code class="language-bash">npm install vue-virtual-scroller
+</code></pre>
+<pre><code class="language-vue">&lt;!-- 文件: src/components/BigTable.vue —— 动态行高虚拟滚动 --&gt;
+&lt;script setup&gt;
+import { RecycleScroller } from &#39;vue-virtual-scroller&#39;;
+import &#39;vue-virtual-scroller/dist/vue-virtual-scroller.css&#39;;
+const items = await fetchHugeList(); // 1 万条也只渲染可视区约 20 条
+&lt;/script&gt;
+
+&lt;template&gt;
+  &lt;RecycleScroller
+    class=&quot;scroller&quot;
+    :items=&quot;items&quot;
+    :item-size=&quot;56&quot;
+    key-field=&quot;id&quot;
+    v-slot=&quot;{ item }&quot;
+  &gt;
+    &lt;div class=&quot;row&quot;&gt;{{ item.name }} · {{ item.score }}&lt;/div&gt;
+  &lt;/RecycleScroller&gt;
+&lt;/template&gt;
+</code></pre>
+<blockquote>
+<p>运行方式：项目内使用；行高不固定用 <code>DynamicScroller</code>。对比改造前后的 DOM Elements 面板节点数。</p>
+</blockquote>
+<p>配套细节：行组件内配合 <code>v-memo</code>（本章第 2 节）；列表数据如果是服务端一次性下发的大 JSON，先做分页/分片（第 5 章第 3 节）。</p>
+<h2 id="4-组件复用与-keepalive">4. 组件复用与 KeepAlive</h2>
+<p>路由切换回来要重发请求、重建组件？<code>&lt;KeepAlive&gt;</code> 缓存组件实例（连同组件状态），切回来直接复活：</p>
+<pre><code class="language-vue">&lt;!-- 文件: src/layouts/Main.vue —— KeepAlive 控制缓存范围与数量 --&gt;
+&lt;template&gt;
+  &lt;RouterView v-slot=&quot;{ Component }&quot;&gt;
+    &lt;KeepAlive :include=&quot;[&#39;Report&#39;, &#39;Dashboard&#39;]&quot; :max=&quot;10&quot;&gt;
+      &lt;component :is=&quot;Component&quot; /&gt;
+    &lt;/KeepAlive&gt;
+  &lt;/RouterView&gt;
+&lt;/template&gt;
+</code></pre>
+<p>三条纪律：</p>
+<ol>
+<li><strong>必须配 <code>include</code> 白名单或 <code>max</code></strong>：无界缓存 = 内存泄漏温床（每个缓存实例连同其数据常驻）；</li>
+<li>被缓存的组件用 <code>onActivated</code>/<code>onDeactivated</code> 代替 <code>onMounted</code>/<code>onUnmounted</code> 做数据刷新与清理；</li>
+<li>含大量状态或定时器的组件不适合缓存，宁可重挂载。</li>
+</ol>
+<h2 id="5-按需加载路由分割与组件库按需引入">5. 按需加载：路由分割与组件库按需引入</h2>
+<p><strong>路由级分割</strong>（Vite 脚手架默认支持，确认每条路由都是动态 import，见第 3 章第 8 节）。</p>
+<p><strong>组件库按需引入</strong>：Element Plus 全量引入约 1MB+，按需引入后只打包用到的组件：</p>
+<pre><code class="language-ts">// 文件: vite.config.ts —— Element Plus 自动按需（unplugin 系列）
+import AutoImport from &#39;unplugin-auto-import/vite&#39;;
+import Components from &#39;unplugin-vue-components/vite&#39;;
+import { ElementPlusResolver } from &#39;unplugin-vue-components/resolvers&#39;;
+
+export default defineConfig({
+  plugins: [
+    AutoImport({ resolvers: [ElementPlusResolver()] }),
+    Components({ resolvers: [ElementPlusResolver()] }),
+    // 模板里直接写 &lt;el-button&gt;，构建时只引入对应组件与样式
+  ],
+});
+</code></pre>
+<blockquote>
+<p>运行方式：<code>npm run build</code> 对比引入前后的产物体积（本例通常减少 60% 以上）。</p>
+</blockquote>
+<p><strong>重型库按需</strong>：echarts 用 <code>echarts/core</code> 注册用到的图表与组件，避免整包引入；大工具函数库改用子路径引入（<code>lodash-es/debounce</code>）。</p>
+<h2 id="6-状态管理pinia-的性能姿势">6. 状态管理：Pinia 的性能姿势</h2>
+<p>Pinia 本身开销极小，性能问题出在<strong>存了什么、怎么存</strong>：</p>
+<pre><code class="language-js">// 文件: src/stores/feed.js —— 大数据量 store 的正确姿势
+import { defineStore } from &#39;pinia&#39;;
+import { shallowRef, triggerRef } from &#39;vue&#39;;
+
+export const useFeedStore = defineStore(&#39;feed&#39;, () =&gt; {
+  // ❌ 反例：ref(hugeList) 深层响应式——每条数据都被 Proxy 代理
+  // ✅ 正解：shallowRef 只代理数组引用本身，内部元素保持原始对象（零代理成本）
+  const list = shallowRef([]);
+
+  function replaceAll(next) {
+    list.value = next;        // 整体替换引用，天然触发更新
+  }
+  function patchOne(id, patch) {
+    const i = list.value.findIndex((x) =&gt; x.id === id);
+    if (i &lt; 0) return;
+    list.value[i] = { ...list.value[i], ...patch };
+    triggerRef(list);         // 手动通知：原地改内容时需显式触发
+  }
+
+  // getters 自动缓存（依赖不变不重算），适合放派生统计
+  const total = (state) =&gt; state.list.length;
+  return { list, replaceAll, patchOne, total };
+});
+</code></pre>
+<blockquote>
+<p>运行方式：Pinia 项目内验证；用 Vue DevTools Timeline 观察 store 更新触发的组件范围。</p>
+</blockquote>
+<p>原则：<strong>store 存「跨组件共享的必要状态」</strong>，组件私有状态留在组件内；巨型 store 按业务域拆分（每个 store 是独立更新单位）。</p>
+<h2 id="7-响应式降耗shallowref-与-markraw">7. 响应式降耗：shallowRef 与 markRaw</h2>
+<p>两类「不该被代理」的数据，用两个 API 免除代理成本：</p>
+<table>
+<thead>
+<tr>
+<th>API</th>
+<th>场景</th>
+<th>效果</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>shallowRef</code></td>
+<td>大数组/大对象（列表、表格数据、图表数据集）</td>
+<td>只有 <code>.value</code> 赋值触发更新，内部不代理</td>
+</tr>
+<tr>
+<td><code>shallowReactive</code></td>
+<td>对象只需顶层响应式</td>
+<td>嵌套属性不代理</td>
+</tr>
+<tr>
+<td><code>markRaw</code></td>
+<td>第三方实例（echarts 实例、地图实例、class 实例）</td>
+<td>永久标记「永不代理」，塞进 reactive 也不被转</td>
+</tr>
+</tbody></table>
+<pre><code class="language-js">// 文件: src/composables/useChart.js —— markRaw 的经典场景
+import { shallowRef, markRaw, onUnmounted } from &#39;vue&#39;;
+import * as echarts from &#39;echarts/core&#39;;
+
+const chart = shallowRef(null);
+
+function init(el) {
+  // 图表实例绝不需要响应式：markRaw 防止它被 Proxy 包裹（避免奇怪 bug + 省内存）
+  chart.value = markRaw(echarts.init(el));
+  window.addEventListener(&#39;resize&#39;, chart.value.resize, { passive: true });
+}
+onUnmounted(() =&gt; window.removeEventListener(&#39;resize&#39;, chart.value.resize));
+</code></pre>
+<blockquote>
+<p>运行方式：Vue 项目内使用；开启响应式转换调试（<code>app.config.warnAboutReactiveLoss</code>）可发现被误代理的实例。</p>
+</blockquote>
+<h2 id="8-构建与产物优化">8. 构建与产物优化</h2>
+<p>Vue 项目的产物优化清单（配合第 3 章通用手段）：</p>
+<pre><code class="language-js">// 文件: vite.config.ts 片段 —— 第三方稳定依赖分包，提升缓存命中
+export default defineConfig({
+  build: {
+    rollupOptions: {
+      output: {
+        // vue 全家桶与 echarts 变更少，单独分包后业务迭代不影响它们的缓存
+        manualChunks: {
+          vue: [&#39;vue&#39;, &#39;vue-router&#39;, &#39;pinia&#39;],
+          charts: [&#39;echarts&#39;],
+        },
+      },
+    },
+  },
+});
+</code></pre>
+<ul>
+<li><input disabled="" type="checkbox"> <code>npm run build</code> 后用 <code>rollup-plugin-visualizer</code> 审查包构成，处理重复依赖</li>
+<li><input disabled="" type="checkbox"> 路由级分割全量覆盖（除首页外的页面全部动态 import）</li>
+<li><input disabled="" type="checkbox"> 组件库/重型库按需引入，体积对比记录在案</li>
+<li><input disabled="" type="checkbox"> 第三方稳定依赖 <code>manualChunks</code> 分包</li>
+<li><input disabled="" type="checkbox"> 产物 Brotli 预压缩，静态资源上 CDN</li>
+<li><input disabled="" type="checkbox"> 建立体积预算（如 JS ≤ 170KB 压缩后）并接入 CI（第 9 章）</li>
+</ul>
+<h2 id="9-最佳实践清单">9. 最佳实践清单</h2>
+<ul>
+<li><input disabled="" type="checkbox"> 组件合理拆分，缩小每次响应式更新的重渲染范围</li>
+<li><input disabled="" type="checkbox"> 派生数据一律 <code>computed</code>；渲染热点用 <code>v-memo</code>（依赖数组写全）</li>
+<li><input disabled="" type="checkbox"> 显隐切换按频率选 <code>v-if</code>/<code>v-show</code>，不凭感觉</li>
+<li><input disabled="" type="checkbox"> 千行级列表上虚拟滚动，行组件配合 <code>v-memo</code></li>
+<li><input disabled="" type="checkbox"> <code>KeepAlive</code> 必带 <code>include</code>/<code>max</code>，缓存组件用激活钩子做刷新与清理</li>
+<li><input disabled="" type="checkbox"> 大数据进 store 用 <code>shallowRef</code>；第三方实例 <code>markRaw</code></li>
+<li><input disabled="" type="checkbox"> 组件库与重型依赖按需引入，产物体积有预算有门禁</li>
+</ul>
+<hr>
+<h2 id="配套漫画ep06">🎬 配套漫画（EP.06）</h2>
+<blockquote>
+<p><strong>EP.06《Vue 后厨的智慧》</strong> —— Vue 餐馆后厨：加碗饭重做整桌菜（组件级重渲染）、computed 半成品缓存、路由懒加载拆菜单、KeepAlive 常客座位、v-memo 旧盘直端。</p>
+<table>
+<thead>
+<tr>
+<th>漫画格</th>
+<th>剧情梗概</th>
+<th>对应本章小节</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>第 1 格</td>
+<td>加碗饭却重做整桌 = 组件级更新粒度</td>
+<td><a href="#1-%E5%93%8D%E5%BA%94%E5%BC%8F%E7%9A%84%E4%BB%A3%E4%BB%B7%E4%B8%8E%E4%BE%9D%E8%B5%96%E8%BF%BD%E8%B8%AA">1. 响应式的代价与依赖追踪</a></td>
+</tr>
+<tr>
+<td>第 2 格</td>
+<td>computed 半成品 vs methods 现做</td>
+<td><a href="#2-%E6%B8%B2%E6%9F%93%E6%8E%A7%E5%88%B6v-if-v-show-computed-%E4%B8%8E-v-memo">2. 渲染控制：v-if v-show computed 与 v-memo</a></td>
+</tr>
+<tr>
+<td>第 3 格</td>
+<td>菜单拆页、常客座位、旧盘直端</td>
+<td><a href="#3-%E5%A4%A7%E5%88%97%E8%A1%A8%E8%99%9A%E6%8B%9F%E6%BB%9A%E5%8A%A8%E5%AE%9E%E6%88%98">3. 大列表：虚拟滚动实战</a>、<a href="#4-%E7%BB%84%E4%BB%B6%E5%A4%8D%E7%94%A8%E4%B8%8E-keepalive">4. 组件复用与 KeepAlive</a>、<a href="#5-%E6%8C%89%E9%9C%80%E5%8A%A0%E8%BD%BD%E8%B7%AF%E7%94%B1%E5%88%86%E5%89%B2%E4%B8%8E%E7%BB%84%E4%BB%B6%E5%BA%93%E6%8C%89%E9%9C%80%E5%BC%95%E5%85%A5">5. 按需加载</a></td>
+</tr>
+<tr>
+<td>第 4 格</td>
+<td>坑点：大 JSON 全塞深层响应式 + 稳叔总结</td>
+<td><a href="#7-%E5%93%8D%E5%BA%94%E5%BC%8F%E9%99%8D%E8%80%97shallowref-%E4%B8%8E-markraw">7. 响应式降耗：shallowRef 与 markRaw</a></td>
+</tr>
+</tbody></table>
+<p>🎬 <a href="../comics/EP.06.svg">打开漫画 EP.06</a> ｜ 📖 <a href="../comics/EP.06.html">漫画讲解稿 EP.06.md</a></p>
+</blockquote>
+
+</main>
+<footer>
+  双形态联动学习体系 ｜ 标准文档 + 漫画剧场 ｜
+  源码仓库 <a href="https://github.com/YZhiJie/frontend-perf-guide">GitHub</a> ｜
+  在线站点 <a href="https://yzhijie.github.io/frontend-perf-guide-pages/">https://yzhijie.github.io/frontend-perf-guide-pages/</a>
+</footer>
+</body>
+</html>

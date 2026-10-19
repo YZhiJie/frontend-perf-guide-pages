@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>第 4 章 · 渲染性能优化：让每一帧都丝滑 · 前端性能优化完全学习指南</title>
+<style>
+:root{--fg:#1f2328;--muted:#57606a;--line:#d0d7de;--accent:#f97316;--link:#0969da;--code-bg:#f6f8fa}
+*{box-sizing:border-box}
+body{margin:0;font-family:-apple-system,BlinkMacSystemFont,'PingFang SC','Microsoft YaHei',sans-serif;color:var(--fg);background:#fff;line-height:1.75}
+header.top{position:sticky;top:0;background:#0f172a;color:#e2e8f0;padding:12px 20px;display:flex;align-items:center;gap:16px;flex-wrap:wrap;z-index:10}
+header.top .brand{font-weight:700;color:#fff}
+header.top .brand em{color:var(--accent);font-style:normal}
+header.top nav{margin-left:auto;display:flex;gap:16px;flex-wrap:wrap}
+header.top nav a{color:#cbd5e1;text-decoration:none;font-size:14px}
+header.top nav a:hover{color:var(--accent)}
+header.top nav a.active{color:#fff;border-bottom:2px solid var(--accent);padding-bottom:2px}
+main{max-width:880px;margin:0 auto;padding:28px 20px 64px}
+main h1{font-size:28px;border-bottom:1px solid var(--line);padding-bottom:.3em}
+main h2{font-size:22px;border-bottom:1px solid var(--line);padding-bottom:.3em;margin-top:2em}
+main h3{font-size:18px;margin-top:1.6em}
+main img{max-width:100%}
+a{color:var(--link)}
+code{background:var(--code-bg);padding:.15em .35em;border-radius:4px;font-size:.9em;font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}
+pre{background:#0f172a;color:#e2e8f0;padding:14px 16px;border-radius:8px;overflow:auto}
+pre code{background:none;color:inherit;padding:0;font-size:13px}
+table{border-collapse:collapse;width:100%;margin:1em 0;display:block;overflow:auto}
+th,td{border:1px solid var(--line);padding:6px 12px;text-align:left}
+th{background:var(--code-bg)}
+blockquote{border-left:4px solid var(--accent);margin:1em 0;padding:.3em 1em;color:var(--muted);background:#fff7ed}
+hr{border:none;border-top:1px solid var(--line);margin:2em 0}
+footer{border-top:1px solid var(--line);color:var(--muted);font-size:13px;text-align:center;padding:20px 16px}
+footer a{color:var(--link);text-decoration:none}
+</style>
+</head>
+<body>
+<header class="top">
+  <span class="brand"><em>前端性能</em>完全指南</span>
+  <nav>
+    <a href="../index.html">首页</a>
+    <a href="../docs/README.html" class="active">标准文档</a>
+    <a href="../comics/index.html">漫画剧场</a>
+    <a href="https://github.com/YZhiJie/frontend-perf-guide">源码仓库</a>
+  </nav>
+</header>
+<main>
+<h1 id="第-4-章-渲染性能优化让每一帧都丝滑">第 4 章 · 渲染性能优化：让每一帧都丝滑</h1>
+<blockquote>
+<p>🎬 本章配套漫画：<a href="../comics/EP.04.svg">EP.04《装修队的血泪史》</a> ｜ <a href="../comics/EP.04.html">漫画讲解稿</a></p>
+<p>学习目标：理解渲染管线与重排/重绘成本，能定位并修复布局抖动、长任务、滚动卡顿三类高频渲染问题。
+前置知识：<a href="./02-core-web-vitals.html">第 2 章</a> INP 指标、<a href="./03-loading.html">第 3 章</a> 关键渲染路径。</p>
+</blockquote>
+<h2 id="0-本章学习地图">0. 本章学习地图</h2>
+<ol>
+<li><a href="#1-%E6%B8%B2%E6%9F%93%E7%AE%A1%E7%BA%BF%E5%9B%9B%E9%81%93%E5%B7%A5%E5%BA%8F">渲染管线四道工序</a></li>
+<li><a href="#2-%E9%87%8D%E6%8E%92%E9%87%8D%E7%BB%98%E4%B8%8E%E5%90%88%E6%88%90%E7%9A%84%E6%88%90%E6%9C%AC%E9%98%B6%E6%A2%AF">重排、重绘与合成的成本阶梯</a></li>
+<li><a href="#3-%E5%BC%BA%E5%88%B6%E5%90%8C%E6%AD%A5%E5%B8%83%E5%B1%80%E4%B8%8E%E5%B8%83%E5%B1%80%E6%8A%96%E5%8A%A8">强制同步布局与布局抖动</a></li>
+<li><a href="#4-%E5%90%88%E6%88%90%E5%B1%82%E4%B8%8E-will-change">合成层与 will-change</a></li>
+<li><a href="#5-%E4%B8%BB%E7%BA%BF%E7%A8%8B%E4%B8%8E%E9%95%BF%E4%BB%BB%E5%8A%A1">主线程与长任务</a></li>
+<li><a href="#6-%E9%98%B2%E6%8A%96%E8%8A%82%E6%B5%81%E4%B8%8E-raf-%E8%8A%82%E6%B5%81">防抖、节流与 rAF 节流</a></li>
+<li><a href="#7-%E8%99%9A%E6%8B%9F%E5%88%97%E8%A1%A8%E4%B8%8E-content-visibility">虚拟列表与 content-visibility</a></li>
+<li><a href="#8-%E6%A1%86%E6%9E%B6%E8%90%BD%E5%9C%B0v-memo-%E4%B8%8E-reactmemo">框架落地：v-memo 与 React.memo</a></li>
+<li><a href="#9-%E6%9C%80%E4%BD%B3%E5%AE%9E%E8%B7%B5%E6%B8%85%E5%8D%95">最佳实践清单</a></li>
+</ol>
+<h2 id="1-渲染管线四道工序">1. 渲染管线四道工序</h2>
+<p>浏览器把 DOM 变成屏幕像素，要过四道工序：</p>
+<pre><code class="language-text">Style（计算样式） → Layout（重排：算几何位置） → Paint（重绘：填像素） → Composite（合成：图层叠加出帧）
+</code></pre>
+<ul>
+<li><strong>Style</strong>：把 CSS 规则匹配到每个元素，算出最终样式；</li>
+<li><strong>Layout</strong>：计算每个元素的几何信息（位置、大小）；</li>
+<li><strong>Paint</strong>：把元素的绘制指令填充成位图；</li>
+<li><strong>Composite</strong>：把各图层合并成最终画面（由 GPU 承担，最快）。</li>
+</ul>
+<p><strong>改样式不一定走完全部工序</strong>——改的属性决定从哪一步开始重跑，这就是下一节的成本阶梯。</p>
+<h2 id="2-重排重绘与合成的成本阶梯">2. 重排、重绘与合成的成本阶梯</h2>
+<table>
+<thead>
+<tr>
+<th>层级</th>
+<th>触发属性示例</th>
+<th>成本</th>
+<th>原因</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>重排（Layout）</strong></td>
+<td><code>width</code> <code>height</code> <code>top</code> <code>left</code> <code>margin</code> <code>font-size</code></td>
+<td>最贵</td>
+<td>几何变了，后续全部工序重跑，且会传染子孙元素</td>
+</tr>
+<tr>
+<td><strong>重绘（Paint）</strong></td>
+<td><code>color</code> <code>background</code> <code>border-color</code> <code>visibility</code></td>
+<td>中等</td>
+<td>只重跑 Paint 及之后</td>
+</tr>
+<tr>
+<td><strong>合成（Composite）</strong></td>
+<td><code>transform</code> <code>opacity</code> <code>filter</code></td>
+<td>最便宜</td>
+<td>只重跑 Composite，可由 GPU 完成</td>
+</tr>
+</tbody></table>
+<p><strong>核心优化思想：把动画从重排层级搬到合成层级。</strong></p>
+<pre><code class="language-css">/* 文件: styles.css —— 同样的视觉位移，成本差一个数量级 */
+
+/* ❌ 反例：动画 top/left，每帧都触发 Layout + Paint */
+.box-bad { transition: top 0.3s; position: absolute; top: 0; }
+.box-bad.active { top: 200px; }
+
+/* ✅ 正解：动画 transform，每帧只走 Composite（GPU 合成） */
+.box-good { transition: transform 0.3s; }
+.box-good.active { transform: translateY(200px); }
+</code></pre>
+<blockquote>
+<p>运行方式：DevTools Performance 面板录制两种动画，对比紫色（Layout）与绿色（Composite）条的存在与否。</p>
+</blockquote>
+<p>完整属性分级表可查 CSS Triggers（csstriggers.com）；拿不准时优先用 <code>transform: translate/scale/rotate</code> 表达位移缩放旋转。</p>
+<h2 id="3-强制同步布局与布局抖动">3. 强制同步布局与布局抖动</h2>
+<p><strong>强制同步布局（Forced Synchronous Layout）</strong>：JS 在同一帧里「读布局属性 → 写样式 → 再读 → 再写」交替进行，每次写都会让刚读的布局失效，浏览器被迫反复重排。</p>
+<pre><code class="language-js">// 文件: 示例片段 —— 布局抖动 ❌ 与批量读写 ✅
+
+// ❌ 反例：读写交替，N 个元素触发 N 次重排
+items.forEach((el) =&gt; {
+  const top = el.offsetTop;       // 读（强制浏览器重排，让刚写的样式生效）
+  el.style.transform = `translateY(${top + 10}px)`; // 写（布局失效）
+});
+
+// ✅ 正解：先批量读完，再批量写，全程只重排 1 次
+const tops = items.map((el) =&gt; el.offsetTop);      // 全部读
+items.forEach((el, i) =&gt; {
+  el.style.transform = `translateY(${tops[i] + 10}px)`; // 全部写
+});
+</code></pre>
+<blockquote>
+<p>运行方式：两种写法分别录制 Performance（完整对比 demo 见 <a href="../examples/03-layout-thrashing.html">examples/03-layout-thrashing.html</a>），观察紫色 Layout 条从连续锯齿变为一根。</p>
+</blockquote>
+<p>常见「隐形读」API 都要警惕：<code>offsetTop/offsetWidth</code>、<code>getBoundingClientRect()</code>、<code>getComputedStyle()</code>、<code>clientHeight</code> 等。</p>
+<h2 id="4-合成层与-will-change">4. 合成层与 will-change</h2>
+<p>把频繁变化的元素提升为独立<strong>合成层</strong>，它重绘时不牵连整页，由 GPU 独立合成——这就是动画提速的原理。</p>
+<pre><code class="language-css">/* 文件: styles.css —— 合成层的正确打开方式 */
+.modal {
+  /* 浏览器提前为将要变化的属性做准备（创建独立图层） */
+  will-change: transform;
+  transition: transform 0.25s;
+}
+</code></pre>
+<p>三条使用纪律：</p>
+<ol>
+<li><strong>加在确实频繁变化的元素上</strong>，随动画结束移除；每个图层都要占显存；</li>
+<li><strong>层爆炸（Layer Explosion）</strong>：给几百个元素都 <code>will-change: transform</code>，显存直接爆掉，反而更卡。用 DevTools Layers 面板检查图层数量与内存；</li>
+<li>静态元素不要加 <code>will-change</code>——它没有「预优化」作用，只有成本。</li>
+</ol>
+<blockquote>
+<p>💡 经验法则：<strong>先测量（Layers/Performance 面板确认瓶颈在 Paint），再提层</strong>，而不是「感觉卡就加 will-change」。</p>
+</blockquote>
+<h2 id="5-主线程与长任务">5. 主线程与长任务</h2>
+<p>主线程一次执行超过 <strong>50ms</strong> 的任务就是<strong>长任务（Long Task）</strong>——期间无法响应任何输入，直接推高 INP。</p>
+<p>检测与拆解：</p>
+<pre><code class="language-js">// 文件: 示例片段 —— 用 PerformanceObserver 监控长任务（生产可上报）
+new PerformanceObserver((list) =&gt; {
+  for (const entry of list.getEntries()) {
+    console.warn(&#39;长任务:&#39;, Math.round(entry.duration), &#39;ms&#39;);
+    // 上报到监控系统：duration、startTime、attribution
+  }
+}).observe({ type: &#39;longtask&#39;, buffered: true });
+</code></pre>
+<p><strong>任务切片</strong>：把大计算拆成小步，每步之间让出主线程（完整说明见第 5 章第 2 节）：</p>
+<pre><code class="language-js">// 文件: 示例片段 —— 切片处理 1 万条数据，每步后主线程可响应用户输入
+async function processAll(items) {
+  const CHUNK = 200; // 每批 200 条，单批控制在 50ms 内
+  for (let i = 0; i &lt; items.length; i += CHUNK) {
+    items.slice(i, i + CHUNK).forEach(process);
+    await new Promise((r) =&gt; setTimeout(r)); // 让出主线程（Chrome 129+ 可用 scheduler.yield()）
+  }
+}
+</code></pre>
+<blockquote>
+<p>运行方式：浏览器运行，Performance 面板可见原本 3s 的整块长任务变为多个小任务块。</p>
+</blockquote>
+<h2 id="6-防抖节流与-raf-节流">6. 防抖、节流与 rAF 节流</h2>
+<p>高频事件（scroll/resize/input/mousemove）必须限频，三种策略：</p>
+<table>
+<thead>
+<tr>
+<th>策略</th>
+<th>行为</th>
+<th>适用</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>防抖 debounce</td>
+<td>停止触发后延迟 N ms 执行一次</td>
+<td>搜索输入、resize 重算</td>
+</tr>
+<tr>
+<td>节流 throttle</td>
+<td>每 N ms 最多执行一次</td>
+<td>滚动加载、按钮防重复点击</td>
+</tr>
+<tr>
+<td>rAF 节流</td>
+<td>每帧最多执行一次，与渲染对齐</td>
+<td>滚动驱动的视觉更新（最推荐）</td>
+</tr>
+</tbody></table>
+<pre><code class="language-js">// 文件: src/utils/raf-throttle.js —— rAF 节流：视觉更新与帧对齐，不产生中间废帧
+export function rafThrottle(fn) {
+  let ticking = false;
+  return function (...args) {
+    if (ticking) return;
+    ticking = true;
+    requestAnimationFrame(() =&gt; {
+      fn.apply(this, args);
+      ticking = false;
+    });
+  };
+}
+
+// 用法：滚动视差/吸顶计算等「必须每帧同步视觉」的场景
+window.addEventListener(&#39;scroll&#39;, rafThrottle(() =&gt; {
+  header.style.transform = `translateY(${Math.min(window.scrollY, 64)}px)`;
+}), { passive: true }); // passive: 告诉浏览器不会 preventDefault，滚动不被 JS 阻塞
+</code></pre>
+<blockquote>
+<p>运行方式：任意页面引入并滚动，Performance 面板确认回调频率与帧率一致。</p>
+</blockquote>
+<h2 id="7-虚拟列表与-content-visibility">7. 虚拟列表与 content-visibility</h2>
+<p><strong>虚拟列表</strong>：1 万条数据只渲染可视区的 20 条，DOM 规模恒定。原理：滚动容器 + 顶部占位（撑起总高度）+ 绝对定位渲染可视窗口（按 <code>滚动距离 / 行高</code> 计算起止下标）。</p>
+<pre><code class="language-js">// 文件: 示例片段 —— 虚拟列表核心计算（生产建议用成熟库）
+function getVisibleRange(scrollTop, viewportH, rowH, total) {
+  const start = Math.max(0, Math.floor(scrollTop / rowH) - 5);      // 上下各多渲染 5 行缓冲
+  const end = Math.min(total, Math.ceil((scrollTop + viewportH) / rowH) + 5);
+  return { start, end, offsetY: start * rowH };
+}
+</code></pre>
+<blockquote>
+<p>运行方式：Vue 用 <code>vue-virtual-scroller</code>、React 用 <code>react-window</code>（API 更完整，处理动态行高/树形等）。</p>
+</blockquote>
+<p><strong>content-visibility</strong>：CSS 层面的「浏览器原生懒渲染」，长页面中视口外的区块跳过渲染，几乎零 JS 成本：</p>
+<pre><code class="language-css">/* 文件: styles.css —— 长列表/长文章区块的浏览器级懒渲染 */
+.section {
+  content-visibility: auto;
+  contain-intrinsic-size: auto 500px; /* 占位高度估算值，防止滚动条跳动（防 CLS） */
+}
+</code></pre>
+<blockquote>
+<p>运行方式：Chrome 打开长页面录制 Performance，对比启用前后 Layout/Paint 耗时。</p>
+</blockquote>
+<h2 id="8-框架落地v-memo-与-reactmemo">8. 框架落地：v-memo 与 React.memo</h2>
+<p>框架的渲染优化本质都是<strong>跳过没有变化的更新</strong>：</p>
+<p><strong>Vue 3</strong>：<code>v-memo</code> 给模板加缓存——依赖数组不变时跳过整段 VNode 渲染：</p>
+<pre><code class="language-vue">&lt;!-- 文件: src/components/List.vue 片段 —— 大列表行组件：仅当 item 变化或选中项变化时重渲染 --&gt;
+&lt;template&gt;
+  &lt;div v-for=&quot;item in list&quot; :key=&quot;item.id&quot; v-memo=&quot;[item.id === selectedId]&quot;&gt;
+    &lt;span&gt;{{ item.name }}&lt;/span&gt;
+    &lt;span&gt;{{ item.detail }}&lt;/span&gt;
+  &lt;/div&gt;
+&lt;/template&gt;
+</code></pre>
+<p><strong>React</strong>：<code>React.memo</code> 包组件 + 稳定的 props 引用（<code>useMemo</code>/<code>useCallback</code>）：</p>
+<pre><code class="language-jsx">// 文件: src/components/Row.jsx —— props 不变则跳过重渲染
+const Row = React.memo(function Row({ item, onSelect }) {
+  return &lt;li onClick={() =&gt; onSelect(item.id)}&gt;{item.name}&lt;/li&gt;;
+}, (prev, next) =&gt; prev.item === next.item); // 可选：自定义浅比较
+
+function List({ items }) {
+  const onSelect = useCallback((id) =&gt; select(id), []); // 稳定引用，否则 memo 失效
+  return &lt;ul&gt;{items.map((it) =&gt; &lt;Row key={it.id} item={it} onSelect={onSelect} /&gt;)}&lt;/ul&gt;;
+}
+</code></pre>
+<blockquote>
+<p>⚠️ 共同的坑：<strong>先确认「确实有无效重渲染」再上缓存</strong>。用 Vue DevTools 的渲染高亮、React DevTools Profiler 定位到具体组件，而不是全站乱包 memo（比较本身也有成本）。系统性方法论见第 6/7 章。</p>
+</blockquote>
+<h2 id="9-最佳实践清单">9. 最佳实践清单</h2>
+<ul>
+<li><input disabled="" type="checkbox"> 动画只用 <code>transform</code>/<code>opacity</code>，禁止动画 <code>top/left/width/height</code></li>
+<li><input disabled="" type="checkbox"> 批量读写分离，消灭循环内的强制同步布局</li>
+<li><input disabled="" type="checkbox"> <code>will-change</code> 只加在实测有瓶颈的频繁变化元素上，用完移除</li>
+<li><input disabled="" type="checkbox"> 大计算切片（<code>scheduler.yield()</code>/<code>setTimeout</code>），单块任务 ≤ 50ms</li>
+<li><input disabled="" type="checkbox"> 高频事件：视觉更新用 rAF 节流 + <code>passive: true</code>，逻辑触发用防抖/节流</li>
+<li><input disabled="" type="checkbox"> 万级数据列表上虚拟滚动；长页面静态区块用 <code>content-visibility: auto</code></li>
+<li><input disabled="" type="checkbox"> 框架层先测量再缓存：Vue <code>v-memo</code>/React <code>memo</code> 只用于确认的无效渲染热点</li>
+</ul>
+<hr>
+<h2 id="配套漫画ep04">🎬 配套漫画（EP.04）</h2>
+<blockquote>
+<p><strong>EP.04《装修队的血泪史》</strong> —— 装修队量一次改一次天天返工（布局抖动），学会先量完再统一改（批量读写）、换窗帘不搬家（transform/opacity）、单独房间（合成层）。</p>
+<table>
+<thead>
+<tr>
+<th>漫画格</th>
+<th>剧情梗概</th>
+<th>对应本章小节</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>第 1 格</td>
+<td>量一次改一次，一天只干半面墙</td>
+<td><a href="#3-%E5%BC%BA%E5%88%B6%E5%90%8C%E6%AD%A5%E5%B8%83%E5%B1%80%E4%B8%8E%E5%B8%83%E5%B1%80%E6%8A%96%E5%8A%A8">3. 强制同步布局与布局抖动</a></td>
+</tr>
+<tr>
+<td>第 2 格</td>
+<td>先量完再统一改 = 批量读写分离</td>
+<td><a href="#2-%E9%87%8D%E6%8E%92%E9%87%8D%E7%BB%98%E4%B8%8E%E5%90%88%E6%88%90%E7%9A%84%E6%88%90%E6%9C%AC%E9%98%B6%E6%A2%AF">2. 重排、重绘与合成的成本阶梯</a></td>
+</tr>
+<tr>
+<td>第 3 格</td>
+<td>换窗帘不搬家、单独房间、电工跑断腿</td>
+<td><a href="#4-%E5%90%88%E6%88%90%E5%B1%82%E4%B8%8E-will-change">4. 合成层与 will-change</a></td>
+</tr>
+<tr>
+<td>第 4 格</td>
+<td>坑点：滥用 will-change + 稳叔总结</td>
+<td><a href="#8-%E6%A1%86%E6%9E%B6%E8%90%BD%E5%9C%B0v-memo-%E4%B8%8E-reactmemo">8. 框架落地：v-memo 与 React.memo</a></td>
+</tr>
+</tbody></table>
+<p>🎬 <a href="../comics/EP.04.svg">打开漫画 EP.04</a> ｜ 📖 <a href="../comics/EP.04.html">漫画讲解稿 EP.04.md</a></p>
+</blockquote>
+
+</main>
+<footer>
+  双形态联动学习体系 ｜ 标准文档 + 漫画剧场 ｜
+  源码仓库 <a href="https://github.com/YZhiJie/frontend-perf-guide">GitHub</a> ｜
+  在线站点 <a href="https://yzhijie.github.io/frontend-perf-guide-pages/">https://yzhijie.github.io/frontend-perf-guide-pages/</a>
+</footer>
+</body>
+</html>

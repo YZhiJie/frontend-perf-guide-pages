@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>EP.05 · 《仓库整理惊魂》 · 前端性能优化完全学习指南</title>
+<style>
+:root{--fg:#1f2328;--muted:#57606a;--line:#d0d7de;--accent:#f97316;--link:#0969da;--code-bg:#f6f8fa}
+*{box-sizing:border-box}
+body{margin:0;font-family:-apple-system,BlinkMacSystemFont,'PingFang SC','Microsoft YaHei',sans-serif;color:var(--fg);background:#fff;line-height:1.75}
+header.top{position:sticky;top:0;background:#0f172a;color:#e2e8f0;padding:12px 20px;display:flex;align-items:center;gap:16px;flex-wrap:wrap;z-index:10}
+header.top .brand{font-weight:700;color:#fff}
+header.top .brand em{color:var(--accent);font-style:normal}
+header.top nav{margin-left:auto;display:flex;gap:16px;flex-wrap:wrap}
+header.top nav a{color:#cbd5e1;text-decoration:none;font-size:14px}
+header.top nav a:hover{color:var(--accent)}
+header.top nav a.active{color:#fff;border-bottom:2px solid var(--accent);padding-bottom:2px}
+main{max-width:880px;margin:0 auto;padding:28px 20px 64px}
+main h1{font-size:28px;border-bottom:1px solid var(--line);padding-bottom:.3em}
+main h2{font-size:22px;border-bottom:1px solid var(--line);padding-bottom:.3em;margin-top:2em}
+main h3{font-size:18px;margin-top:1.6em}
+main img{max-width:100%}
+a{color:var(--link)}
+code{background:var(--code-bg);padding:.15em .35em;border-radius:4px;font-size:.9em;font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}
+pre{background:#0f172a;color:#e2e8f0;padding:14px 16px;border-radius:8px;overflow:auto}
+pre code{background:none;color:inherit;padding:0;font-size:13px}
+table{border-collapse:collapse;width:100%;margin:1em 0;display:block;overflow:auto}
+th,td{border:1px solid var(--line);padding:6px 12px;text-align:left}
+th{background:var(--code-bg)}
+blockquote{border-left:4px solid var(--accent);margin:1em 0;padding:.3em 1em;color:var(--muted);background:#fff7ed}
+hr{border:none;border-top:1px solid var(--line);margin:2em 0}
+footer{border-top:1px solid var(--line);color:var(--muted);font-size:13px;text-align:center;padding:20px 16px}
+footer a{color:var(--link);text-decoration:none}
+</style>
+</head>
+<body>
+<header class="top">
+  <span class="brand"><em>前端性能</em>完全指南</span>
+  <nav>
+    <a href="../index.html">首页</a>
+    <a href="../docs/README.html">标准文档</a>
+    <a href="../comics/index.html" class="active">漫画剧场</a>
+    <a href="https://github.com/YZhiJie/frontend-perf-guide">源码仓库</a>
+  </nav>
+</header>
+<main>
+<h1 id="ep05-仓库整理惊魂">EP.05 · 《仓库整理惊魂》</h1>
+<blockquote>
+<p>🎬 漫画：<a href="./EP.05.svg">EP.05.svg</a> ｜ 📄 对应文档：<a href="../docs/05-runtime.html">第 5 章 · 运行时性能：主线程、内存与泄漏</a></p>
+<p>本话主旨：主线程要会休息（切片/Worker），内存要舍得扔（清理泄漏）。</p>
+</blockquote>
+<h2 id="本话剧情">本话剧情</h2>
+<p>小奔的仓库陷入瘫痪：一个工人被超大件货物卡死，全部订单排队（长任务阻塞主线程）；稳叔盘点库存发现满墙「已作废订单」还挂着（游离 DOM、忘记清理的定时器）。治理方案：大活拆小份穿插着干（任务切片）、不要的东西及时贴丢弃标签清走（卸载时清理），实在搬不动的重活雇外包（Web Worker）。</p>
+<h2 id="知识点节点">知识点节点</h2>
+<h3 id="节点-1-长任务工人被大件卡住漫画第-1-格">节点 1 · 长任务：工人被大件卡住（漫画第 1 格）</h3>
+<ul>
+<li><strong>生活映射</strong>：工人搬一件 3 秒的大件期间，所有订单只能排队 = 主线程执行超 50ms 的任务期间无法响应任何输入。</li>
+<li><strong>技术对应</strong>：事件循环里渲染发生在任务之间；超 50ms 即长任务，直接推高 INP。</li>
+<li><strong>深入阅读</strong>：📖 <a href="../docs/05-runtime.html#1-%E4%BA%8B%E4%BB%B6%E5%BE%AA%E7%8E%AF%E6%B5%8F%E8%A7%88%E5%99%A8%E7%9A%84%E6%97%B6%E9%97%B4%E5%88%87%E7%89%87%E6%B3%95%E5%88%99">1. 事件循环：浏览器的时间切片法则</a>、<a href="../docs/05-runtime.html#2-%E9%95%BF%E4%BB%BB%E5%8A%A1%E5%88%87%E5%88%86%E4%B8%8E%E8%B0%83%E5%BA%A6">2. 长任务切分与调度</a></li>
+</ul>
+<h3 id="节点-2-内存泄漏作废订单挂满墙漫画第-2-格">节点 2 · 内存泄漏：作废订单挂满墙（漫画第 2 格）</h3>
+<ul>
+<li><strong>生活映射</strong>：已作废的订单还挂在墙上占地方 = 已从页面删除的 DOM、已失效的定时器还被引用着，GC 永远不敢回收。</li>
+<li><strong>技术对应</strong>：四大泄漏模式——意外全局、忘清定时器、游离 DOM、闭包持有大数据；堆快照对比是排查利器。</li>
+<li><strong>深入阅读</strong>：📖 <a href="../docs/05-runtime.html#4-%E5%9B%9B%E5%A4%A7%E5%86%85%E5%AD%98%E6%B3%84%E6%BC%8F%E6%A8%A1%E5%BC%8F">4. 四大内存泄漏模式</a></li>
+</ul>
+<h3 id="节点-3-雇外包web-worker漫画第-3-格">节点 3 · 雇外包：Web Worker（漫画第 3 格）</h3>
+<ul>
+<li><strong>生活映射</strong>：搬不动的重活交给外包团队 = 与 DOM 无关的稳定重计算搬进 Worker 线程，主线程零阻塞。</li>
+<li><strong>技术对应</strong>：Worker 不能操作 DOM；大数据用 Transferable 零拷贝传递；用完 terminate。</li>
+<li><strong>深入阅读</strong>：📖 <a href="../docs/05-runtime.html#5-web-worker%E6%8A%8A%E9%87%8D%E6%B4%BB%E6%90%AC%E5%87%BA%E4%B8%BB%E7%BA%BF%E7%A8%8B">5. Web Worker：把重活搬出主线程</a></li>
+</ul>
+<h3 id="节点-4-最大坑点闭包拽住整间仓库漫画第-4-格">节点 4 · 最大坑点：闭包拽住整间仓库（漫画第 4 格）</h3>
+<ul>
+<li><strong>误区</strong>：闭包随手一包，只想用 <code>length</code> 却拽住了整个 10 万条数组——一个变量放不下一间仓库。</li>
+<li><strong>正解</strong>：只捕获需要的值；框架组件里每个副作用都有销毁路径（Vue <code>onUnmounted</code> / React effect 清理函数）。</li>
+<li><strong>深入阅读</strong>：📖 <a href="../docs/05-runtime.html#3-v8-%E5%86%85%E5%AD%98%E7%AE%A1%E7%90%86%E4%B8%8E%E5%9E%83%E5%9C%BE%E5%9B%9E%E6%94%B6">3. V8 内存管理与垃圾回收</a>、<a href="../docs/05-runtime.html#7-%E6%A1%86%E6%9E%B6%E8%90%BD%E5%9C%B0%E7%BB%84%E4%BB%B6%E5%8D%B8%E8%BD%BD%E6%97%B6%E7%9A%84%E8%B5%84%E6%BA%90%E6%B8%85%E7%90%86">7. 框架落地：组件卸载时的资源清理</a></li>
+</ul>
+<h2 id="常见认知误区">常见认知误区</h2>
+<table>
+<thead>
+<tr>
+<th>误区</th>
+<th>真相</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>JS 有 GC 就不会内存泄漏</td>
+<td>GC 只回收不可达对象；只要还有引用挂着就永远回收不掉</td>
+</tr>
+<tr>
+<td>切片越细越好</td>
+<td>切片本身有调度开销，按 50ms 红线控制粒度即可</td>
+</tr>
+<tr>
+<td>setTimeout(fn, 0) 就是异步了</td>
+<td>它仍占主线程执行时间；重计算要切片或上 Worker，不能只靠延迟</td>
+</tr>
+</tbody></table>
+<h2 id="一句话带走">一句话带走</h2>
+<p><strong>主线程要会休息（切片 + Worker），内存要舍得扔（及时清理引用）——卡顿与泄漏都是「不肯放手」造成的。</strong></p>
+<hr>
+<blockquote>
+<p>📚 下一话预告：<a href="./EP.06.html">EP.06《Vue 后厨的智慧》</a>——Vue 框架专项优化 ｜ 跳转：<a href="../docs/06-vue.html">第 6 章 · Vue 专项优化方案</a></p>
+</blockquote>
+
+</main>
+<footer>
+  双形态联动学习体系 ｜ 标准文档 + 漫画剧场 ｜
+  源码仓库 <a href="https://github.com/YZhiJie/frontend-perf-guide">GitHub</a> ｜
+  在线站点 <a href="https://yzhijie.github.io/frontend-perf-guide-pages/">https://yzhijie.github.io/frontend-perf-guide-pages/</a>
+</footer>
+</body>
+</html>

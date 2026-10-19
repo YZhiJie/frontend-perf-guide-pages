@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>EP.02 · 《快递签收的三门课》 · 前端性能优化完全学习指南</title>
+<style>
+:root{--fg:#1f2328;--muted:#57606a;--line:#d0d7de;--accent:#f97316;--link:#0969da;--code-bg:#f6f8fa}
+*{box-sizing:border-box}
+body{margin:0;font-family:-apple-system,BlinkMacSystemFont,'PingFang SC','Microsoft YaHei',sans-serif;color:var(--fg);background:#fff;line-height:1.75}
+header.top{position:sticky;top:0;background:#0f172a;color:#e2e8f0;padding:12px 20px;display:flex;align-items:center;gap:16px;flex-wrap:wrap;z-index:10}
+header.top .brand{font-weight:700;color:#fff}
+header.top .brand em{color:var(--accent);font-style:normal}
+header.top nav{margin-left:auto;display:flex;gap:16px;flex-wrap:wrap}
+header.top nav a{color:#cbd5e1;text-decoration:none;font-size:14px}
+header.top nav a:hover{color:var(--accent)}
+header.top nav a.active{color:#fff;border-bottom:2px solid var(--accent);padding-bottom:2px}
+main{max-width:880px;margin:0 auto;padding:28px 20px 64px}
+main h1{font-size:28px;border-bottom:1px solid var(--line);padding-bottom:.3em}
+main h2{font-size:22px;border-bottom:1px solid var(--line);padding-bottom:.3em;margin-top:2em}
+main h3{font-size:18px;margin-top:1.6em}
+main img{max-width:100%}
+a{color:var(--link)}
+code{background:var(--code-bg);padding:.15em .35em;border-radius:4px;font-size:.9em;font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}
+pre{background:#0f172a;color:#e2e8f0;padding:14px 16px;border-radius:8px;overflow:auto}
+pre code{background:none;color:inherit;padding:0;font-size:13px}
+table{border-collapse:collapse;width:100%;margin:1em 0;display:block;overflow:auto}
+th,td{border:1px solid var(--line);padding:6px 12px;text-align:left}
+th{background:var(--code-bg)}
+blockquote{border-left:4px solid var(--accent);margin:1em 0;padding:.3em 1em;color:var(--muted);background:#fff7ed}
+hr{border:none;border-top:1px solid var(--line);margin:2em 0}
+footer{border-top:1px solid var(--line);color:var(--muted);font-size:13px;text-align:center;padding:20px 16px}
+footer a{color:var(--link);text-decoration:none}
+</style>
+</head>
+<body>
+<header class="top">
+  <span class="brand"><em>前端性能</em>完全指南</span>
+  <nav>
+    <a href="../index.html">首页</a>
+    <a href="../docs/README.html">标准文档</a>
+    <a href="../comics/index.html" class="active">漫画剧场</a>
+    <a href="https://github.com/YZhiJie/frontend-perf-guide">源码仓库</a>
+  </nav>
+</header>
+<main>
+<h1 id="ep02-快递签收的三门课">EP.02 · 《快递签收的三门课》</h1>
+<blockquote>
+<p>🎬 漫画：<a href="./EP.02.svg">EP.02.svg</a> ｜ 📄 对应文档：<a href="../docs/02-core-web-vitals.html">第 2 章 · Core Web Vitals 核心指标详解</a></p>
+<p>本话主旨：用快递站生活化理解三大核心指标——LCP、INP、CLS 的定义、阈值与优化方向。</p>
+</blockquote>
+<h2 id="本话剧情">本话剧情</h2>
+<p>稳叔把小奔带到快递站实习。第一课：用户记住的是<strong>最大的那件包裹什么时候到</strong>（LCP）；第二课：门铃响了多久有人开门（INP）；第三课：家具自己搬家会摔伤客人（CLS）。小奔刚想夸口「分数都刷到 100」，被稳叔提醒：实验室跑分不等于真实用户体验。</p>
+<h2 id="知识点节点">知识点节点</h2>
+<h3 id="节点-1-lcp最大的包裹何时到漫画第-1-格">节点 1 · LCP：最大的包裹何时到（漫画第 1 格）</h3>
+<ul>
+<li><strong>生活映射</strong>：用户不关心所有包裹（全部资源），只关心最大的那件（最大内容元素）什么时候出现在门口。</li>
+<li><strong>阈值</strong>：2.5 秒内为优（真实用户数据 p75 口径）。</li>
+<li><strong>优化抓手</strong>：CDN、图片格式、preload、渲染阻塞治理——对应「更快出字节、更早被发现、渲染不被堵」。</li>
+<li><strong>深入阅读</strong>：📖 <a href="../docs/02-core-web-vitals.html#4-lcp%E6%9C%80%E5%A4%A7%E5%86%85%E5%AE%B9%E5%85%83%E7%B4%A0%E4%BD%95%E6%97%B6%E5%87%BA%E7%8E%B0">4. LCP：最大内容元素何时出现</a></li>
+</ul>
+<h3 id="节点-2-inp门铃响了谁开门漫画第-2-格">节点 2 · INP：门铃响了谁开门（漫画第 2 格）</h3>
+<ul>
+<li><strong>生活映射</strong>：按门铃（点击）到门打开（画面反馈）的总时间——输入延迟 + 处理时间 + 呈现延迟。</li>
+<li><strong>阈值</strong>：200ms 内为优；最差的那次交互决定口碑。</li>
+<li><strong>优化抓手</strong>：拆长任务、事件回调减负、控制 DOM 规模。</li>
+<li><strong>深入阅读</strong>：📖 <a href="../docs/02-core-web-vitals.html#5-inp%E4%BA%A4%E4%BA%92%E5%93%8D%E5%BA%94%E7%9A%84%E7%81%B5%E9%AD%82%E6%8B%B7%E9%97%AE">5. INP：交互响应的灵魂拷问</a></li>
+</ul>
+<h3 id="节点-3-cls家具会自己搬家漫画第-3-格">节点 3 · CLS：家具会自己搬家（漫画第 3 格）</h3>
+<ul>
+<li><strong>生活映射</strong>：内容加载后页面元素突然下移，就像沙发自己挪位——客人（用户）坐空摔跤（点错按钮）。</li>
+<li><strong>阈值</strong>：CLS ≤ 0.1；得分 = 影响比例 × 距离比例。</li>
+<li><strong>优化抓手</strong>：媒体显式宽高、预留占位、字体策略、只用 transform/opacity 做动画。</li>
+<li><strong>深入阅读</strong>：📖 <a href="../docs/02-core-web-vitals.html#6-cls%E5%B8%83%E5%B1%80%E5%81%8F%E7%A7%BB%E7%9A%84%E5%85%83%E5%87%B6%E6%8E%92%E6%9F%A5">6. CLS：布局偏移的元凶排查</a></li>
+</ul>
+<h3 id="节点-4-最大坑点只看实验室跑分漫画第-4-格">节点 4 · 最大坑点：只看实验室跑分（漫画第 4 格）</h3>
+<ul>
+<li><strong>误区</strong>：Lighthouse 刷到 100 分就宣布优化完成——实验室环境太理想，真实用户的网络、设备、缓存千差万别。</li>
+<li><strong>正解</strong>：所有指标讨论默认指真实用户数据 p75；实验室工具用于定位问题，业务结论看 RUM。</li>
+<li><strong>深入阅读</strong>：📖 <a href="../docs/02-core-web-vitals.html#1-%E6%8C%87%E6%A0%87%E5%85%A8%E6%99%AF%E4%B8%8E%E8%AF%84%E5%88%86%E6%A0%87%E5%87%86">1. 指标全景与评分标准</a>、<a href="../docs/02-core-web-vitals.html#7-%E7%94%A8-web-vitals-%E5%BA%93%E9%87%87%E9%9B%86%E7%9C%9F%E5%AE%9E%E7%94%A8%E6%88%B7%E6%95%B0%E6%8D%AE">7. 用 web-vitals 库采集真实用户数据</a></li>
+</ul>
+<h2 id="常见认知误区">常见认知误区</h2>
+<table>
+<thead>
+<tr>
+<th>误区</th>
+<th>真相</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>LCP = 最后一个资源加载完</td>
+<td>是「最大内容元素」渲染完成，与元素大小有关，与加载顺序无关</td>
+</tr>
+<tr>
+<td>FID 还在被用作核心指标</td>
+<td>2024 年 3 月起 INP 已取代 FID，老监控要迁移</td>
+</tr>
+<tr>
+<td>布局偏移都是坏事</td>
+<td>用户输入后 500ms 内的偏移不计入（如手风琴展开）</td>
+</tr>
+</tbody></table>
+<h2 id="一句话带走">一句话带走</h2>
+<p><strong>大东西快出现（LCP≤2.5s）、点了有反应（INP≤200ms）、东西别乱跳（CLS≤0.1）——用真实用户 p75 数据说话。</strong></p>
+<hr>
+<blockquote>
+<p>📚 下一话预告：<a href="./EP.03.html">EP.03《餐厅备菜大作战》</a>——用餐厅厨房讲透加载优化 ｜ 跳转：<a href="../docs/03-loading.html">第 3 章 · 加载性能优化</a></p>
+</blockquote>
+
+</main>
+<footer>
+  双形态联动学习体系 ｜ 标准文档 + 漫画剧场 ｜
+  源码仓库 <a href="https://github.com/YZhiJie/frontend-perf-guide">GitHub</a> ｜
+  在线站点 <a href="https://yzhijie.github.io/frontend-perf-guide-pages/">https://yzhijie.github.io/frontend-perf-guide-pages/</a>
+</footer>
+</body>
+</html>

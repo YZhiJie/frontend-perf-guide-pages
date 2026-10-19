@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>第 9 章 · 生产环境落地实践 · 前端性能优化完全学习指南</title>
+<style>
+:root{--fg:#1f2328;--muted:#57606a;--line:#d0d7de;--accent:#f97316;--link:#0969da;--code-bg:#f6f8fa}
+*{box-sizing:border-box}
+body{margin:0;font-family:-apple-system,BlinkMacSystemFont,'PingFang SC','Microsoft YaHei',sans-serif;color:var(--fg);background:#fff;line-height:1.75}
+header.top{position:sticky;top:0;background:#0f172a;color:#e2e8f0;padding:12px 20px;display:flex;align-items:center;gap:16px;flex-wrap:wrap;z-index:10}
+header.top .brand{font-weight:700;color:#fff}
+header.top .brand em{color:var(--accent);font-style:normal}
+header.top nav{margin-left:auto;display:flex;gap:16px;flex-wrap:wrap}
+header.top nav a{color:#cbd5e1;text-decoration:none;font-size:14px}
+header.top nav a:hover{color:var(--accent)}
+header.top nav a.active{color:#fff;border-bottom:2px solid var(--accent);padding-bottom:2px}
+main{max-width:880px;margin:0 auto;padding:28px 20px 64px}
+main h1{font-size:28px;border-bottom:1px solid var(--line);padding-bottom:.3em}
+main h2{font-size:22px;border-bottom:1px solid var(--line);padding-bottom:.3em;margin-top:2em}
+main h3{font-size:18px;margin-top:1.6em}
+main img{max-width:100%}
+a{color:var(--link)}
+code{background:var(--code-bg);padding:.15em .35em;border-radius:4px;font-size:.9em;font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}
+pre{background:#0f172a;color:#e2e8f0;padding:14px 16px;border-radius:8px;overflow:auto}
+pre code{background:none;color:inherit;padding:0;font-size:13px}
+table{border-collapse:collapse;width:100%;margin:1em 0;display:block;overflow:auto}
+th,td{border:1px solid var(--line);padding:6px 12px;text-align:left}
+th{background:var(--code-bg)}
+blockquote{border-left:4px solid var(--accent);margin:1em 0;padding:.3em 1em;color:var(--muted);background:#fff7ed}
+hr{border:none;border-top:1px solid var(--line);margin:2em 0}
+footer{border-top:1px solid var(--line);color:var(--muted);font-size:13px;text-align:center;padding:20px 16px}
+footer a{color:var(--link);text-decoration:none}
+</style>
+</head>
+<body>
+<header class="top">
+  <span class="brand"><em>前端性能</em>完全指南</span>
+  <nav>
+    <a href="../index.html">首页</a>
+    <a href="../docs/README.html" class="active">标准文档</a>
+    <a href="../comics/index.html">漫画剧场</a>
+    <a href="https://github.com/YZhiJie/frontend-perf-guide">源码仓库</a>
+  </nav>
+</header>
+<main>
+<h1 id="第-9-章-生产环境落地实践">第 9 章 · 生产环境落地实践</h1>
+<blockquote>
+<p>🎬 本章配套漫画：<a href="../comics/EP.09.svg">EP.09《工厂质检上线记》</a> ｜ <a href="../comics/EP.09.html">漫画讲解稿</a></p>
+<p>学习目标：掌握从「立项 → 基线 → 优化 → 门禁 → 监控」的生产环境完整落地流程，让性能优化从一次性运动变成可持续机制。
+前置知识：第 1~8 章全链路知识；本章把它们组装成工程流程。</p>
+</blockquote>
+<h2 id="0-本章学习地图">0. 本章学习地图</h2>
+<ol>
+<li><a href="#1-%E6%80%A7%E8%83%BD%E9%A2%84%E7%AE%97%E7%9A%84%E5%88%B6%E5%AE%9A%E4%B8%8E%E5%BC%BA%E5%88%B6%E6%89%A7%E8%A1%8C">性能预算的制定与强制执行</a></li>
+<li><a href="#2-%E7%AC%AC%E4%B8%80%E6%AD%A5%E5%BB%BA%E7%AB%8B%E6%80%A7%E8%83%BD%E5%9F%BA%E7%BA%BF">第一步：建立性能基线</a></li>
+<li><a href="#3-%E7%AC%AC%E4%BA%8C%E6%AD%A5%E4%B8%80%E8%BD%AE%E5%AE%8C%E6%95%B4%E4%BC%98%E5%8C%96%E7%9A%84%E6%A0%87%E5%87%86%E6%B5%81%E7%A8%8B">第二步：一轮完整优化的标准流程</a></li>
+<li><a href="#4-%E7%AC%AC%E4%B8%89%E6%AD%A5ci-%E9%97%A8%E7%A6%81%E4%B8%8E%E5%9B%9E%E5%BD%92%E9%98%B2%E6%8A%A4">第三步：CI 门禁与回归防护</a></li>
+<li><a href="#5-%E7%AC%AC%E5%9B%9B%E6%AD%A5rum-%E7%9B%91%E6%8E%A7%E4%B8%8A%E7%BA%BF%E4%B8%8E%E5%91%8A%E8%AD%A6">第四步：RUM 监控上线与告警</a></li>
+<li><a href="#6-%E4%BC%98%E5%8C%96%E5%AE%9E%E5%BD%95%E4%B8%80%E4%B8%AA%E5%AE%8C%E6%95%B4%E6%A1%88%E4%BE%8B%E7%9A%84%E5%89%8D%E5%90%8E%E5%AF%B9%E6%AF%94">优化实录：一个完整案例的前后对比</a></li>
+<li><a href="#7-%E5%9B%A2%E9%98%9F%E5%8D%8F%E4%BD%9C%E8%AE%A9%E6%80%A7%E8%83%BD%E6%88%90%E4%B8%BA%E6%97%A5%E5%B8%B8">团队协作：让性能成为日常</a></li>
+<li><a href="#8-%E8%90%BD%E5%9C%B0%E6%A3%80%E6%9F%A5%E6%B8%85%E5%8D%95">落地检查清单</a></li>
+</ol>
+<h2 id="1-性能预算的制定与强制执行">1. 性能预算的制定与强制执行</h2>
+<p>预算是落地流程的「宪法」——先立预算，再做优化，否则优化成果守不住。第 1 章第 5 节给出了模板，这里补上<strong>强制执行</strong>的工具链：</p>
+<pre><code class="language-json">// 文件: package.json 片段 —— size-limit：产物体积预算，超标即 CI 失败
+{
+  &quot;scripts&quot;: {
+    &quot;size&quot;: &quot;size-limit&quot;
+  },
+  &quot;size-limit&quot;: [
+    { &quot;name&quot;: &quot;首屏 JS&quot;, &quot;path&quot;: &quot;dist/assets/index-*.js&quot;, &quot;limit&quot;: &quot;170 KB&quot; },
+    { &quot;name&quot;: &quot;首屏 CSS&quot;, &quot;path&quot;: &quot;dist/assets/index-*.css&quot;, &quot;limit&quot;: &quot;40 KB&quot; },
+    { &quot;name&quot;: &quot;全站 JS&quot;, &quot;path&quot;: &quot;dist/assets/*.js&quot;, &quot;limit&quot;: &quot;500 KB&quot;, &quot;gzip&quot;: false }
+  ]
+}
+</code></pre>
+<blockquote>
+<p>运行方式：<code>npm i -D size-limit</code> 后执行 <code>npm run size</code>；<code>gzip: false</code> 时按 Brotli/原始体积口径统计，注意与预算口径一致。</p>
+</blockquote>
+<p>预算落地的三个层次（由弱到强）：<strong>文档约定 → 本地脚本 → CI 拦截</strong>。只有第三层真正有效。</p>
+<h2 id="2-第一步建立性能基线">2. 第一步：建立性能基线</h2>
+<p>优化前必须拿到「现状快照」，否则后面全是感觉流。基线包含三份数据：</p>
+<pre><code class="language-bash"># 文件: scripts/baseline.sh —— 基线采集脚本（多页面 × 多次运行取中位）
+PAGES=(&quot;/&quot; &quot;/list&quot; &quot;/detail/1&quot; &quot;/login&quot;)
+for p in &quot;${PAGES[@]}&quot;; do
+  for i in 1 2 3; do
+    npx lighthouse &quot;https://example.com$p&quot; \
+      --preset=perf --output=json --output-path=&quot;./baseline/$(echo $p | tr &#39;/&#39; &#39;_&#39;)-$i.json&quot; \
+      --chrome-flags=&quot;--headless&quot;
+  done
+done
+# 再用 jq 汇总各页面的 LCP/TBT/CLS 中位数，填入基线表
+</code></pre>
+<p>基线表模板：</p>
+<table>
+<thead>
+<tr>
+<th>页面</th>
+<th>LCP p75</th>
+<th>INP p75</th>
+<th>CLS p75</th>
+<th>JS 体积</th>
+<th>Lighthouse 分</th>
+<th>采集日期</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>/</td>
+<td>3.8s</td>
+<td>340ms</td>
+<td>0.21</td>
+<td>420KB</td>
+<td>62</td>
+<td>2026-10-18</td>
+</tr>
+</tbody></table>
+<p>同时：DevTools 录一次典型用户操作的 Performance 存档、Network 导出 HAR——这些是后面每一步优化的对照组。</p>
+<h2 id="3-第二步一轮完整优化的标准流程">3. 第二步：一轮完整优化的标准流程</h2>
+<p>从指标倒推出工作清单，按「收益/成本比」排序执行：</p>
+<pre><code class="language-text">指标劣化 ─▶ 定位链路 ─▶ 对应优化手段（章节索引）
+─────────────────────────────────────────────
+LCP 慢  ─▶ 加载链路  ─▶ CDN/缓存(第3章7) → 图片(第3章4) → 关键CSS(第3章1) → 预热(第3章2/8)
+TBT/INP 高 ─▶ 主线程 ─▶ 切片(第5章2) → Worker(第5章5) → 框架重渲染(第6/7章)
+CLS 大  ─▶ 视觉稳定 ─▶ 尺寸占位(第2章6) → 字体策略(第3章5) → 动画属性(第4章2)
+包体积大 ─▶ 交付层  ─▶ 分割(第3章6/8) → 按需引入(第6章5) → 压缩(第3章3)
+</code></pre>
+<p><strong>单轮优化的六步循环</strong>（一轮只解决一类问题）：</p>
+<ol>
+<li>从基线表挑出最差的<strong>一个</strong>指标；</li>
+<li>用第 8 章工具定位到具体环节与资源；</li>
+<li>实施对应优化（按上表索引到具体章节手段）；</li>
+<li>同环境复测，与基线对比，记录该措施的收益；</li>
+<li>有效 → 固化为规范；无效 → 回滚，换下一候选；</li>
+<li>更新基线表，进入下一指标。</li>
+</ol>
+<h2 id="4-第三步ci-门禁与回归防护">4. 第三步：CI 门禁与回归防护</h2>
+<p>优化的敌人是「下个迭代悄悄劣化回去」。CI 门禁三件套（体积、分数、指标断言）：</p>
+<pre><code class="language-yaml"># 文件: .github/workflows/perf-gate.yml —— 性能门禁：体积预算 + Lighthouse CI
+name: perf-gate
+on: [pull_request]
+jobs:
+  gate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 22 }
+      - run: npm ci
+      - run: npm run build
+      - name: 体积预算检查
+        run: npx size-limit
+      - name: Lighthouse 断言
+        run: npx @lhci/cli autorun   # 断言配置见第 8 章第 3 节 lighthouserc.js
+</code></pre>
+<blockquote>
+<p>运行方式：PR 触发，任一门禁失败即拦截合并。阈值与第 1 章第 5 节的性能预算保持一致。</p>
+</blockquote>
+<p>两条实战经验：门禁阈值设为「当前值 + 5% 容差」起步（太严会被绕过或长期红着），随优化逐步收紧；门禁失败的信息要能指导修复（size-limit/lhci 的输出直接给出超标明细）。</p>
+<h2 id="5-第四步rum-监控上线与告警">5. 第四步：RUM 监控上线与告警</h2>
+<p>CI 门禁守实验室口径，RUM 守真实用户口径（采集代码见第 2 章第 7 节）。上线三步：</p>
+<ol>
+<li><strong>后端聚合</strong>：按 <code>metric.id</code>（会话）+ 路由 + 设备分片，各指标算 p75/p98，按天落表；</li>
+<li><strong>看板</strong>：三大指标趋势 + 分路由热力（哪条路由最差）+ 与发版时间线对齐；</li>
+<li><strong>告警</strong>：p75 环比劣化超 10% 连续两天 → 触发告警并自动关联当次发版 diff。</li>
+</ol>
+<p>发版后的标准动作：<strong>灰度对比</strong>——新版本对 10% 用户放量，对比新旧版本的 RUM 指标，确认优化真实生效后再全量。这一步是「实验室收益」与「业务收益」之间的验收关卡。</p>
+<h2 id="6-优化实录一个完整案例的前后对比">6. 优化实录：一个完整案例的前后对比</h2>
+<p>某电商首页（Vue 3，日均 PV 50 万）的一轮完整落地，供校准预期：</p>
+<table>
+<thead>
+<tr>
+<th>措施</th>
+<th>对应章节</th>
+<th>前后变化（该措施单项贡献）</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>LCP 主图换 AVIF + <code>fetchpriority=&quot;high&quot;</code> + preload</td>
+<td>第 3 章 4</td>
+<td>LCP 3.8s → 2.9s</td>
+</tr>
+<tr>
+<td>静态资源 Brotli + CDN 边缘缓存</td>
+<td>第 3 章 3/7</td>
+<td>TTFB 1.1s → 0.4s</td>
+</tr>
+<tr>
+<td>关键 CSS 内联 + 全量样式异步</td>
+<td>第 3 章 1</td>
+<td>FCP 2.6s → 1.9s</td>
+</tr>
+<tr>
+<td>路由/重组件分割，JS 420KB → 168KB</td>
+<td>第 3 章 6</td>
+<td>TBT 620ms → 240ms</td>
+</tr>
+<tr>
+<td>首页长列表虚拟滚动 + <code>v-memo</code></td>
+<td>第 6 章 2/3</td>
+<td>INP 340ms → 180ms</td>
+</tr>
+<tr>
+<td>媒体显式宽高 + 字体 <code>size-adjust</code></td>
+<td>第 2 章 6</td>
+<td>CLS 0.21 → 0.06</td>
+</tr>
+<tr>
+<td>CI 门禁 + RUM 看板</td>
+<td>本章 4/5</td>
+<td>（防回归，无直接指标）</td>
+</tr>
+</tbody></table>
+<p><strong>总计：LCP 3.8s→2.3s（-39%）、INP 340ms→180ms（-47%）、CLS 0.21→0.06（-71%）</strong>；上线后两周转化率提升约 6%。两点启示：单项措施都不惊艳，<strong>组合拳才出量级收益</strong>；RUM 验证是整个流程闭环的最后一环。</p>
+<h2 id="7-团队协作让性能成为日常">7. 团队协作：让性能成为日常</h2>
+<p>机制比热情可靠。四个可复制的制度：</p>
+<ol>
+<li><strong>PR 性能清单</strong>：改动涉及首屏/列表/大依赖时，必须附性能自测说明（截图或数据）；</li>
+<li><strong>性能轮值</strong>：每周一人盯 RUM 看板与告警，发现劣化当天定位、当天提 issue；</li>
+<li><strong>新页面准入</strong>：新页面上线前跑基线脚本，指标不达预算不准放量；</li>
+<li><strong>复盘沉淀</strong>：每次优化案例（措施、数据、坑）沉淀进团队文档，与本教程各章建立索引。</li>
+</ol>
+<h2 id="8-落地检查清单">8. 落地检查清单</h2>
+<p>按 0 → 1 顺序执行，全部完成即形成闭环体系：</p>
+<ul>
+<li><input disabled="" type="checkbox"> 与业务方对齐目标，签下性能预算（第 1 章第 5 节模板）</li>
+<li><input disabled="" type="checkbox"> 跑基线脚本，填基线表，DevTools/HAR 归档</li>
+<li><input disabled="" type="checkbox"> 按六步循环完成首轮优化（收益最大的指标先行）</li>
+<li><input disabled="" type="checkbox"> <code>size-limit</code> 体积预算进 package.json</li>
+<li><input disabled="" type="checkbox"> Lighthouse CI（lighthouserc.js）+ GitHub Actions 门禁拦截 PR</li>
+<li><input disabled="" type="checkbox"> web-vitals 采集上报上线，后端聚合 p75</li>
+<li><input disabled="" type="checkbox"> RUM 看板 + 环比告警搭建完成</li>
+<li><input disabled="" type="checkbox"> 发版流程加入灰度对比验收</li>
+<li><input disabled="" type="checkbox"> PR 性能清单、轮值制度、新页面准入三制度落地</li>
+</ul>
+<hr>
+<h2 id="配套漫画ep09">🎬 配套漫画（EP.09）</h2>
+<blockquote>
+<p><strong>EP.09《工厂质检上线记》</strong> —— 工厂里讲落地：先立「性能预算」合格线、CI 质检流水线自动过磅体检、产品装黑匣子数据回流报警（RUM）。</p>
+<table>
+<thead>
+<tr>
+<th>漫画格</th>
+<th>剧情梗概</th>
+<th>对应本章小节</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>第 1 格</td>
+<td>工厂门口立性能预算牌</td>
+<td><a href="#1-%E6%80%A7%E8%83%BD%E9%A2%84%E7%AE%97%E7%9A%84%E5%88%B6%E5%AE%9A%E4%B8%8E%E5%BC%BA%E5%88%B6%E6%89%A7%E8%A1%8C">1. 性能预算的制定与强制执行</a></td>
+</tr>
+<tr>
+<td>第 2 格</td>
+<td>质检流水线：过磅、体检、放行</td>
+<td><a href="#4-%E7%AC%AC%E4%B8%89%E6%AD%A5ci-%E9%97%A8%E7%A6%81%E4%B8%8E%E5%9B%9E%E5%BD%92%E9%98%B2%E6%8A%A4">4. 第三步：CI 门禁与回归防护</a></td>
+</tr>
+<tr>
+<td>第 3 格</td>
+<td>黑匣子回流监控大屏自动报警</td>
+<td><a href="#5-%E7%AC%AC%E5%9B%9B%E6%AD%A5rum-%E7%9B%91%E6%8E%A7%E4%B8%8A%E7%BA%BF%E4%B8%8E%E5%91%8A%E8%AD%A6">5. 第四步：RUM 监控上线与告警</a></td>
+</tr>
+<tr>
+<td>第 4 格</td>
+<td>坑点：一次性优化不是终点 + 稳叔总结</td>
+<td><a href="#7-%E5%9B%A2%E9%98%9F%E5%8D%8F%E4%BD%9C%E8%AE%A9%E6%80%A7%E8%83%BD%E6%88%90%E4%B8%BA%E6%97%A5%E5%B8%B8">7. 团队协作：让性能成为日常</a></td>
+</tr>
+</tbody></table>
+<p>🎬 <a href="../comics/EP.09.svg">打开漫画 EP.09</a> ｜ 📖 <a href="../comics/EP.09.html">漫画讲解稿 EP.09.md</a></p>
+</blockquote>
+
+</main>
+<footer>
+  双形态联动学习体系 ｜ 标准文档 + 漫画剧场 ｜
+  源码仓库 <a href="https://github.com/YZhiJie/frontend-perf-guide">GitHub</a> ｜
+  在线站点 <a href="https://yzhijie.github.io/frontend-perf-guide-pages/">https://yzhijie.github.io/frontend-perf-guide-pages/</a>
+</footer>
+</body>
+</html>

@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<title>示例 03：布局抖动（Layout Thrashing）对比实验</title>
+<!-- 配套文档：docs/04-rendering.md 第 3 节（布局抖动与读写分离） -->
+<!--
+  运行方式：浏览器直接打开本文件，分别点击两个按钮，对比耗时与火焰图。
+  进阶：打开 DevTools → Performance 面板录制，坏写法会看到密集的
+  "Layout" 紫色块交替出现；好写法只有一次 Layout。
+-->
+<style>
+  body { font-family: system-ui, sans-serif; max-width: 720px; margin: 40px auto; padding: 0 16px; }
+  button { padding: 8px 16px; margin-right: 12px; cursor: pointer; }
+  .row { height: 24px; margin: 4px 0; background: #e8eef7; border-radius: 4px; }
+  #bad-out, #good-out { font-weight: 600; margin: 8px 0 24px; }
+</style>
+</head>
+<body>
+<h1>布局抖动对比实验（100 行 × 交错读写）</h1>
+<p>两个按钮都做同一件事：读取每行高度并按序号改写高度。区别只在<b>读写的顺序</b>。</p>
+<button id="bad">① 坏写法：读一行 → 写一行（交错）</button>
+<button id="good">② 好写法：先批量读 → 再批量写</button>
+<div id="bad-out"></div>
+<div id="good-out"></div>
+<div id="rows"></div>
+
+<script>
+const rowsBox = document.getElementById('rows');
+function buildRows() {
+  rowsBox.innerHTML = '';
+  for (let i = 0; i < 100; i++) {
+    const div = document.createElement('div');
+    div.className = 'row';
+    rowsBox.appendChild(div);
+  }
+}
+const rows = () => rowsBox.children;
+
+// 坏写法：强制同步布局经典模式 —— 交错读写，每次写完下一次读被迫 reflow
+document.getElementById('bad').onclick = () => {
+  buildRows();
+  const t0 = performance.now();
+  for (let i = 0; i < rows().length; i++) {
+    const h = rows()[i].offsetHeight;   // 读：使上一轮写入的样式失效 → 强制 reflow
+    rows()[i].style.height = h + i % 3 + 'px'; // 写：使布局失效
+  }
+  document.getElementById('bad-out').textContent = `① 坏写法耗时：${(performance.now() - t0).toFixed(1)} ms`;
+};
+
+// 好写法：读写分离 —— 先把所有读集中做完，再统一写
+document.getElementById('good').onclick = () => {
+  buildRows();
+  const t0 = performance.now();
+  const heights = [];
+  for (let i = 0; i < rows().length; i++) heights.push(rows()[i].offsetHeight); // 批量读
+  for (let i = 0; i < rows().length; i++) rows()[i].style.height = heights[i] + i % 3 + 'px'; // 批量写
+  document.getElementById('good-out').textContent = `② 好写法耗时：${(performance.now() - t0).toFixed(1)} ms`;
+};
+
+buildRows();
+</script>
+</body>
+</html>

@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>EP.01 · 《小镇的早高峰》 · 前端性能优化完全学习指南</title>
+<style>
+:root{--fg:#1f2328;--muted:#57606a;--line:#d0d7de;--accent:#f97316;--link:#0969da;--code-bg:#f6f8fa}
+*{box-sizing:border-box}
+body{margin:0;font-family:-apple-system,BlinkMacSystemFont,'PingFang SC','Microsoft YaHei',sans-serif;color:var(--fg);background:#fff;line-height:1.75}
+header.top{position:sticky;top:0;background:#0f172a;color:#e2e8f0;padding:12px 20px;display:flex;align-items:center;gap:16px;flex-wrap:wrap;z-index:10}
+header.top .brand{font-weight:700;color:#fff}
+header.top .brand em{color:var(--accent);font-style:normal}
+header.top nav{margin-left:auto;display:flex;gap:16px;flex-wrap:wrap}
+header.top nav a{color:#cbd5e1;text-decoration:none;font-size:14px}
+header.top nav a:hover{color:var(--accent)}
+header.top nav a.active{color:#fff;border-bottom:2px solid var(--accent);padding-bottom:2px}
+main{max-width:880px;margin:0 auto;padding:28px 20px 64px}
+main h1{font-size:28px;border-bottom:1px solid var(--line);padding-bottom:.3em}
+main h2{font-size:22px;border-bottom:1px solid var(--line);padding-bottom:.3em;margin-top:2em}
+main h3{font-size:18px;margin-top:1.6em}
+main img{max-width:100%}
+a{color:var(--link)}
+code{background:var(--code-bg);padding:.15em .35em;border-radius:4px;font-size:.9em;font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}
+pre{background:#0f172a;color:#e2e8f0;padding:14px 16px;border-radius:8px;overflow:auto}
+pre code{background:none;color:inherit;padding:0;font-size:13px}
+table{border-collapse:collapse;width:100%;margin:1em 0;display:block;overflow:auto}
+th,td{border:1px solid var(--line);padding:6px 12px;text-align:left}
+th{background:var(--code-bg)}
+blockquote{border-left:4px solid var(--accent);margin:1em 0;padding:.3em 1em;color:var(--muted);background:#fff7ed}
+hr{border:none;border-top:1px solid var(--line);margin:2em 0}
+footer{border-top:1px solid var(--line);color:var(--muted);font-size:13px;text-align:center;padding:20px 16px}
+footer a{color:var(--link);text-decoration:none}
+</style>
+</head>
+<body>
+<header class="top">
+  <span class="brand"><em>前端性能</em>完全指南</span>
+  <nav>
+    <a href="../index.html">首页</a>
+    <a href="../docs/README.html">标准文档</a>
+    <a href="../comics/index.html" class="active">漫画剧场</a>
+    <a href="https://github.com/YZhiJie/frontend-perf-guide">源码仓库</a>
+  </nav>
+</header>
+<main>
+<h1 id="ep01-小镇的早高峰">EP.01 · 《小镇的早高峰》</h1>
+<blockquote>
+<p>🎬 漫画：<a href="./EP.01.svg">EP.01.svg</a> ｜ 📄 对应文档：<a href="../docs/01-overview.html">第 1 章 · 性能优化总览与心智模型</a></p>
+<p>本话主旨：建立「性能优化是工程不是玄学」的心智模型——先度量、再定位、小步优化、用数据验证。</p>
+</blockquote>
+<h2 id="本话剧情">本话剧情</h2>
+<p>性能小镇的早高峰，小奔在车里堵了 40 分钟崩溃不已。稳叔把他拉进交通指挥中心，指着一本「账」：加载每慢 1 秒，转化率就往下掉一截。小奔想一口气把全镇的路都修了，被稳叔拦下——修路要先测流量、找到最堵的那个路口、修一个测一次。<strong>网站性能与早高峰是同一件事：用户等 3 秒就关页。</strong></p>
+<h2 id="知识点节点">知识点节点</h2>
+<h3 id="节点-1-性能就是留存与转化漫画第-1-格">节点 1 · 性能就是留存与转化（漫画第 1 格）</h3>
+<ul>
+<li><strong>生活映射</strong>：早高峰堵车 40 分钟 = 页面白屏转圈 40 秒，用户（乘客）会直接下车（关页）。</li>
+<li><strong>关键数字</strong>：移动端加载从 1s 涨到 3s，跳出概率增加约 32%（Google 研究）；页面 0.1s 级别的提速即可带来可观的转化提升。</li>
+<li><strong>深入阅读</strong>：📖 <a href="../docs/01-overview.html#1-%E4%B8%BA%E4%BB%80%E4%B9%88%E6%80%A7%E8%83%BD%E5%B0%B1%E6%98%AF%E9%92%B1">1. 为什么性能就是钱</a></li>
+</ul>
+<h3 id="节点-2-性能是一本可以量化的账漫画第-2-格">节点 2 · 性能是一本可以量化的账（漫画第 2 格）</h3>
+<ul>
+<li><strong>生活映射</strong>：指挥中心的大屏 = 性能监控大盘；「转化率 vs 加载时长」的柱状图是每个业务都该挂出来的账。</li>
+<li><strong>关键数字</strong>：性能优化的收益必须落到业务指标（转化率、留存、营收）上，而不是只盯着技术分数。</li>
+<li><strong>深入阅读</strong>：📖 <a href="../docs/01-overview.html#2-%E4%B8%80%E6%9D%A1%E8%AF%B7%E6%B1%82%E7%9A%84%E6%97%85%E7%A8%8B%E5%85%A8%E6%99%AF%E5%9B%BE">2. 一条请求的旅程全景图</a></li>
+</ul>
+<h3 id="节点-3-度量先行的修路三步法漫画第-3-格">节点 3 · 度量先行的修路三步法（漫画第 3 格）</h3>
+<ul>
+<li><strong>生活映射</strong>：先测流量（度量）→ 找最堵的路口（定位瓶颈）→ 修一个测一次（小步优化 + 验证）。</li>
+<li><strong>关键动作</strong>：RAIL 模型给「修到什么程度算好」划了刻度；性能预算给「不能修坏」立了规矩。</li>
+<li><strong>深入阅读</strong>：📖 <a href="../docs/01-overview.html#3-rail-%E6%A8%A1%E5%9E%8B%E5%9B%9B%E5%88%BB%E5%BA%A6">3. RAIL 模型四刻度</a>、<a href="../docs/01-overview.html#4-%E5%BA%A6%E9%87%8F%E5%85%88%E8%A1%8C%E7%9A%84%E4%BC%98%E5%8C%96%E6%96%B9%E6%B3%95%E8%AE%BA">4. 度量先行的优化方法论</a>、<a href="../docs/01-overview.html#5-%E6%80%A7%E8%83%BD%E9%A2%84%E7%AE%97%E7%BB%99%E9%A1%B9%E7%9B%AE%E7%AB%8B%E8%A7%84%E7%9F%A9">5. 性能预算给项目立规矩</a></li>
+</ul>
+<h3 id="节点-4-最大坑点没测量就优化漫画第-4-格">节点 4 · 最大坑点：没测量就优化（漫画第 4 格）</h3>
+<ul>
+<li><strong>误区</strong>：凭感觉上手改代码——缓存加一堆、图片压一遍、依赖换一换，改完不知道变快了还是变慢了。</li>
+<li><strong>正解</strong>：先建立基线数据（Lighthouse + DevTools + 真实用户监控），每次只改一处、每次改完复测对比。</li>
+<li><strong>深入阅读</strong>：📖 <a href="../docs/01-overview.html#4-%E5%BA%A6%E9%87%8F%E5%85%88%E8%A1%8C%E7%9A%84%E4%BC%98%E5%8C%96%E6%96%B9%E6%B3%95%E8%AE%BA">4. 度量先行的优化方法论</a>、<a href="../docs/01-overview.html#7-%E6%9C%80%E4%BD%B3%E5%AE%9E%E8%B7%B5%E6%B8%85%E5%8D%95">7. 最佳实践清单</a></li>
+</ul>
+<h2 id="常见认知误区">常见认知误区</h2>
+<table>
+<thead>
+<tr>
+<th>误区</th>
+<th>真相</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>性能优化就是「加缓存、压图片」</td>
+<td>它是覆盖网络、渲染、运行时、框架、工程的完整链路</td>
+</tr>
+<tr>
+<td>一次性优化做完就一劳永逸</td>
+<td>没有预算与门禁，下一个迭代就会劣化回去</td>
+</tr>
+<tr>
+<td>分数高就是体验好</td>
+<td>实验室分数只是代理指标，真实用户数据才是裁判</td>
+</tr>
+</tbody></table>
+<h2 id="一句话带走">一句话带走</h2>
+<p><strong>先度量、再定位、小步优化、用数据验证——性能优化是工程，不是玄学。</strong></p>
+<hr>
+<blockquote>
+<p>📚 下一话预告：<a href="./EP.02.html">EP.02《快递签收的三门课》</a>——用快递站讲透 Core Web Vitals 三大指标 ｜ 跳转：<a href="../docs/02-core-web-vitals.html">第 2 章 · Core Web Vitals 核心指标详解</a></p>
+</blockquote>
+
+</main>
+<footer>
+  双形态联动学习体系 ｜ 标准文档 + 漫画剧场 ｜
+  源码仓库 <a href="https://github.com/YZhiJie/frontend-perf-guide">GitHub</a> ｜
+  在线站点 <a href="https://yzhijie.github.io/frontend-perf-guide-pages/">https://yzhijie.github.io/frontend-perf-guide-pages/</a>
+</footer>
+</body>
+</html>

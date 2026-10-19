@@ -1,0 +1,162 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 840" font-family="'PingFang SC','Hiragino Sans GB','Microsoft YaHei',sans-serif">
+  <defs>
+    <linearGradient id="bgG" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#eff6ff"/>
+      <stop offset="1" stop-color="#dbeafe"/>
+    </linearGradient>
+    <linearGradient id="hdrG" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#1e293b"/>
+      <stop offset="1" stop-color="#475569"/>
+    </linearGradient>
+    <clipPath id="pc1"><rect x="3" y="37" width="554" height="320" rx="13"/></clipPath>
+    <clipPath id="pc2"><rect x="3" y="37" width="554" height="320" rx="13"/></clipPath>
+    <clipPath id="pc3"><rect x="3" y="37" width="554" height="320" rx="13"/></clipPath>
+    <clipPath id="pc4"><rect x="3" y="37" width="554" height="320" rx="13"/></clipPath>
+    <g id="uncle">
+      <rect x="-16" y="-36" width="11" height="36" rx="4" fill="#334155"/>
+      <rect x="5" y="-36" width="11" height="36" rx="4" fill="#334155"/>
+      <rect x="-34" y="-98" width="12" height="50" rx="6" fill="#6d28d9"/>
+      <rect x="22" y="-98" width="12" height="50" rx="6" fill="#6d28d9"/>
+      <circle cx="-28" cy="-44" r="6.5" fill="#fcd9b8"/>
+      <circle cx="28" cy="-44" r="6.5" fill="#fcd9b8"/>
+      <rect x="-25" y="-104" width="50" height="72" rx="15" fill="#7c3aed"/>
+      <circle cx="0" cy="-122" r="25" fill="#fcd9b8"/>
+      <path d="M-25,-124 a25,25 0 0 1 50,0 z" fill="#e2e8f0"/>
+      <circle cx="-10" cy="-120" r="7.5" fill="#ffffff" stroke="#1e293b" stroke-width="1.6"/>
+      <circle cx="10" cy="-120" r="7.5" fill="#ffffff" stroke="#1e293b" stroke-width="1.6"/>
+      <line x1="-3" y1="-120" x2="3" y2="-120" stroke="#1e293b" stroke-width="1.6"/>
+      <circle cx="-10" cy="-120" r="2" fill="#1e293b"/>
+      <circle cx="10" cy="-120" r="2" fill="#1e293b"/>
+      <path d="M-6,-108 q6,4 12,0" stroke="#b45309" stroke-width="1.6" fill="none" stroke-linecap="round"/>
+      <ellipse cx="0" cy="-102" rx="9" ry="4.5" fill="#e2e8f0"/>
+    </g>
+    <g id="ben">
+      <rect x="-15" y="-32" width="11" height="32" rx="4" fill="#1e293b"/>
+      <rect x="4" y="-32" width="11" height="32" rx="4" fill="#1e293b"/>
+      <rect x="-33" y="-94" width="12" height="48" rx="6" fill="#0284c7"/>
+      <rect x="21" y="-94" width="12" height="48" rx="6" fill="#0284c7"/>
+      <circle cx="-27" cy="-42" r="6" fill="#fcd9b8"/>
+      <circle cx="27" cy="-42" r="6" fill="#fcd9b8"/>
+      <rect x="-24" y="-100" width="48" height="70" rx="15" fill="#0ea5e9"/>
+      <path d="M-24,-88 q24,14 48,0" stroke="#7dd3fc" stroke-width="3" fill="none"/>
+      <circle cx="0" cy="-118" r="23" fill="#fcd9b8"/>
+      <path d="M-23,-120 a23,23 0 0 1 46,0 z" fill="#0f172a"/>
+      <path d="M-14,-136 l3,-10 5,8 z" fill="#0f172a"/>
+      <path d="M6,-138 l4,-10 5,9 z" fill="#0f172a"/>
+      <circle cx="-8" cy="-116" r="2.4" fill="#1e293b"/>
+      <circle cx="8" cy="-116" r="2.4" fill="#1e293b"/>
+      <ellipse cx="0" cy="-104" rx="4" ry="5" fill="#7c2d12"/>
+    </g>
+  </defs>
+
+  <rect width="1200" height="840" fill="url(#bgG)"/>
+
+  <!-- 头部横幅 -->
+  <rect x="20" y="16" width="1160" height="56" rx="14" fill="url(#hdrG)"/>
+  <rect x="36" y="28" width="88" height="32" rx="9" fill="#f97316"/>
+  <text x="80" y="50" text-anchor="middle" font-size="18" font-weight="bold" fill="#ffffff">EP.09</text>
+  <text x="142" y="52" font-size="25" font-weight="bold" fill="#ffffff">工厂质检上线记 —— 生产环境落地</text>
+  <text x="1164" y="50" text-anchor="end" font-size="14" fill="#cbd5e1">性能小镇 · 配套文档 docs/09-production.md</text>
+
+  <!-- 第 1 格 · 性能预算 -->
+  <g transform="translate(20,84)">
+    <rect width="560" height="360" rx="16" fill="#ffffff"/>
+    <g clip-path="url(#pc1)">
+      <rect x="3" y="37" width="554" height="320" fill="#f1f5f9"/>
+      <rect x="40" y="56" width="300" height="250" rx="10" fill="#ffffff" stroke="#0f172a" stroke-width="2"/>
+      <text x="190" y="84" text-anchor="middle" font-size="13" font-weight="bold" fill="#0f172a">性能预算表</text>
+      <text x="62" y="118" font-size="13" fill="#0f172a">首包 JS</text>
+      <text x="230" y="118" font-size="13" font-weight="bold" fill="#047857">≤ 170 KB</text>
+      <path d="M60,130 L320,130" stroke="#e2e8f0" stroke-width="1"/>
+      <text x="62" y="156" font-size="13" fill="#0f172a">CSS</text>
+      <text x="230" y="156" font-size="13" font-weight="bold" fill="#047857">≤ 40 KB</text>
+      <path d="M60,168 L320,168" stroke="#e2e8f0" stroke-width="1"/>
+      <text x="62" y="194" font-size="13" fill="#0f172a">LCP</text>
+      <text x="230" y="194" font-size="13" font-weight="bold" fill="#047857">≤ 2.5 s</text>
+      <path d="M60,206 L320,206" stroke="#e2e8f0" stroke-width="1"/>
+      <text x="62" y="232" font-size="13" fill="#0f172a">INP</text>
+      <text x="230" y="232" font-size="13" font-weight="bold" fill="#047857">≤ 200 ms</text>
+      <path d="M60,244 L320,244" stroke="#e2e8f0" stroke-width="1"/>
+      <text x="62" y="270" font-size="13" fill="#0f172a">CLS</text>
+      <text x="230" y="270" font-size="13" font-weight="bold" fill="#047857">≤ 0.1</text>
+      <rect x="360" y="90" width="180" height="120" rx="10" fill="#ffffff" stroke="#f97316" stroke-width="2"/>
+      <text x="450" y="118" text-anchor="middle" font-size="13" font-weight="bold" fill="#c2410c">超了就是红灯</text>
+      <text x="380" y="148" font-size="12" fill="#7c2d12">先定红线，</text>
+      <text x="380" y="172" font-size="12" fill="#7c2d12">再谈怎么优化</text>
+      <use href="#uncle" transform="translate(430,330) scale(0.7)"/>
+      <use href="#ben" transform="translate(500,330) scale(0.68)"/>
+    </g>
+    <path d="M0,34 L0,16 Q0,0 16,0 L544,0 Q560,0 560,16 L560,34 Z" fill="#e2e8f0"/>
+    <text x="18" y="24" font-size="16" font-weight="bold" fill="#0f172a">第 1 格 · 性能预算：先定质检红线</text>
+    <rect width="560" height="360" rx="16" fill="none" stroke="#0f172a" stroke-width="2"/>
+  </g>
+
+  <!-- 第 2 格 · CI 门禁 -->
+  <g transform="translate(608,84)">
+    <rect width="560" height="360" rx="16" fill="#ffffff"/>
+    <g clip-path="url(#pc2)">
+      <rect x="3" y="37" width="554" height="320" fill="#fff7ed"/>
+      <rect x="40" y="180" width="480" height="16" rx="8" fill="#94a3b8"/>
+      <rect x="80" y="152" width="46" height="28" rx="4" fill="#fcd34d" stroke="#b45309" stroke-width="1.4"/>
+      <rect x="150" y="152" width="46" height="28" rx="4" fill="#fcd34d" stroke="#b45309" stroke-width="1.4"/>
+      <rect x="240" y="96" width="26" height="84" fill="#dc2626"/>
+      <rect x="240" y="96" width="140" height="22" rx="6" fill="#dc2626"/>
+      <text x="303" y="112" text-anchor="middle" font-size="12" font-weight="bold" fill="#ffffff">CI 门禁</text>
+      <rect x="380" y="150" width="130" height="90" rx="8" fill="#ffffff" stroke="#dc2626" stroke-width="2"/>
+      <text x="445" y="176" text-anchor="middle" font-size="12" font-weight="bold" fill="#b91c1c">构建失败</text>
+      <text x="445" y="200" text-anchor="middle" font-size="11" fill="#7f1d1d">JS 210KB 超 170KB</text>
+      <text x="445" y="220" text-anchor="middle" font-size="11" fill="#7f1d1d">LCP 3.1s 超 2.5s</text>
+      <text x="40" y="232" font-size="12" fill="#475569">每次 PR 自动跑门禁，超预算直接红灯</text>
+      <text x="40" y="258" font-size="12" fill="#7c2d12">不合格的构建，连测试环境都上不去</text>
+    </g>
+    <path d="M0,34 L0,16 Q0,0 16,0 L544,0 Q560,0 560,16 L560,34 Z" fill="#e2e8f0"/>
+    <text x="18" y="24" font-size="16" font-weight="bold" fill="#0f172a">第 2 格 · CI 门禁：不合格不放行</text>
+    <rect width="560" height="360" rx="16" fill="none" stroke="#0f172a" stroke-width="2"/>
+  </g>
+
+  <!-- 第 3 格 · 监控告警 -->
+  <g transform="translate(20,462)">
+    <rect width="560" height="360" rx="16" fill="#ffffff"/>
+    <g clip-path="url(#pc3)">
+      <rect x="3" y="37" width="554" height="320" fill="#ecfdf5"/>
+      <rect x="40" y="56" width="480" height="220" rx="10" fill="#ffffff" stroke="#0f172a" stroke-width="2"/>
+      <text x="60" y="84" font-size="12" font-weight="bold" fill="#0f172a">真实用户 p75 趋势</text>
+      <path d="M70,110 L70,240" stroke="#cbd5e1" stroke-width="2"/>
+      <path d="M70,240 L510,240" stroke="#cbd5e1" stroke-width="2"/>
+      <path d="M70,150 L510,150" stroke="#f97316" stroke-width="2" stroke-dasharray="8 6"/>
+      <text x="424" y="144" font-size="11" fill="#c2410c">2.5s 阈值</text>
+      <path d="M84,200 L154,180 L224,186 L294,164 L364,156 L434,176 L500,204" stroke="#0ea5e9" stroke-width="3" fill="none"/>
+      <circle cx="364" cy="156" r="6" fill="#dc2626"/>
+      <text x="326" y="140" font-size="11" font-weight="bold" fill="#b91c1c">告警</text>
+      <path d="M470,66 a14,14 0 0 1 28,0 l4,18 l-36,0 z" fill="#f59e0b"/>
+      <circle cx="484" cy="88" r="6" fill="#f59e0b"/>
+      <text x="40" y="304" font-size="13" fill="#065f46">上线只是开始，p75 曲线要一直盯着。</text>
+    </g>
+    <path d="M0,34 L0,16 Q0,0 16,0 L544,0 Q560,0 560,16 L560,34 Z" fill="#e2e8f0"/>
+    <text x="18" y="24" font-size="16" font-weight="bold" fill="#0f172a">第 3 格 · 监控告警：上线后继续盯着</text>
+    <rect width="560" height="360" rx="16" fill="none" stroke="#0f172a" stroke-width="2"/>
+  </g>
+
+  <!-- 第 4 格 · 坑点与稳叔总结 -->
+  <g transform="translate(608,462)">
+    <rect width="560" height="360" rx="16" fill="#ffffff"/>
+    <g clip-path="url(#pc4)">
+      <rect x="3" y="37" width="554" height="320" fill="#fff7ed"/>
+      <rect x="24" y="54" width="96" height="34" rx="9" fill="#f97316"/>
+      <text x="72" y="77" text-anchor="middle" font-size="17" font-weight="bold" fill="#ffffff">坑点</text>
+      <rect x="24" y="102" width="512" height="88" rx="12" fill="#ffffff" stroke="#f97316" stroke-width="2"/>
+      <text x="44" y="132" font-size="15" fill="#7c2d12">只在本地测速就宣布上线——</text>
+      <text x="44" y="160" font-size="15" fill="#7c2d12">真实网络的 p75 才是判决书。</text>
+      <rect x="24" y="210" width="420" height="116" rx="12" fill="#ecfdf5" stroke="#10b981" stroke-width="2"/>
+      <text x="44" y="240" font-size="16" font-weight="bold" fill="#059669">稳叔总结</text>
+      <text x="44" y="268" font-size="15" fill="#065f46">先定预算，再让门禁守门。</text>
+      <text x="44" y="294" font-size="15" fill="#065f46">上线后盯着 p75，退步就告警。</text>
+      <use href="#uncle" transform="translate(486,352) scale(0.72)"/>
+      <use href="#ben" transform="translate(536,352) scale(0.7)"/>
+      <text x="24" y="344" font-size="12" fill="#64748b">本格对应第 9 章 1~7 节 ｜ 详细讲解见 EP.09.md</text>
+    </g>
+    <path d="M0,34 L0,16 Q0,0 16,0 L544,0 Q560,0 560,16 L560,34 Z" fill="#e2e8f0"/>
+    <text x="18" y="24" font-size="16" font-weight="bold" fill="#0f172a">第 4 格 · 坑点与稳叔总结</text>
+    <rect width="560" height="360" rx="16" fill="none" stroke="#0f172a" stroke-width="2"/>
+  </g>
+</svg>

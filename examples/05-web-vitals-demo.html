@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<title>示例 05：用 PerformanceObserver 原生采集 Core Web Vitals</title>
+<!-- 配套文档：docs/01-overview.md 第 4 节（指标采集与上报） -->
+<!--
+  运行方式：浏览器打开本文件，观察指标实时更新；
+  也可配合 `npx serve examples` 或 `python3 -m http.server` 体验。
+  生产建议：直接用 web-vitals 库（onLCP/onINP/onCLS...），本示例展示其底层原理。
+-->
+<style>
+  body { font-family: system-ui, sans-serif; max-width: 720px; margin: 40px auto; padding: 0 16px; }
+  .metric { display: inline-block; width: 150px; margin: 8px; padding: 12px; border-radius: 8px; color: #fff; }
+  .good { background: #0cce6b; } .ni { background: #ffa400; } .poor { background: #ff4e42; } .na { background: #9e9e9e; }
+  .block { height: 120px; margin: 16px 0; background: #e3ecf7; border-radius: 8px; }
+</style>
+</head>
+<body>
+<h1>原生采集 Core Web Vitals</h1>
+<div id="panel"></div>
+<p>下方两个色块会<b>延迟插入</b>，用于演示 LCP 元素被更晚出现的最大内容取代、以及无尺寸图片导致的 CLS。</p>
+<div id="late"></div>
+
+<script>
+const panel = document.getElementById('panel');
+const thresholds = {
+  LCP: [2500, 4000], FCP: [1800, 3000], TTFB: [800, 1800], CLS: [0.1, 0.25], 'Long Task': [50, 200],
+};
+function render(name, value, unit = 'ms') {
+  const [g, p] = thresholds[name] || [0, 1];
+  const cls = value == null ? 'na' : value <= g ? 'good' : value <= p ? 'ni' : 'poor';
+  let card = document.getElementById('m-' + name.replace(' ', ''));
+  if (!card) {
+    card = document.createElement('div');
+    card.id = 'm-' + name.replace(' ', '');
+    card.className = 'metric';
+    panel.appendChild(card);
+  }
+  card.className = 'metric ' + cls;
+  card.textContent = name + (value == null ? '：采集中…' : `：${typeof value === 'number' ? value.toFixed(name === 'CLS' ? 3 : 0) : value} ${unit}`);
+}
+
+// LCP：largest-contentful-paint，只关心最后一次（直到用户交互/页面隐藏）
+new PerformanceObserver((list) => {
+  const entries = list.getEntries();
+  const last = entries[entries.length - 1];
+  render('LCP', last.startTime);
+  console.log('LCP 元素：', last.element, 'URL：', last.url);
+}).observe({ type: 'largest-contentful-paint', buffered: true });
+
+// FCP：first-contentful-paint
+new PerformanceObserver((list) => {
+  render('FCP', list.getEntries()[0]?.startTime);
+}).observe({ type: 'paint', buffered: true });
+
+// TTFB：Navigation Timing v2
+render('TTFB', performance.getEntriesByType('navigation')[0]?.responseStart);
+
+// CLS：layout-shift，会话窗口口径（简化版：累计所有 shift，生产用 web-vitals 库的会话窗口算法）
+let cls = 0;
+new PerformanceObserver((list) => {
+  for (const e of list.getEntries()) if (!e.hadRecentInput) { cls += e.value; render('CLS', cls, ''); }
+}).observe({ type: 'layout-shift', buffered: true });
+
+// 长任务：>50ms
+new PerformanceObserver((list) => {
+  for (const e of list.getEntries()) render('Long Task', e.duration);
+}).observe({ type: 'longtask', buffered: true });
+
+// 生产上报姿势：sendBeacon 在页面卸载时也不丢包
+function report(name, value) {
+  navigator.sendBeacon?.('/vitals', JSON.stringify({ name, value, t: Date.now() }));
+  console.log(`上报 ${name} =`, value);
+}
+
+// 演示：延迟 2s 插入更大内容（LCP 被取代）+ 无尺寸图片（CLS）
+setTimeout(() => {
+  const big = document.createElement('div');
+  big.className = 'block';
+  big.style.background = 'linear-gradient(90deg,#7ab8ff,#b6d9ff)';
+  big.textContent = '我是新的最大内容元素（LCP 被 me 取代）';
+  document.getElementById('late').appendChild(big);
+
+  const img = document.createElement('img');
+  img.src = 'data:image/svg+xml,' + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="400" height="200"><rect width="400" height="200" fill="#ffd54f"/></svg>');
+  img.alt = '无宽高属性的图片 → 触发布局位移'; // 坑点：未设置 width/height，插入瞬间推动下方内容
+  document.getElementById('late').appendChild(img);
+  setTimeout(() => report('CLS', cls), 300);
+}, 2000);
+
+setTimeout(() => report('LCP', performance.getEntriesByType('largest-contentful-paint').pop()?.startTime), 3000);
+</script>
+</body>
+</html>

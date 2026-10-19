@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>性能小镇 · 前端性能优化漫画教程</title>
+<style>
+  :root {
+    --bg: #0f172a; --card: #1e293b; --line: #334155;
+    --text: #e2e8f0; --dim: #94a3b8; --accent: #f97316; --cyan: #38bdf8;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: var(--bg); color: var(--text); font-family: 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif; }
+  header { padding: 28px 24px 12px; text-align: center; }
+  header h1 { font-size: 26px; letter-spacing: 2px; }
+  header h1 em { color: var(--accent); font-style: normal; }
+  header p { margin-top: 8px; color: var(--dim); font-size: 14px; }
+  header a { color: var(--cyan); text-decoration: none; }
+  /* ---------- 画廊 ---------- */
+  #gallery { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 20px; padding: 24px; max-width: 1240px; margin: 0 auto; }
+  .card { background: var(--card); border: 1px solid var(--line); border-radius: 14px; overflow: hidden; display: flex; flex-direction: column; transition: transform .15s, border-color .15s; }
+  .card:hover { transform: translateY(-3px); border-color: var(--accent); }
+  .card .thumb { display: block; width: 100%; aspect-ratio: 1200/840; object-fit: cover; cursor: pointer; background: #fff; }
+  .card .body { padding: 14px 16px 16px; display: flex; flex-direction: column; gap: 10px; flex: 1; }
+  .ep-badge { display: inline-block; background: var(--accent); color: #fff; font-size: 12px; font-weight: 700; padding: 2px 10px; border-radius: 6px; width: fit-content; }
+  .card h2 { font-size: 17px; }
+  .card .summary { color: var(--dim); font-size: 13px; line-height: 1.6; flex: 1; }
+  .card .links { display: flex; gap: 8px; }
+  .btn { flex: 1; text-align: center; font-size: 13px; padding: 7px 0; border-radius: 8px; text-decoration: none; border: 1px solid var(--line); color: var(--text); transition: background .15s; }
+  .btn:hover { background: #273449; }
+  .btn.open { background: var(--accent); border-color: var(--accent); color: #fff; font-weight: 600; }
+  .btn.open:hover { background: #ea6a0a; }
+  /* ---------- 阅读视图 ---------- */
+  #reader { display: none; max-width: 1180px; margin: 0 auto; padding: 20px; }
+  #reader .top { display: flex; align-items: center; gap: 12px; margin-bottom: 14px; flex-wrap: wrap; }
+  #reader .top h2 { font-size: 20px; flex: 1; }
+  #reader .stage { background: #fff; border-radius: 14px; overflow: hidden; border: 1px solid var(--line); }
+  #reader .stage img { display: block; width: 100%; }
+  #reader .nav { display: flex; gap: 12px; margin-top: 14px; }
+  #reader .doclink { color: var(--cyan); font-size: 14px; text-decoration: none; }
+  .back { cursor: pointer; color: var(--accent); font-size: 14px; background: none; border: 1px solid var(--line); border-radius: 8px; padding: 6px 14px; }
+  footer { text-align: center; color: var(--dim); font-size: 12px; padding: 18px 0 30px; }
+</style>
+</head>
+<body>
+<header>
+  <h1><em>性能小镇</em> · 前端性能优化漫画教程</h1>
+  <p>双文档联动：漫画建立直觉 → <a href="../docs/README.html">标准技术文档</a>深入原理 ｜ 讲解稿内有逐节点跳转链接</p>
+</header>
+
+<main id="gallery"></main>
+
+<section id="reader">
+  <div class="top">
+    <button class="back" onclick="showGallery()">← 返回目录</button>
+    <h2 id="reader-title"></h2>
+    <a id="reader-doc" class="doclink" target="_blank"></a>
+  </div>
+  <div class="stage"><img id="reader-img" alt="漫画页"></div>
+  <nav class="nav">
+    <button class="btn" id="prev-btn" onclick="step(-1)">← 上一话</button>
+    <a class="btn" id="reader-notes" target="_blank">📖 打开本话讲解稿</a>
+    <button class="btn" id="next-btn" onclick="step(1)">下一话 →</button>
+  </nav>
+</section>
+
+<footer>性能小镇 EP.01~EP.09 ｜ 与 docs/ 九章标准教程一一对应，映射由 scripts/check-mapping.mjs 门禁保障</footer>
+
+<script src="./manifest.js"></script>
+<script>
+  const EPISODES = window.COMIC_MANIFEST.episodes;
+  const gallery = document.getElementById('gallery');
+  const reader = document.getElementById('reader');
+  let current = 0;
+
+  // 画廊：一次渲染全部话卡片（缩略图懒加载）
+  EPISODES.forEach((ep, i) => {
+    const card = document.createElement('article');
+    card.className = 'card';
+    card.innerHTML =
+      '<img class="thumb" loading="lazy" alt="' + ep.title + '" src="' + ep.svg + '">' +
+      '<div class="body">' +
+        '<span class="ep-badge">' + ep.id + '</span>' +
+        '<h2>' + ep.title + '</h2>' +
+        '<p class="summary">' + ep.summary + '</p>' +
+        '<div class="links">' +
+          '<button class="btn open" onclick="openReader(' + i + ')">▶ 阅读</button>' +
+          '<a class="btn" href="' + ep.notes + '">讲解稿</a>' +
+          '<a class="btn" href="' + ep.doc + '">对应文档</a>' +
+        '</div>' +
+      '</div>';
+    gallery.appendChild(card);
+  });
+
+  function openReader(i) {
+    current = i;
+    const ep = EPISODES[i];
+    document.getElementById('reader-img').src = ep.svg;
+    document.getElementById('reader-title').textContent = ep.id + ' · ' + ep.title;
+    document.getElementById('reader-notes').href = ep.notes;
+    document.getElementById('reader-doc').href = ep.doc;
+    document.getElementById('reader-doc').textContent = '📄 ' + ep.docTitle;
+    document.getElementById('prev-btn').disabled = i === 0;
+    document.getElementById('next-btn').disabled = i === EPISODES.length - 1;
+    gallery.style.display = 'none';
+    reader.style.display = 'block';
+    window.scrollTo(0, 0);
+  }
+
+  function showGallery() {
+    reader.style.display = 'none';
+    gallery.style.display = 'grid';
+  }
+
+  function step(delta) {
+    const next = current + delta;
+    if (next >= 0 && next < EPISODES.length) openReader(next);
+  }
+
+  // 键盘快捷键：← → 翻话，Esc 回目录
+  document.addEventListener('keydown', (e) => {
+    if (reader.style.display !== 'block') return;
+    if (e.key === 'ArrowLeft') step(-1);
+    else if (e.key === 'ArrowRight') step(1);
+    else if (e.key === 'Escape') showGallery();
+  });
+</script>
+</body>
+</html>

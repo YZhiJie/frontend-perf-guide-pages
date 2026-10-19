@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>EP.09 · 《工厂质检上线记》 · 前端性能优化完全学习指南</title>
+<style>
+:root{--fg:#1f2328;--muted:#57606a;--line:#d0d7de;--accent:#f97316;--link:#0969da;--code-bg:#f6f8fa}
+*{box-sizing:border-box}
+body{margin:0;font-family:-apple-system,BlinkMacSystemFont,'PingFang SC','Microsoft YaHei',sans-serif;color:var(--fg);background:#fff;line-height:1.75}
+header.top{position:sticky;top:0;background:#0f172a;color:#e2e8f0;padding:12px 20px;display:flex;align-items:center;gap:16px;flex-wrap:wrap;z-index:10}
+header.top .brand{font-weight:700;color:#fff}
+header.top .brand em{color:var(--accent);font-style:normal}
+header.top nav{margin-left:auto;display:flex;gap:16px;flex-wrap:wrap}
+header.top nav a{color:#cbd5e1;text-decoration:none;font-size:14px}
+header.top nav a:hover{color:var(--accent)}
+header.top nav a.active{color:#fff;border-bottom:2px solid var(--accent);padding-bottom:2px}
+main{max-width:880px;margin:0 auto;padding:28px 20px 64px}
+main h1{font-size:28px;border-bottom:1px solid var(--line);padding-bottom:.3em}
+main h2{font-size:22px;border-bottom:1px solid var(--line);padding-bottom:.3em;margin-top:2em}
+main h3{font-size:18px;margin-top:1.6em}
+main img{max-width:100%}
+a{color:var(--link)}
+code{background:var(--code-bg);padding:.15em .35em;border-radius:4px;font-size:.9em;font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}
+pre{background:#0f172a;color:#e2e8f0;padding:14px 16px;border-radius:8px;overflow:auto}
+pre code{background:none;color:inherit;padding:0;font-size:13px}
+table{border-collapse:collapse;width:100%;margin:1em 0;display:block;overflow:auto}
+th,td{border:1px solid var(--line);padding:6px 12px;text-align:left}
+th{background:var(--code-bg)}
+blockquote{border-left:4px solid var(--accent);margin:1em 0;padding:.3em 1em;color:var(--muted);background:#fff7ed}
+hr{border:none;border-top:1px solid var(--line);margin:2em 0}
+footer{border-top:1px solid var(--line);color:var(--muted);font-size:13px;text-align:center;padding:20px 16px}
+footer a{color:var(--link);text-decoration:none}
+</style>
+</head>
+<body>
+<header class="top">
+  <span class="brand"><em>前端性能</em>完全指南</span>
+  <nav>
+    <a href="../index.html">首页</a>
+    <a href="../docs/README.html">标准文档</a>
+    <a href="../comics/index.html" class="active">漫画剧场</a>
+    <a href="https://github.com/YZhiJie/frontend-perf-guide">源码仓库</a>
+  </nav>
+</header>
+<main>
+<h1 id="ep09-工厂质检上线记">EP.09 · 《工厂质检上线记》</h1>
+<blockquote>
+<p>🎬 漫画：<a href="./EP.09.svg">EP.09.svg</a> ｜ 📄 对应文档：<a href="../docs/09-production.html">第 9 章 · 生产环境落地实践</a></p>
+<p>本话主旨：性能是持续工程——预算先行、CI 把关、RUM 盯梢。</p>
+</blockquote>
+<h2 id="本话剧情">本话剧情</h2>
+<p>优化大丰收的小奔抱着「合格产品」直奔上线大门，被稳叔一把拦住：先立「性能预算」合格线（JS ≤ 170KB、LCP ≤ 2.5s）；产品要过质检流水线（CI 自动过磅、Lighthouse 体检，超标不出厂）；出厂后还要装黑匣子（RUM 上报），数据回流监控大屏，劣化自动报警。小奔终于明白：一次性优化不是终点，没有守护的优化下个迭代就劣化回去。</p>
+<h2 id="知识点节点">知识点节点</h2>
+<h3 id="节点-1-性能预算先立合格线漫画第-1-格">节点 1 · 性能预算：先立合格线（漫画第 1 格）</h3>
+<ul>
+<li><strong>生活映射</strong>：工厂没合格线，残次品照样出厂 = 项目没预算，性能在迭代中无声劣化。</li>
+<li><strong>技术对应</strong>：5~8 项预算（JS 体积、LCP/INP/CLS p75、Lighthouse 分数）写进工具链，而非口头约定。</li>
+<li><strong>深入阅读</strong>：📖 <a href="../docs/09-production.html#1-%E6%80%A7%E8%83%BD%E9%A2%84%E7%AE%97%E7%9A%84%E5%88%B6%E5%AE%9A%E4%B8%8E%E5%BC%BA%E5%88%B6%E6%89%A7%E8%A1%8C">1. 性能预算的制定与强制执行</a></li>
+</ul>
+<h3 id="节点-2-质检流水线ci-门禁漫画第-2-格">节点 2 · 质检流水线：CI 门禁（漫画第 2 格）</h3>
+<ul>
+<li><strong>生活映射</strong>：每批产品自动过磅（size-limit 体积门禁）、体检（Lighthouse CI 断言）、超标拦截不出厂。</li>
+<li><strong>技术对应</strong>：GitHub Actions 上 build → size-limit → lhci autorun 三连，失败即拦 PR；阈值随优化逐步收紧。</li>
+<li><strong>深入阅读</strong>：📖 <a href="../docs/09-production.html#4-%E7%AC%AC%E4%B8%89%E6%AD%A5ci-%E9%97%A8%E7%A6%81%E4%B8%8E%E5%9B%9E%E5%BD%92%E9%98%B2%E6%8A%A4">4. 第三步：CI 门禁与回归防护</a></li>
+</ul>
+<h3 id="节点-3-黑匣子回流rum-监控与告警漫画第-3-格">节点 3 · 黑匣子回流：RUM 监控与告警（漫画第 3 格）</h3>
+<ul>
+<li><strong>生活映射</strong>：出厂产品装黑匣子，数据回流大屏，异常自动报警 = 线上 web-vitals 上报，p75 聚合看板 + 环比告警。</li>
+<li><strong>技术对应</strong>：按会话聚合、按路由/设备分片；发版后灰度对比验收，实验室收益转业务收益。</li>
+<li><strong>深入阅读</strong>：📖 <a href="../docs/09-production.html#5-%E7%AC%AC%E5%9B%9B%E6%AD%A5rum-%E7%9B%91%E6%8E%A7%E4%B8%8A%E7%BA%BF%E4%B8%8E%E5%91%8A%E8%AD%A6">5. 第四步：RUM 监控上线与告警</a></li>
+</ul>
+<h3 id="节点-4-最大坑点一次性优化不是终点漫画第-4-格">节点 4 · 最大坑点：一次性优化不是终点（漫画第 4 格）</h3>
+<ul>
+<li><strong>误区</strong>：优化项目验收归档后没人再看数据——三个月后指标悄悄回到原点。</li>
+<li><strong>正解</strong>：预算 → 门禁 → 监控三件套常驻；配套 PR 性能清单、轮值盯板、新页面准入三制度。</li>
+<li><strong>深入阅读</strong>：📖 <a href="../docs/09-production.html#7-%E5%9B%A2%E9%98%9F%E5%8D%8F%E4%BD%9C%E8%AE%A9%E6%80%A7%E8%83%BD%E6%88%90%E4%B8%BA%E6%97%A5%E5%B8%B8">7. 团队协作：让性能成为日常</a>、<a href="../docs/09-production.html#8-%E8%90%BD%E5%9C%B0%E6%A3%80%E6%9F%A5%E6%B8%85%E5%8D%95">8. 落地检查清单</a></li>
+</ul>
+<h2 id="常见认知误区">常见认知误区</h2>
+<table>
+<thead>
+<tr>
+<th>误区</th>
+<th>真相</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>优化是一次性项目</td>
+<td>没有预算与门禁，下一个迭代就劣化回去</td>
+</tr>
+<tr>
+<td>CI 跑了 Lighthouse 就稳了</td>
+<td>实验室口径守「问题不引入」，RUM 守「体验不劣化」，缺一不可</td>
+</tr>
+<tr>
+<td>门禁阈值越严越好</td>
+<td>从「当前值 +5% 容差」起步逐步收紧，太严会被绕过</td>
+</tr>
+</tbody></table>
+<h2 id="一句话带走">一句话带走</h2>
+<p><strong>预算先行、CI 把关、RUM 盯梢——性能不是一次性运动，而是需要流水线守护的持续工程。</strong></p>
+<hr>
+<blockquote>
+<p>📚 回到起点：<a href="./EP.01.html">EP.01《小镇的早高峰》</a>复习方法论 ｜ 跳转：<a href="../docs/01-overview.html">第 1 章 · 性能优化总览与心智模型</a></p>
+</blockquote>
+
+</main>
+<footer>
+  双形态联动学习体系 ｜ 标准文档 + 漫画剧场 ｜
+  源码仓库 <a href="https://github.com/YZhiJie/frontend-perf-guide">GitHub</a> ｜
+  在线站点 <a href="https://yzhijie.github.io/frontend-perf-guide-pages/">https://yzhijie.github.io/frontend-perf-guide-pages/</a>
+</footer>
+</body>
+</html>

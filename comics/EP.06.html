@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>EP.06 · 《Vue 后厨的智慧》 · 前端性能优化完全学习指南</title>
+<style>
+:root{--fg:#1f2328;--muted:#57606a;--line:#d0d7de;--accent:#f97316;--link:#0969da;--code-bg:#f6f8fa}
+*{box-sizing:border-box}
+body{margin:0;font-family:-apple-system,BlinkMacSystemFont,'PingFang SC','Microsoft YaHei',sans-serif;color:var(--fg);background:#fff;line-height:1.75}
+header.top{position:sticky;top:0;background:#0f172a;color:#e2e8f0;padding:12px 20px;display:flex;align-items:center;gap:16px;flex-wrap:wrap;z-index:10}
+header.top .brand{font-weight:700;color:#fff}
+header.top .brand em{color:var(--accent);font-style:normal}
+header.top nav{margin-left:auto;display:flex;gap:16px;flex-wrap:wrap}
+header.top nav a{color:#cbd5e1;text-decoration:none;font-size:14px}
+header.top nav a:hover{color:var(--accent)}
+header.top nav a.active{color:#fff;border-bottom:2px solid var(--accent);padding-bottom:2px}
+main{max-width:880px;margin:0 auto;padding:28px 20px 64px}
+main h1{font-size:28px;border-bottom:1px solid var(--line);padding-bottom:.3em}
+main h2{font-size:22px;border-bottom:1px solid var(--line);padding-bottom:.3em;margin-top:2em}
+main h3{font-size:18px;margin-top:1.6em}
+main img{max-width:100%}
+a{color:var(--link)}
+code{background:var(--code-bg);padding:.15em .35em;border-radius:4px;font-size:.9em;font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}
+pre{background:#0f172a;color:#e2e8f0;padding:14px 16px;border-radius:8px;overflow:auto}
+pre code{background:none;color:inherit;padding:0;font-size:13px}
+table{border-collapse:collapse;width:100%;margin:1em 0;display:block;overflow:auto}
+th,td{border:1px solid var(--line);padding:6px 12px;text-align:left}
+th{background:var(--code-bg)}
+blockquote{border-left:4px solid var(--accent);margin:1em 0;padding:.3em 1em;color:var(--muted);background:#fff7ed}
+hr{border:none;border-top:1px solid var(--line);margin:2em 0}
+footer{border-top:1px solid var(--line);color:var(--muted);font-size:13px;text-align:center;padding:20px 16px}
+footer a{color:var(--link);text-decoration:none}
+</style>
+</head>
+<body>
+<header class="top">
+  <span class="brand"><em>前端性能</em>完全指南</span>
+  <nav>
+    <a href="../index.html">首页</a>
+    <a href="../docs/README.html">标准文档</a>
+    <a href="../comics/index.html" class="active">漫画剧场</a>
+    <a href="https://github.com/YZhiJie/frontend-perf-guide">源码仓库</a>
+  </nav>
+</header>
+<main>
+<h1 id="ep06-vue-后厨的智慧">EP.06 · 《Vue 后厨的智慧》</h1>
+<blockquote>
+<p>🎬 漫画：<a href="./EP.06.svg">EP.06.svg</a> ｜ 📄 对应文档：<a href="../docs/06-vue.html">第 6 章 · Vue 专项优化方案</a></p>
+<p>本话主旨：Vue 的性能之道——让组件少算、缓存、按需渲染。</p>
+</blockquote>
+<h2 id="本话剧情">本话剧情</h2>
+<p>小奔到 Vue 餐馆后厨观摩，目睹灾难：客人只加一碗米饭，厨师却把整桌菜重做一遍（组件级重渲染粒度）。稳叔亮出后厨智慧：computed 是备好的半成品（依赖不变直接端出），v-if 是「不做不上桌」而 v-show 是「做好盖盖子」，菜单拆页按需上（路由懒加载），常客老位置留着（KeepAlive），没变的菜直接端旧盘（v-memo）。最后踩坑：把几万条的大 JSON 全塞深层响应式，Proxy 逐层代理白耗 CPU。</p>
+<h2 id="知识点节点">知识点节点</h2>
+<h3 id="节点-1-更新粒度是组件级漫画第-1-格">节点 1 · 更新粒度是组件级（漫画第 1 格）</h3>
+<ul>
+<li><strong>生活映射</strong>：加碗饭重做整桌 = 一个响应式数据变化，触发整个组件重渲染，组件越大代价越大。</li>
+<li><strong>技术对应</strong>：Proxy 依赖追踪 + 组件级 render effect；拆组件就是缩小更新范围。</li>
+<li><strong>深入阅读</strong>：📖 <a href="../docs/06-vue.html#1-%E5%93%8D%E5%BA%94%E5%BC%8F%E7%9A%84%E4%BB%A3%E4%BB%B7%E4%B8%8E%E4%BE%9D%E8%B5%96%E8%BF%BD%E8%B8%AA">1. 响应式的代价与依赖追踪</a></li>
+</ul>
+<h3 id="节点-2-computed-是半成品v-memo-是旧盘直端漫画第-2-格">节点 2 · computed 是半成品，v-memo 是旧盘直端（漫画第 2 格）</h3>
+<ul>
+<li><strong>生活映射</strong>：半成品不用每次现做（computed 缓存）；没变的菜端旧盘（v-memo 跳过子树渲染）。</li>
+<li><strong>技术对应</strong>：computed 缓存派生数据；v-memo 依赖数组不变则跳过渲染；v-if/v-show 按切换频率选。</li>
+<li><strong>深入阅读</strong>：📖 <a href="../docs/06-vue.html#2-%E6%B8%B2%E6%9F%93%E6%8E%A7%E5%88%B6v-if-v-show-computed-%E4%B8%8E-v-memo">2. 渲染控制：v-if v-show computed 与 v-memo</a></li>
+</ul>
+<h3 id="节点-3-拆菜单与常客座位按需加载与-keepalive漫画第-3-格">节点 3 · 拆菜单与常客座位：按需加载与 KeepAlive（漫画第 3 格）</h3>
+<ul>
+<li><strong>生活映射</strong>：厚菜单拆单页（路由级分割）；常客老位置留着（KeepAlive 缓存组件实例）。</li>
+<li><strong>技术对应</strong>：动态 import 按路由分包；组件库按需引入（unplugin 系列）；KeepAlive 必须配 include/max。</li>
+<li><strong>深入阅读</strong>：📖 <a href="../docs/06-vue.html#3-%E5%A4%A7%E5%88%97%E8%A1%A8%E8%99%9A%E6%8B%9F%E6%BB%9A%E5%8A%A8%E5%AE%9E%E6%88%98">3. 大列表：虚拟滚动实战</a>、<a href="../docs/06-vue.html#4-%E7%BB%84%E4%BB%B6%E5%A4%8D%E7%94%A8%E4%B8%8E-keepalive">4. 组件复用与 KeepAlive</a>、<a href="../docs/06-vue.html#5-%E6%8C%89%E9%9C%80%E5%8A%A0%E8%BD%BD%E8%B7%AF%E7%94%B1%E5%88%86%E5%89%B2%E4%B8%8E%E7%BB%84%E4%BB%B6%E5%BA%93%E6%8C%89%E9%9C%80%E5%BC%95%E5%85%A5">5. 按需加载：路由分割与组件库按需引入</a></li>
+</ul>
+<h3 id="节点-4-最大坑点大数据全塞深层响应式漫画第-4-格">节点 4 · 最大坑点：大数据全塞深层响应式（漫画第 4 格）</h3>
+<ul>
+<li><strong>误区</strong>：<code>ref(hugeList)</code> 深层响应式——几万条数据被 Proxy 逐层代理，白白吃掉内存与 CPU。</li>
+<li><strong>正解</strong>：大数组用 <code>shallowRef</code> + 整体替换；第三方实例（echarts/地图）用 <code>markRaw</code> 标记永不代理。</li>
+<li><strong>深入阅读</strong>：📖 <a href="../docs/06-vue.html#7-%E5%93%8D%E5%BA%94%E5%BC%8F%E9%99%8D%E8%80%97shallowref-%E4%B8%8E-markraw">7. 响应式降耗：shallowRef 与 markRaw</a>、<a href="../docs/06-vue.html#6-%E7%8A%B6%E6%80%81%E7%AE%A1%E7%90%86pinia-%E7%9A%84%E6%80%A7%E8%83%BD%E5%A7%BF%E5%8A%BF">6. 状态管理：Pinia 的性能姿势</a></li>
+</ul>
+<h2 id="常见认知误区">常见认知误区</h2>
+<table>
+<thead>
+<tr>
+<th>误区</th>
+<th>真相</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Vue 是响应式框架，性能不用操心</td>
+<td>更新粒度是组件级，重组件滥用照样卡</td>
+</tr>
+<tr>
+<td>v-show 一律优于 v-if</td>
+<td>频繁切换才用 v-show；初始为假的块用 v-if 更省</td>
+</tr>
+<tr>
+<td>KeepAlive 无脑包路由</td>
+<td>无界缓存等于内存泄漏温床，必须 include/max</td>
+</tr>
+</tbody></table>
+<h2 id="一句话带走">一句话带走</h2>
+<p><strong>让组件少算（拆分与 computed）、缓存（v-memo 与 KeepAlive）、按需渲染（v-if 与懒加载）——Vue 优化的本质是缩小更新范围。</strong></p>
+<hr>
+<blockquote>
+<p>📚 下一话预告：<a href="./EP.07.html">EP.07《React 后厨的调度艺术》</a>——React 框架专项优化 ｜ 跳转：<a href="../docs/07-react.html">第 7 章 · React 专项优化方案</a></p>
+</blockquote>
+
+</main>
+<footer>
+  双形态联动学习体系 ｜ 标准文档 + 漫画剧场 ｜
+  源码仓库 <a href="https://github.com/YZhiJie/frontend-perf-guide">GitHub</a> ｜
+  在线站点 <a href="https://yzhijie.github.io/frontend-perf-guide-pages/">https://yzhijie.github.io/frontend-perf-guide-pages/</a>
+</footer>
+</body>
+</html>

@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>第 3 章 · 加载性能优化：网络与资源 · 前端性能优化完全学习指南</title>
+<style>
+:root{--fg:#1f2328;--muted:#57606a;--line:#d0d7de;--accent:#f97316;--link:#0969da;--code-bg:#f6f8fa}
+*{box-sizing:border-box}
+body{margin:0;font-family:-apple-system,BlinkMacSystemFont,'PingFang SC','Microsoft YaHei',sans-serif;color:var(--fg);background:#fff;line-height:1.75}
+header.top{position:sticky;top:0;background:#0f172a;color:#e2e8f0;padding:12px 20px;display:flex;align-items:center;gap:16px;flex-wrap:wrap;z-index:10}
+header.top .brand{font-weight:700;color:#fff}
+header.top .brand em{color:var(--accent);font-style:normal}
+header.top nav{margin-left:auto;display:flex;gap:16px;flex-wrap:wrap}
+header.top nav a{color:#cbd5e1;text-decoration:none;font-size:14px}
+header.top nav a:hover{color:var(--accent)}
+header.top nav a.active{color:#fff;border-bottom:2px solid var(--accent);padding-bottom:2px}
+main{max-width:880px;margin:0 auto;padding:28px 20px 64px}
+main h1{font-size:28px;border-bottom:1px solid var(--line);padding-bottom:.3em}
+main h2{font-size:22px;border-bottom:1px solid var(--line);padding-bottom:.3em;margin-top:2em}
+main h3{font-size:18px;margin-top:1.6em}
+main img{max-width:100%}
+a{color:var(--link)}
+code{background:var(--code-bg);padding:.15em .35em;border-radius:4px;font-size:.9em;font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}
+pre{background:#0f172a;color:#e2e8f0;padding:14px 16px;border-radius:8px;overflow:auto}
+pre code{background:none;color:inherit;padding:0;font-size:13px}
+table{border-collapse:collapse;width:100%;margin:1em 0;display:block;overflow:auto}
+th,td{border:1px solid var(--line);padding:6px 12px;text-align:left}
+th{background:var(--code-bg)}
+blockquote{border-left:4px solid var(--accent);margin:1em 0;padding:.3em 1em;color:var(--muted);background:#fff7ed}
+hr{border:none;border-top:1px solid var(--line);margin:2em 0}
+footer{border-top:1px solid var(--line);color:var(--muted);font-size:13px;text-align:center;padding:20px 16px}
+footer a{color:var(--link);text-decoration:none}
+</style>
+</head>
+<body>
+<header class="top">
+  <span class="brand"><em>前端性能</em>完全指南</span>
+  <nav>
+    <a href="../index.html">首页</a>
+    <a href="../docs/README.html" class="active">标准文档</a>
+    <a href="../comics/index.html">漫画剧场</a>
+    <a href="https://github.com/YZhiJie/frontend-perf-guide">源码仓库</a>
+  </nav>
+</header>
+<main>
+<h1 id="第-3-章-加载性能优化网络与资源">第 3 章 · 加载性能优化：网络与资源</h1>
+<blockquote>
+<p>🎬 本章配套漫画：<a href="../comics/EP.03.svg">EP.03《餐厅备菜大作战》</a> ｜ <a href="../comics/EP.03.html">漫画讲解稿</a></p>
+<p>学习目标：掌握从网络传输到资源交付的全链路加载优化，能独立完成一次首屏加载的完整优化。
+前置知识：<a href="./02-core-web-vitals.html">第 2 章</a> 的 TTFB/FCP/LCP 指标含义。</p>
+</blockquote>
+<h2 id="0-本章学习地图">0. 本章学习地图</h2>
+<ol>
+<li><a href="#1-%E5%85%B3%E9%94%AE%E6%B8%B2%E6%9F%93%E8%B7%AF%E5%BE%84%E6%B5%8F%E8%A7%88%E5%99%A8%E6%8B%BF%E5%88%B0-html-%E4%B9%8B%E5%90%8E">关键渲染路径：浏览器拿到 HTML 之后</a></li>
+<li><a href="#2-%E7%BD%91%E7%BB%9C%E5%B1%82%E4%BC%98%E5%8C%96cdn-%E4%B8%8E%E8%BF%9E%E6%8E%A5%E9%A2%84%E7%83%AD">网络层优化：CDN 与连接预热</a></li>
+<li><a href="#3-%E8%B5%84%E6%BA%90%E5%8E%8B%E7%BC%A9%E4%B8%8E%E4%BC%A0%E8%BE%93">资源压缩与传输</a></li>
+<li><a href="#4-%E5%9B%BE%E7%89%87%E4%BC%98%E5%8C%96%E6%A0%BC%E5%BC%8F%E5%93%8D%E5%BA%94%E5%BC%8F%E4%B8%8E%E6%87%92%E5%8A%A0%E8%BD%BD">图片优化：格式、响应式与懒加载</a></li>
+<li><a href="#5-%E5%AD%97%E4%BD%93%E5%8A%A0%E8%BD%BD%E7%AD%96%E7%95%A5">字体加载策略</a></li>
+<li><a href="#6-javascript-%E4%BA%A4%E4%BB%98%E4%B8%8E%E4%BB%A3%E7%A0%81%E5%88%86%E5%89%B2">JavaScript 交付与代码分割</a></li>
+<li><a href="#7-%E7%BC%93%E5%AD%98%E7%AD%96%E7%95%A5%E8%AE%BE%E8%AE%A1">缓存策略设计</a></li>
+<li><a href="#8-%E6%A1%86%E6%9E%B6%E8%90%BD%E5%9C%B0%E8%B7%AF%E7%94%B1%E5%88%86%E5%89%B2%E4%B8%8E%E8%B5%84%E6%BA%90%E6%8F%90%E7%A4%BA">框架落地：路由分割与资源提示</a></li>
+<li><a href="#9-%E6%9C%80%E4%BD%B3%E5%AE%9E%E8%B7%B5%E6%B8%85%E5%8D%95">最佳实践清单</a></li>
+</ol>
+<h2 id="1-关键渲染路径浏览器拿到-html-之后">1. 关键渲染路径：浏览器拿到 HTML 之后</h2>
+<p>浏览器渲染首屏的最短路径叫<strong>关键渲染路径（Critical Rendering Path）</strong>：</p>
+<pre><code class="language-text">HTML ──解析──▶ DOM 树 ──┐
+                        ├──▶ 渲染树 ──▶ Layout ──▶ Paint ──▶ 用户看到内容
+CSS  ──解析──▶ CSSOM ──┘
+</code></pre>
+<p>两个会「堵路」的关键机制：</p>
+<ol>
+<li><strong>CSS 阻塞渲染</strong>：浏览器要等所有 <code>render-blocking</code> CSS 下载并解析完才渲染首屏。首屏用不到的 CSS（主题、弹窗、打印样式）都在拖慢 FCP。</li>
+<li><strong>JS 阻塞解析</strong>：默认的 <code>&lt;script src&gt;</code> 会阻塞 HTML 解析（要先下载执行完才继续）。</li>
+</ol>
+<p><code>&lt;script&gt;</code> 三种加载方式的差异（必须烂熟）：</p>
+<table>
+<thead>
+<tr>
+<th>方式</th>
+<th>HTML 解析</th>
+<th>执行时机</th>
+<th>适用</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>&lt;script src&gt;</code></td>
+<td>⛔ 阻塞</td>
+<td>下载完立即执行</td>
+<td>极少用（依赖顺序且必须早执行）</td>
+</tr>
+<tr>
+<td><code>&lt;script async src&gt;</code></td>
+<td>不阻塞</td>
+<td>下载完立即执行（顺序不确定）</td>
+<td>独立脚本：统计、广告</td>
+</tr>
+<tr>
+<td><code>&lt;script defer src&gt;</code></td>
+<td>不阻塞</td>
+<td>DOM 解析完、DOMContentLoaded 前按序执行</td>
+<td>应用主体脚本（默认选它）</td>
+</tr>
+</tbody></table>
+<p><strong>关键 CSS 内联</strong>：首屏必需的样式（约 14KB 内）内联进 HTML，其余样式异步加载：</p>
+<pre><code class="language-html">&lt;!-- 文件: index.html 片段 —— 关键 CSS 内联 + 全量样式异步化 --&gt;
+&lt;head&gt;
+  &lt;style&gt;/* 首屏关键样式：布局骨架、首屏组件，约 10~14KB */&lt;/style&gt;
+  &lt;!-- 非关键 CSS 异步加载：不支持  preload 的浏览器回退 noscript --&gt;
+  &lt;link rel=&quot;preload&quot; href=&quot;/css/full.css&quot; as=&quot;style&quot; onload=&quot;this.rel=&#39;stylesheet&#39;&quot;&gt;
+  &lt;noscript&gt;&lt;link rel=&quot;stylesheet&quot; href=&quot;/css/full.css&quot;&gt;&lt;/noscript&gt;
+&lt;/head&gt;
+</code></pre>
+<blockquote>
+<p>运行方式：静态页面直接验证；Vite 项目可用 <code>vite-plugin-critical</code> 类插件自动化。</p>
+</blockquote>
+<h2 id="2-网络层优化cdn-与连接预热">2. 网络层优化：CDN 与连接预热</h2>
+<p><strong>CDN</strong>：把静态资源部署到离用户最近的边缘节点，缩短物理往返（RTT）。这是 TTFB 优化的第一杠杆，且几乎零成本——静态资源上 CDN 是底线要求。</p>
+<p><strong>HTTP/2 与 HTTP/3</strong>：HTTP/1.1 同一连接同时只能处理一个请求（队头阻塞），HTTP/2 多路复用让多个请求并行跑在一条连接上。这意味着：合并文件的「雪碧图/拼包」手法在 HTTP/2 下<strong>不再是必需</strong>，甚至有害（缓存粒度变差）。</p>
+<p><strong>连接预热</strong>：对关键第三方域提前建连，省下 100~300ms 的 DNS/TCP/TLS 握手：</p>
+<pre><code class="language-html">&lt;!-- 文件: index.html 片段 —— 资源提示：提前建连 --&gt;
+&lt;link rel=&quot;preconnect&quot; href=&quot;https://cdn.example.com&quot;&gt;       &lt;!-- DNS+TCP+TLS 全套，给最关键的域 --&gt;
+&lt;link rel=&quot;dns-prefetch&quot; href=&quot;https://analytics.example.com&quot;&gt; &lt;!-- 只做 DNS，给次要的域 --&gt;
+</code></pre>
+<blockquote>
+<p>运行方式：静态标签，打开 DevTools Network 面板观察连接 Timing 中 Waiting 阶段的变化。</p>
+</blockquote>
+<p><strong>优先级提示</strong>：对 LCP 主图加 <code>fetchpriority=&quot;high&quot;</code>，让浏览器优先下载：</p>
+<pre><code class="language-html">&lt;img src=&quot;/hero.avif&quot; fetchpriority=&quot;high&quot; alt=&quot;首屏主图&quot;&gt;
+</code></pre>
+<h2 id="3-资源压缩与传输">3. 资源压缩与传输</h2>
+<p>文本类资源（JS/CSS/HTML/SVG/JSON）必须压缩，两档压缩对比：</p>
+<table>
+<thead>
+<tr>
+<th>算法</th>
+<th>压缩率</th>
+<th>CPU 成本</th>
+<th>兼容性</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>gzip</td>
+<td>基准</td>
+<td>低</td>
+<td>全量</td>
+</tr>
+<tr>
+<td>Brotli</td>
+<td>比 gzip 再小 15~20%</td>
+<td>压缩高/解压低</td>
+<td>全部现代浏览器</td>
+</tr>
+</tbody></table>
+<p>实践组合拳：</p>
+<ol>
+<li><strong>构建期预压缩</strong>：产物同时产出 <code>.gz</code> 与 <code>.br</code> 文件（<code>vite-plugin-compression2</code> 等），Nginx 直接发预压缩文件，避免请求时实时压缩的 CPU 开销；</li>
+<li><strong>minify 必开</strong>：Terser/esbuild 压缩 JS、cssnano 压 CSS；</li>
+<li><strong>图片/视频/WOFF2 不再 gzip</strong>：本身已是压缩格式，二次压缩白白耗 CPU；</li>
+<li><strong>开启 HTTP/2</strong>：Nginx <code>listen 443 ssl http2;</code>。</li>
+</ol>
+<h2 id="4-图片优化格式响应式与懒加载">4. 图片优化：格式、响应式与懒加载</h2>
+<p>图片通常占页面流量的大头，是加载优化的最大单项收益来源。</p>
+<p><strong>格式选型</strong>：WebP 比 JPEG 小 25~35%，AVIF 再小 20% 左右；新格式用 <code>&lt;picture&gt;</code> 兜底：</p>
+<pre><code class="language-html">&lt;!-- 文件: 图片响应式与格式降级模板 --&gt;
+&lt;picture&gt;
+  &lt;source type=&quot;image/avif&quot; srcset=&quot;hero.avif&quot;&gt;
+  &lt;source type=&quot;image/webp&quot; srcset=&quot;hero.webp&quot;&gt;
+  &lt;img src=&quot;hero.jpg&quot; alt=&quot;首屏主图&quot; width=&quot;1200&quot; height=&quot;600&quot;
+       fetchpriority=&quot;high&quot;&gt;&lt;!-- width/height 防止 CLS --&gt;
+&lt;/picture&gt;
+
+&lt;!-- srcset/sizes：按视口宽度发合适尺寸，避免手机下载 3x 大图 --&gt;
+&lt;img srcset=&quot;photo-400.jpg 400w, photo-800.jpg 800w, photo-1600.jpg 1600w&quot;
+     sizes=&quot;(max-width: 600px) 400px, 800px&quot;
+     src=&quot;photo-800.jpg&quot; alt=&quot;正文配图&quot; loading=&quot;lazy&quot; decoding=&quot;async&quot;&gt;
+</code></pre>
+<blockquote>
+<p>运行方式：静态页面直接验证；用 DevTools Network 面板按设备模拟确认实际命中的资源。</p>
+</blockquote>
+<p><strong>懒加载的正确姿势</strong>：</p>
+<ul>
+<li>原生优先：<code>loading=&quot;lazy&quot;</code>（Chrome 77+ 全量支持）；</li>
+<li>复杂场景（滚动容器内/动画触发）用 <code>IntersectionObserver</code> 手动控制；</li>
+<li><strong>铁律：LCP 元素（首屏主图）绝不懒加载</strong>——懒加载会推迟它的发现时机，直接拖慢 LCP。</li>
+</ul>
+<pre><code class="language-js">// 文件: 示例片段 —— IntersectionObserver 懒加载（原生 loading 不够用的场景）
+const io = new IntersectionObserver((entries) =&gt; {
+  for (const e of entries) {
+    if (!e.isIntersecting) continue;
+    const img = e.target;
+    img.src = img.dataset.src;        // 进入视口再发真实请求
+    io.unobserve(img);                // 加载一次即停，避免重复回调
+  }
+}, { rootMargin: &#39;600px 0px&#39; });      // 提前 600px 预取，滚动到时刚好加载完
+document.querySelectorAll(&#39;img[data-src]&#39;).forEach((img) =&gt; io.observe(img));
+</code></pre>
+<blockquote>
+<p>运行方式：浏览器打开含 <code>data-src</code> 图片的页面，在 Network 面板观察按需加载时序。</p>
+</blockquote>
+<h2 id="5-字体加载策略">5. 字体加载策略</h2>
+<p>Web 字体是隐性杀手：字体文件常达 200KB+，且默认会阻塞文本渲染（隐形文本闪烁 FOIT）。</p>
+<p>四步标准方案：</p>
+<pre><code class="language-html">&lt;!-- 文件: index.html 片段 —— 字体加载四件套 --&gt;
+&lt;link rel=&quot;preload&quot; href=&quot;/fonts/main.woff2&quot; as=&quot;font&quot; type=&quot;font/woff2&quot; crossorigin&gt;
+&lt;style&gt;
+  @font-face {
+    font-family: &#39;Main&#39;;
+    src: url(&#39;/fonts/main.woff2&#39;) format(&#39;woff2&#39;); /* 只用 WOFF2，现代浏览器全覆盖 */
+    font-display: swap;  /* 下载期先用回退字体显示，避免白屏 */
+    size-adjust: 98%;    /* 微调回退字体度量，减少换行抖动（防 CLS） */
+  }
+&lt;/style&gt;
+</code></pre>
+<table>
+<thead>
+<tr>
+<th>font-display</th>
+<th>行为</th>
+<th>适用</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>auto</code>/<code>block</code></td>
+<td>等字体（最长约 3s 隐形文本）</td>
+<td>默认，不建议</td>
+</tr>
+<tr>
+<td><code>swap</code></td>
+<td>立即用回退字体，字体到了再换</td>
+<td>大多数场景（可能闪一下）</td>
+</tr>
+<tr>
+<td><code>optional</code></td>
+<td>100ms 内没下完就整周期用回退字体</td>
+<td>强稳定性诉求（CLS 最优）</td>
+</tr>
+</tbody></table>
+<p>进阶：<strong>子集化</strong>（<code>fonttools</code>/<code>glyphhanger</code> 只保留用到的字符，中文场景收益巨大，几百 KB 可压到几十 KB）。</p>
+<h2 id="6-javascript-交付与代码分割">6. JavaScript 交付与代码分割</h2>
+<p>JS 是首屏最常见的负担。优化三板斧：</p>
+<p><strong>① Tree Shaking</strong>：确保 <code>package.json</code> 标注 <code>&quot;sideEffects&quot;: false</code>（或列出有副作用的文件），让打包器安全删除未引用代码；工具库按子路径引入（<code>import debounce from &#39;lodash-es/debounce&#39;</code>）。</p>
+<p><strong>② 代码分割</strong>：按「路由级 → 重组件级」两级拆分，首屏只加载首屏需要的代码：</p>
+<pre><code class="language-js">// 文件: src/router.js 片段 —— 动态 import 实现路由级分割（Vue 与 React 通用）
+const routes = [
+  // 首页同步加载（保证首屏最快）；其余页面按需加载
+  { path: &#39;/&#39;, component: () =&gt; import(&#39;./views/Home.vue&#39;) },
+  { path: &#39;/admin&#39;, component: () =&gt; import(&#39;./views/Admin.vue&#39;) }, // 管理后台不在首包
+];
+</code></pre>
+<p><strong>③ 产物瘦身验证</strong>：用 <code>rollup-plugin-visualizer</code>（Vite）或 <code>webpack-bundle-analyzer</code> 看包构成，重点排查重复依赖与误整包引入。</p>
+<h2 id="7-缓存策略设计">7. 缓存策略设计</h2>
+<p>HTTP 缓存两层机制：</p>
+<table>
+<thead>
+<tr>
+<th>机制</th>
+<th>关键头</th>
+<th>行为</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>强缓存</td>
+<td><code>Cache-Control: max-age=31536000</code></td>
+<td>有效期内浏览器<strong>不发请求</strong>，直接用本地副本</td>
+</tr>
+<tr>
+<td>协商缓存</td>
+<td><code>ETag</code> / <code>Last-Modified</code></td>
+<td>发请求问服务器「变了没」，没变返回 304</td>
+</tr>
+</tbody></table>
+<p>标准组合（内容寻址缓存）：</p>
+<pre><code class="language-text">带内容 hash 的静态资源：Cache-Control: public, max-age=31536000, immutable
+  → app.3f9a2b.js 内容变了文件名就变，缓存永不冲突，可以放心缓存一年
+HTML 文档：            Cache-Control: no-cache
+  → 每次协商校验，保证用户总能拿到引用最新资源的 HTML
+</code></pre>
+<blockquote>
+<p>💡 <strong>一句话</strong>：HTML 不缓存（或短缓存），带 hash 的静态资源永久缓存。这一条做好，回访用户的 LCP 可以直接从网络级降到本地级。</p>
+</blockquote>
+<h2 id="8-框架落地路由分割与资源提示">8. 框架落地：路由分割与资源提示</h2>
+<p>框架项目里，代码分割通常已被脚手架默认支持，要做的是「确认分割粒度」与「补预热」：</p>
+<p><strong>Vue 3</strong>（Vite 脚手架默认动态 import 路由即自动分割）：</p>
+<pre><code class="language-js">// 文件: src/router/index.js —— Vue Router 懒加载 + webpack 魔法注释命名分包
+const routes = [
+  {
+    path: &#39;/report&#39;,
+    // 同一 chunk 的资源合并下载，便于缓存与并行
+    component: () =&gt; import(/* webpackChunkName: &quot;report&quot; */ &#39;../views/Report.vue&#39;),
+  },
+];
+</code></pre>
+<p><strong>React</strong>（<code>React.lazy</code> 必须配合 <code>Suspense</code>）：</p>
+<pre><code class="language-jsx">// 文件: src/App.jsx —— React 路由级分割
+import { lazy, Suspense } from &#39;react&#39;;
+const Admin = lazy(() =&gt; import(&#39;./views/Admin&#39;));
+
+export default function App() {
+  return (
+    &lt;Suspense fallback={&lt;div&gt;加载中…&lt;/div&gt;}&gt;
+      &lt;Admin /&gt;
+    &lt;/Suspense&gt;
+  );
+}
+</code></pre>
+<p><strong>资源预热</strong>：对「用户大概率会去的下一个路由」提前拉取，点进去时零等待：</p>
+<pre><code class="language-html">&lt;!-- 文件: index.html 片段 —— 预取下一路由（空闲时拉取，不抢首屏带宽） --&gt;
+&lt;link rel=&quot;prefetch&quot; href=&quot;/assets/Admin-9f2c1a.js&quot;&gt;
+</code></pre>
+<blockquote>
+<p>运行方式：<code>npm run build</code> 后观察 dist 产物目录的分包结构，DevTools Network 中确认 prefetch 在空闲期触发。</p>
+</blockquote>
+<h2 id="9-最佳实践清单">9. 最佳实践清单</h2>
+<ul>
+<li><input disabled="" type="checkbox"> 所有 <code>&lt;script&gt;</code> 默认 <code>defer</code>，独立第三方脚本才用 <code>async</code></li>
+<li><input disabled="" type="checkbox"> 关键 CSS 内联，全量 CSS 异步加载</li>
+<li><input disabled="" type="checkbox"> 静态资源全部上 CDN，Brotli 预压缩产物</li>
+<li><input disabled="" type="checkbox"> 图片：AVIF/WebP + <code>srcset</code> + 显式宽高；LCP 主图 <code>fetchpriority=&quot;high&quot;</code> 且绝不懒加载</li>
+<li><input disabled="" type="checkbox"> 字体：WOFF2 + <code>preload</code> + <code>font-display: swap</code>，中文大字体做子集化</li>
+<li><input disabled="" type="checkbox"> Tree Shaking 生效（<code>sideEffects</code> 配置正确），路由级代码分割到位</li>
+<li><input disabled="" type="checkbox"> 缓存：hash 资源 <code>max-age=31536000, immutable</code>，HTML <code>no-cache</code></li>
+<li><input disabled="" type="checkbox"> 对关键第三方域 <code>preconnect</code>，对下一路由 <code>prefetch</code></li>
+</ul>
+<hr>
+<h2 id="配套漫画ep03">🎬 配套漫画（EP.03）</h2>
+<blockquote>
+<p><strong>EP.03《餐厅备菜大作战》</strong> —— 餐厅厨房=页面加载：就近备菜（CDN）、半成品预制（压缩+缓存）、菜单拆页（代码分割）、按需做菜（懒加载）。</p>
+<table>
+<thead>
+<tr>
+<th>漫画格</th>
+<th>剧情梗概</th>
+<th>对应本章小节</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>第 1 格</td>
+<td>灾难厨房：样样现拉，上菜 40 分钟</td>
+<td><a href="#1-%E5%85%B3%E9%94%AE%E6%B8%B2%E6%9F%93%E8%B7%AF%E5%BE%84%E6%B5%8F%E8%A7%88%E5%99%A8%E6%8B%BF%E5%88%B0-html-%E4%B9%8B%E5%90%8E">1. 关键渲染路径：浏览器拿到 HTML 之后</a></td>
+</tr>
+<tr>
+<td>第 2 格</td>
+<td>稳叔三板斧：CDN、压缩缓存、预热</td>
+<td><a href="#2-%E7%BD%91%E7%BB%9C%E5%B1%82%E4%BC%98%E5%8C%96cdn-%E4%B8%8E%E8%BF%9E%E6%8E%A5%E9%A2%84%E7%83%AD">2. 网络层优化：CDN 与连接预热</a>、<a href="#3-%E8%B5%84%E6%BA%90%E5%8E%8B%E7%BC%A9%E4%B8%8E%E4%BC%A0%E8%BE%93">3. 资源压缩与传输</a></td>
+</tr>
+<tr>
+<td>第 3 格</td>
+<td>菜单拆页、按需做菜，40 分钟变 8 分钟</td>
+<td><a href="#4-%E5%9B%BE%E7%89%87%E4%BC%98%E5%8C%96%E6%A0%BC%E5%BC%8F%E5%93%8D%E5%BA%94%E5%BC%8F%E4%B8%8E%E6%87%92%E5%8A%A0%E8%BD%BD">4. 图片优化</a>、<a href="#6-javascript-%E4%BA%A4%E4%BB%98%E4%B8%8E%E4%BB%A3%E7%A0%81%E5%88%86%E5%89%B2">6. JavaScript 交付与代码分割</a></td>
+</tr>
+<tr>
+<td>第 4 格</td>
+<td>坑点：拆太碎增加往返 + 稳叔总结</td>
+<td><a href="#7-%E7%BC%93%E5%AD%98%E7%AD%96%E7%95%A5%E8%AE%BE%E8%AE%A1">7. 缓存策略设计</a></td>
+</tr>
+</tbody></table>
+<p>🎬 <a href="../comics/EP.03.svg">打开漫画 EP.03</a> ｜ 📖 <a href="../comics/EP.03.html">漫画讲解稿 EP.03.md</a></p>
+</blockquote>
+
+</main>
+<footer>
+  双形态联动学习体系 ｜ 标准文档 + 漫画剧场 ｜
+  源码仓库 <a href="https://github.com/YZhiJie/frontend-perf-guide">GitHub</a> ｜
+  在线站点 <a href="https://yzhijie.github.io/frontend-perf-guide-pages/">https://yzhijie.github.io/frontend-perf-guide-pages/</a>
+</footer>
+</body>
+</html>

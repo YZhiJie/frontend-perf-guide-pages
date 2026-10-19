@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>第 8 章 · 性能检测工具完全指南 · 前端性能优化完全学习指南</title>
+<style>
+:root{--fg:#1f2328;--muted:#57606a;--line:#d0d7de;--accent:#f97316;--link:#0969da;--code-bg:#f6f8fa}
+*{box-sizing:border-box}
+body{margin:0;font-family:-apple-system,BlinkMacSystemFont,'PingFang SC','Microsoft YaHei',sans-serif;color:var(--fg);background:#fff;line-height:1.75}
+header.top{position:sticky;top:0;background:#0f172a;color:#e2e8f0;padding:12px 20px;display:flex;align-items:center;gap:16px;flex-wrap:wrap;z-index:10}
+header.top .brand{font-weight:700;color:#fff}
+header.top .brand em{color:var(--accent);font-style:normal}
+header.top nav{margin-left:auto;display:flex;gap:16px;flex-wrap:wrap}
+header.top nav a{color:#cbd5e1;text-decoration:none;font-size:14px}
+header.top nav a:hover{color:var(--accent)}
+header.top nav a.active{color:#fff;border-bottom:2px solid var(--accent);padding-bottom:2px}
+main{max-width:880px;margin:0 auto;padding:28px 20px 64px}
+main h1{font-size:28px;border-bottom:1px solid var(--line);padding-bottom:.3em}
+main h2{font-size:22px;border-bottom:1px solid var(--line);padding-bottom:.3em;margin-top:2em}
+main h3{font-size:18px;margin-top:1.6em}
+main img{max-width:100%}
+a{color:var(--link)}
+code{background:var(--code-bg);padding:.15em .35em;border-radius:4px;font-size:.9em;font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}
+pre{background:#0f172a;color:#e2e8f0;padding:14px 16px;border-radius:8px;overflow:auto}
+pre code{background:none;color:inherit;padding:0;font-size:13px}
+table{border-collapse:collapse;width:100%;margin:1em 0;display:block;overflow:auto}
+th,td{border:1px solid var(--line);padding:6px 12px;text-align:left}
+th{background:var(--code-bg)}
+blockquote{border-left:4px solid var(--accent);margin:1em 0;padding:.3em 1em;color:var(--muted);background:#fff7ed}
+hr{border:none;border-top:1px solid var(--line);margin:2em 0}
+footer{border-top:1px solid var(--line);color:var(--muted);font-size:13px;text-align:center;padding:20px 16px}
+footer a{color:var(--link);text-decoration:none}
+</style>
+</head>
+<body>
+<header class="top">
+  <span class="brand"><em>前端性能</em>完全指南</span>
+  <nav>
+    <a href="../index.html">首页</a>
+    <a href="../docs/README.html" class="active">标准文档</a>
+    <a href="../comics/index.html">漫画剧场</a>
+    <a href="https://github.com/YZhiJie/frontend-perf-guide">源码仓库</a>
+  </nav>
+</header>
+<main>
+<h1 id="第-8-章-性能检测工具完全指南">第 8 章 · 性能检测工具完全指南</h1>
+<blockquote>
+<p>🎬 本章配套漫画：<a href="../comics/EP.08.svg">EP.08《性能体检中心》</a> ｜ <a href="../comics/EP.08.html">漫画讲解稿</a></p>
+<p>学习目标：熟练使用 Lighthouse、Lighthouse CI、DevTools Performance/Network、WebPageTest 与 RUM 采集，形成「实验室定位 + 真实数据定论」的完整测量能力。
+前置知识：<a href="./02-core-web-vitals.html">第 2 章</a> 指标口径。</p>
+</blockquote>
+<h2 id="0-本章学习地图">0. 本章学习地图</h2>
+<ol>
+<li><a href="#1-%E5%B7%A5%E5%85%B7%E5%85%A8%E6%99%AF%E9%80%89%E5%AF%B9%E5%B7%A5%E5%85%B7%E5%81%9A%E5%AF%B9%E4%BA%8B">工具全景：选对工具做对事</a></li>
+<li><a href="#2-lighthouse%E4%BB%8E%E8%B7%91%E5%88%86%E5%88%B0%E6%94%B9%E8%BF%9B%E9%A1%B9">Lighthouse：从跑分到改进项</a></li>
+<li><a href="#3-lighthouse-ci%E6%8A%8A%E5%88%86%E6%95%B0%E5%85%B3%E8%BF%9B%E6%B5%81%E6%B0%B4%E7%BA%BF">Lighthouse CI：把分数关进流水线</a></li>
+<li><a href="#4-performance-%E9%9D%A2%E6%9D%BF%E7%81%AB%E7%84%B0%E5%9B%BE%E7%B2%BE%E8%AF%BB">Performance 面板：火焰图精读</a></li>
+<li><a href="#5-network-%E9%9D%A2%E6%9D%BF%E7%80%91%E5%B8%83%E5%9B%BE%E4%B8%8E%E4%BC%98%E5%85%88%E7%BA%A7">Network 面板：瀑布图与优先级</a></li>
+<li><a href="#6-webpagetest%E7%9C%9F%E5%AE%9E%E7%BD%91%E7%BB%9C%E7%8E%AF%E5%A2%83%E4%BC%9A%E8%AF%8A">WebPageTest：真实网络环境会诊</a></li>
+<li><a href="#7-rum-%E4%B8%8E%E7%9C%9F%E5%AE%9E%E7%94%A8%E6%88%B7%E6%95%B0%E6%8D%AE">RUM 与真实用户数据</a></li>
+<li><a href="#8-%E6%9C%80%E4%BD%B3%E5%AE%9E%E8%B7%B5%E6%B8%85%E5%8D%95">最佳实践清单</a></li>
+</ol>
+<h2 id="1-工具全景选对工具做对事">1. 工具全景：选对工具做对事</h2>
+<table>
+<thead>
+<tr>
+<th>工具</th>
+<th>类型</th>
+<th>回答的问题</th>
+<th>使用场景</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Lighthouse</td>
+<td>实验室快照</td>
+<td>「这个页面整体几分，该改什么」</td>
+<td>快速体检、改进清单</td>
+</tr>
+<tr>
+<td>DevTools Performance</td>
+<td>实验室精查</td>
+<td>「具体哪段代码/哪一帧卡」</td>
+<td>定位长任务、布局抖动</td>
+</tr>
+<tr>
+<td>DevTools Network</td>
+<td>实验室精查</td>
+<td>「哪些资源慢、优先级对不对」</td>
+<td>加载问题溯源</td>
+</tr>
+<tr>
+<td>WebPageTest</td>
+<td>可控真实环境</td>
+<td>「换个地点/网络/设备还快吗」</td>
+<td>弱网与地域矩阵测试</td>
+</tr>
+<tr>
+<td>web-vitals + RUM</td>
+<td>真实用户</td>
+<td>「我的真实用户体验到底如何」</td>
+<td>业务结论、回归告警</td>
+</tr>
+<tr>
+<td>Lighthouse CI</td>
+<td>流水线</td>
+<td>「这次提交有没有让性能变差」</td>
+<td>CI 门禁</td>
+</tr>
+</tbody></table>
+<blockquote>
+<p>💡 心法：<strong>实验室找病因，真实数据下诊断</strong>。所有实验室工具都无法替代真实用户监控。</p>
+</blockquote>
+<h2 id="2-lighthouse从跑分到改进项">2. Lighthouse：从跑分到改进项</h2>
+<p>三种跑法，CLI 最适合自动化与批量：</p>
+<pre><code class="language-bash"># 文件: 终端命令 —— Lighthouse CLI 跑移动端模拟（Chrome 需已安装）
+npx lighthouse https://example.com \
+  --preset=perf \
+  --form-factor=mobile \
+  --screenEmulation.mobile \
+  --output=html --output-path=./lh-report.html \
+  --chrome-flags=&quot;--headless&quot;
+
+# 桌面端口径
+npx lighthouse https://example.com --preset=desktop --output=json --output-path=./lh.json --chrome-flags=&quot;--headless&quot;
+</code></pre>
+<blockquote>
+<p>运行方式：直接执行；<code>--quiet</code> 静默输出，<code>--only-categories=performance</code> 只跑性能类。</p>
+</blockquote>
+<p><strong>报告解读三步</strong>：</p>
+<ol>
+<li><strong>看性能分构成</strong>：Lighthouse 10 的性能分由五项加权——TBT 30%、LCP 25%、CLS 25%、FCP 10%、SI 10%。先修权重高的（TBT/LCP/CLS）；</li>
+<li><strong>看「Opportunities/诊断」区</strong>：按预估节省时间排序的改进项（如「启用文本压缩 可省 1.2s」），逐项落地；</li>
+<li><strong>区分模拟与实测</strong>：Lighthouse 移动端默认是<strong>模拟节流</strong>（Moto G4 + 慢速 4G + 4 倍 CPU 降速），数字用于横向对比，不等于真实用户。</li>
+</ol>
+<p><strong>三个常见误读</strong>：</p>
+<ul>
+<li>分数每次波动 ±5 分属正常（环境噪声），要看趋势与多次中位数，别纠结单次；</li>
+<li>「性能分 90」不等于「真实用户体验好」——它测的是单页单环境快照；</li>
+<li>插件/登录态会显著改变结果，测试统一用无痕模式 + 无插件。</li>
+</ul>
+<h2 id="3-lighthouse-ci把分数关进流水线">3. Lighthouse CI：把分数关进流水线</h2>
+<pre><code class="language-bash">npm install -g @lhci/cli
+</code></pre>
+<pre><code class="language-js">// 文件: lighthouserc.js —— Lighthouse CI 配置：连跑 3 次取稳定值，低于阈值即失败
+module.exports = {
+  ci: {
+    collect: {
+      staticDistDir: &#39;./dist&#39;,      // 或 url 列表：url: [&#39;https://example.com&#39;]
+      numberOfRuns: 3,              // 多次运行抵消波动
+    },
+    assert: {
+      assertions: {
+        &#39;categories:performance&#39;: [&#39;error&#39;, { minScore: 0.85 }],
+        &#39;largest-contentful-paint&#39;: [&#39;error&#39;, { maxNumericValue: 2500 }],
+        &#39;cumulative-layout-shift&#39;: [&#39;error&#39;, { maxNumericValue: 0.1 }],
+        &#39;total-byte-weight&#39;: [&#39;warn&#39;, { maxNumericValue: 3 * 1024 * 1024 }],
+      },
+    },
+  },
+};
+</code></pre>
+<pre><code class="language-bash"># 文件: 终端命令 —— 本地与 CI 中执行（见第 9 章流水线接入）
+npx lhci autorun
+</code></pre>
+<blockquote>
+<p>运行方式：先 <code>npm run build</code> 再 <code>npx lhci autorun</code>；断言失败会以非零退出码拦截流水线。</p>
+</blockquote>
+<h2 id="4-performance-面板火焰图精读">4. Performance 面板：火焰图精读</h2>
+<p>DevTools Performance 面板是定位「哪段代码卡」的核心武器。标准操作流：</p>
+<ol>
+<li><strong>先设节流</strong>（模拟用户环境）：CPU 4x slowdown + Network Slow 4G；</li>
+<li><strong>录制</strong>：点击录制 → 执行用户操作（滚动/点击/输入）→ 停止；</li>
+<li><strong>读轨道</strong>（自上而下：Timings → Interactions → 主线程火焰图 → 帧率）。</li>
+</ol>
+<p>火焰图读图要点：</p>
+<table>
+<thead>
+<tr>
+<th>看什么</th>
+<th>识别特征</th>
+<th>结论</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>长任务</td>
+<td>主线程上 &gt;50ms 的整块，右上角红色三角</td>
+<td>点开 Bottom-Up 按 Self Time 排序找元凶函数</td>
+</tr>
+<tr>
+<td>布局抖动</td>
+<td>连续的紫色 Layout 锯齿（本教材第 4 章第 3 节）</td>
+<td>读写分离重构</td>
+</tr>
+<tr>
+<td>掉帧</td>
+<td>Frames 轨道出现红色帧 / FPS 曲线下探</td>
+<td>结合上方两项定位</td>
+</tr>
+<tr>
+<td>GC 频繁</td>
+<td>主线程密集的 GC 条纹</td>
+<td>内存问题，转 Memory 面板（第 5 章）</td>
+</tr>
+<tr>
+<td>强制同步布局</td>
+<td>函数名旁紫色「Recalculate Style — forced reflow」标记</td>
+<td>读布局 API 的调用点</td>
+</tr>
+</tbody></table>
+<blockquote>
+<p>💡 Bottom-Up（自下而上）视图按 <strong>Self Time（自身耗时）</strong> 排序，是「找到那个函数」最快的路径；Call Tree 则回答「它是被谁调用的」。</p>
+</blockquote>
+<h2 id="5-network-面板瀑布图与优先级">5. Network 面板：瀑布图与优先级</h2>
+<p>加载问题的第一现场。关键动作：</p>
+<ol>
+<li>勾选 <strong>Disable cache</strong>，选 <strong>Slow 4G</strong> 节流，刷新录制；</li>
+<li><strong>Waterfall 列</strong>读时序：横条越长下载越久；<strong>斜向阶梯</strong>（一条接一条）说明存在串行阻塞——典型如「HTML → CSS → 字体 → 渲染」的链式等待；</li>
+<li><strong>Priority 列</strong>看优先级：LCP 主图应是 High（否则加 <code>fetchpriority=&quot;high&quot;</code>，见第 3 章）；被降级的预加载资源（Preload as=style 但迟迟不用）会触发警告；</li>
+<li>按 <strong>Initiator</strong> 列追责：这个请求是谁触发的？（往往能定位到某段 JS 才发起请求的问题）；</li>
+<li>导出 <strong>HAR</strong> 归档对比：优化前后各存一份，逐请求对比 Time 与 Size 变化。</li>
+</ol>
+<h2 id="6-webpagetest真实网络环境会诊">6. WebPageTest：真实网络环境会诊</h2>
+<p>WebPageTest 提供全球测试节点 + 真实设备/网络档位，补齐 Lighthouse「实验室理想化」的短板：</p>
+<ul>
+<li><strong>测试配置</strong>：选地点（选目标用户的真实地域）、连接档位（3G/4G/光纤）、机型、测试次数（建议 3+ 次取中位）；</li>
+<li><strong>First View vs Repeat View</strong>：首次访问（冷缓存）与回访（命中缓存）分开看——回访慢说明缓存策略有问题（第 3 章第 7 节）；</li>
+<li><strong>Filmstrip 视图</strong>：逐帧截图，直观看到「白屏多久、内容何时出现、何时可交互」，比数字更能对齐团队认知；</li>
+<li><strong>对比测试</strong>：把优化前后两条 URL 放进 Compare，瀑布图并排对比，适合做优化汇报材料。</li>
+</ul>
+<h2 id="7-rum-与真实用户数据">7. RUM 与真实用户数据</h2>
+<p>采集端在第 2 章第 7 节（web-vitals 上报），这里讲<strong>数据消费端</strong>——RUM 看板的最小可用形态：</p>
+<table>
+<thead>
+<tr>
+<th>维度</th>
+<th>内容</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>聚合口径</td>
+<td>各指标取 <strong>p75</strong>（Google 官方口径），同时看 p98 防长尾</td>
+</tr>
+<tr>
+<td>分片维度</td>
+<td>页面路由、设备类型、网络类型、地区——劣化时快速圈定范围</td>
+</tr>
+<tr>
+<td>趋势与告警</td>
+<td>按天趋势 + 环比，p75 连续劣化超阈值（如 10%）触发告警</td>
+</tr>
+<tr>
+<td>归因辅助</td>
+<td>配合 web-vitals 的 attribution 版本上报瓶颈归属（哪个元素/哪一阶段）</td>
+</tr>
+</tbody></table>
+<blockquote>
+<p>💡 没有 RUM 看板的团队，性能优化是盲人摸象：你不知道用户在哪条路上被卡住，也不知道优化上线后是否真的生效。</p>
+</blockquote>
+<h2 id="8-最佳实践清单">8. 最佳实践清单</h2>
+<ul>
+<li><input disabled="" type="checkbox"> Lighthouse 统一用 CLI + 无痕模式跑，多次取中位数看趋势</li>
+<li><input disabled="" type="checkbox"> 性能分构成记牢：TBT/LCP/CLS 权重最高，优先修它们</li>
+<li><input disabled="" type="checkbox"> Lighthouse CI 接入流水线，断言阈值与性能预算（第 9 章）一致</li>
+<li><input disabled="" type="checkbox"> Performance 录制前先设节流（CPU 4x + Slow 4G），结论才接近真实</li>
+<li><input disabled="" type="checkbox"> 定位函数级瓶颈用 Bottom-Up 的 Self Time 排序</li>
+<li><input disabled="" type="checkbox"> Network 瀑布图排查串行链与优先级错位，HAR 归档做前后对比</li>
+<li><input disabled="" type="checkbox"> WebPageTest 补真实地域/弱网/首访回访视角</li>
+<li><input disabled="" type="checkbox"> RUM 看板以 p75 为口径、可按路由与设备分片、有劣化告警</li>
+</ul>
+<hr>
+<h2 id="配套漫画ep08">🎬 配套漫画（EP.08）</h2>
+<blockquote>
+<p><strong>EP.08《性能体检中心》</strong> —— 网站「不舒服」去医院：Lighthouse 医生打分开单、Performance CT 机找堵点、WebPageTest 异地弱网会诊、web-vitals 手环 24 小时监测。</p>
+<table>
+<thead>
+<tr>
+<th>漫画格</th>
+<th>剧情梗概</th>
+<th>对应本章小节</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>第 1 格</td>
+<td>Lighthouse 医生打出 62 分报告</td>
+<td><a href="#2-lighthouse%E4%BB%8E%E8%B7%91%E5%88%86%E5%88%B0%E6%94%B9%E8%BF%9B%E9%A1%B9">2. Lighthouse：从跑分到改进项</a></td>
+</tr>
+<tr>
+<td>第 2 格</td>
+<td>CT 机火焰图找到堵点血管</td>
+<td><a href="#4-performance-%E9%9D%A2%E6%9D%BF%E7%81%AB%E7%84%B0%E5%9B%BE%E7%B2%BE%E8%AF%BB">4. Performance 面板：火焰图精读</a></td>
+</tr>
+<tr>
+<td>第 3 格</td>
+<td>异地弱网会诊 + 真实用户手环</td>
+<td><a href="#6-webpagetest%E7%9C%9F%E5%AE%9E%E7%BD%91%E7%BB%9C%E7%8E%AF%E5%A2%83%E4%BC%9A%E8%AF%8A">6. WebPageTest</a>、<a href="#7-rum-%E4%B8%8E%E7%9C%9F%E5%AE%9E%E7%94%A8%E6%88%B7%E6%95%B0%E6%8D%AE">7. RUM 与真实用户数据</a></td>
+</tr>
+<tr>
+<td>第 4 格</td>
+<td>坑点：实验室分数 ≠ 真实体验 + 稳叔总结</td>
+<td><a href="#1-%E5%B7%A5%E5%85%B7%E5%85%A8%E6%99%AF%E9%80%89%E5%AF%B9%E5%B7%A5%E5%85%B7%E5%81%9A%E5%AF%B9%E4%BA%8B">1. 工具全景：选对工具做对事</a></td>
+</tr>
+</tbody></table>
+<p>🎬 <a href="../comics/EP.08.svg">打开漫画 EP.08</a> ｜ 📖 <a href="../comics/EP.08.html">漫画讲解稿 EP.08.md</a></p>
+</blockquote>
+
+</main>
+<footer>
+  双形态联动学习体系 ｜ 标准文档 + 漫画剧场 ｜
+  源码仓库 <a href="https://github.com/YZhiJie/frontend-perf-guide">GitHub</a> ｜
+  在线站点 <a href="https://yzhijie.github.io/frontend-perf-guide-pages/">https://yzhijie.github.io/frontend-perf-guide-pages/</a>
+</footer>
+</body>
+</html>

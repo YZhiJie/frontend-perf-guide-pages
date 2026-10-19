@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>第 2 章 · Core Web Vitals 核心指标详解 · 前端性能优化完全学习指南</title>
+<style>
+:root{--fg:#1f2328;--muted:#57606a;--line:#d0d7de;--accent:#f97316;--link:#0969da;--code-bg:#f6f8fa}
+*{box-sizing:border-box}
+body{margin:0;font-family:-apple-system,BlinkMacSystemFont,'PingFang SC','Microsoft YaHei',sans-serif;color:var(--fg);background:#fff;line-height:1.75}
+header.top{position:sticky;top:0;background:#0f172a;color:#e2e8f0;padding:12px 20px;display:flex;align-items:center;gap:16px;flex-wrap:wrap;z-index:10}
+header.top .brand{font-weight:700;color:#fff}
+header.top .brand em{color:var(--accent);font-style:normal}
+header.top nav{margin-left:auto;display:flex;gap:16px;flex-wrap:wrap}
+header.top nav a{color:#cbd5e1;text-decoration:none;font-size:14px}
+header.top nav a:hover{color:var(--accent)}
+header.top nav a.active{color:#fff;border-bottom:2px solid var(--accent);padding-bottom:2px}
+main{max-width:880px;margin:0 auto;padding:28px 20px 64px}
+main h1{font-size:28px;border-bottom:1px solid var(--line);padding-bottom:.3em}
+main h2{font-size:22px;border-bottom:1px solid var(--line);padding-bottom:.3em;margin-top:2em}
+main h3{font-size:18px;margin-top:1.6em}
+main img{max-width:100%}
+a{color:var(--link)}
+code{background:var(--code-bg);padding:.15em .35em;border-radius:4px;font-size:.9em;font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}
+pre{background:#0f172a;color:#e2e8f0;padding:14px 16px;border-radius:8px;overflow:auto}
+pre code{background:none;color:inherit;padding:0;font-size:13px}
+table{border-collapse:collapse;width:100%;margin:1em 0;display:block;overflow:auto}
+th,td{border:1px solid var(--line);padding:6px 12px;text-align:left}
+th{background:var(--code-bg)}
+blockquote{border-left:4px solid var(--accent);margin:1em 0;padding:.3em 1em;color:var(--muted);background:#fff7ed}
+hr{border:none;border-top:1px solid var(--line);margin:2em 0}
+footer{border-top:1px solid var(--line);color:var(--muted);font-size:13px;text-align:center;padding:20px 16px}
+footer a{color:var(--link);text-decoration:none}
+</style>
+</head>
+<body>
+<header class="top">
+  <span class="brand"><em>前端性能</em>完全指南</span>
+  <nav>
+    <a href="../index.html">首页</a>
+    <a href="../docs/README.html" class="active">标准文档</a>
+    <a href="../comics/index.html">漫画剧场</a>
+    <a href="https://github.com/YZhiJie/frontend-perf-guide">源码仓库</a>
+  </nav>
+</header>
+<main>
+<h1 id="第-2-章-core-web-vitals-核心指标详解">第 2 章 · Core Web Vitals 核心指标详解</h1>
+<blockquote>
+<p>🎬 本章配套漫画：<a href="../comics/EP.02.svg">EP.02《快递签收的三门课》</a> ｜ <a href="../comics/EP.02.html">漫画讲解稿</a></p>
+<p>学习目标：吃透 Core Web Vitals 各指标的定义、测量原理、评分标准与优化手段，能独立搭建真实用户指标采集。
+前置知识：<a href="./01-overview.html">第 1 章</a> 的请求旅程全景图。</p>
+</blockquote>
+<h2 id="0-本章学习地图">0. 本章学习地图</h2>
+<ol>
+<li><a href="#1-%E6%8C%87%E6%A0%87%E5%85%A8%E6%99%AF%E4%B8%8E%E8%AF%84%E5%88%86%E6%A0%87%E5%87%86">指标全景与评分标准</a></li>
+<li><a href="#2-ttfb%E7%AC%AC%E4%B8%80%E5%AD%97%E8%8A%82%E7%9A%84%E7%AD%89%E5%BE%85">TTFB：第一字节的等待</a></li>
+<li><a href="#3-fcp%E7%AC%AC%E4%B8%80%E5%8D%B0%E8%B1%A1">FCP：第一印象</a></li>
+<li><a href="#4-lcp%E6%9C%80%E5%A4%A7%E5%86%85%E5%AE%B9%E5%85%83%E7%B4%A0%E4%BD%95%E6%97%B6%E5%87%BA%E7%8E%B0">LCP：最大内容元素何时出现</a></li>
+<li><a href="#5-inp%E4%BA%A4%E4%BA%92%E5%93%8D%E5%BA%94%E7%9A%84%E7%81%B5%E9%AD%82%E6%8B%B7%E9%97%AE">INP：交互响应的灵魂拷问</a></li>
+<li><a href="#6-cls%E5%B8%83%E5%B1%80%E5%81%8F%E7%A7%BB%E7%9A%84%E5%85%83%E5%87%B6%E6%8E%92%E6%9F%A5">CLS：布局偏移的元凶排查</a></li>
+<li><a href="#7-%E7%94%A8-web-vitals-%E5%BA%93%E9%87%87%E9%9B%86%E7%9C%9F%E5%AE%9E%E7%94%A8%E6%88%B7%E6%95%B0%E6%8D%AE">用 web-vitals 库采集真实用户数据</a></li>
+<li><a href="#8-%E6%9C%80%E4%BD%B3%E5%AE%9E%E8%B7%B5%E6%B8%85%E5%8D%95">最佳实践清单</a></li>
+</ol>
+<h2 id="1-指标全景与评分标准">1. 指标全景与评分标准</h2>
+<p>Core Web Vitals（2024 年 3 月起，INP 取代 FID 成为核心三指标之一）+ 两个诊断性指标：</p>
+<table>
+<thead>
+<tr>
+<th>指标</th>
+<th>全称</th>
+<th>测量什么</th>
+<th>好</th>
+<th>需改进</th>
+<th>差</th>
+<th>性质</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>LCP</strong></td>
+<td>Largest Contentful Paint</td>
+<td>最大内容元素渲染时间</td>
+<td>≤ 2.5s</td>
+<td>≤ 4.0s</td>
+<td>&gt; 4.0s</td>
+<td>核心</td>
+</tr>
+<tr>
+<td><strong>INP</strong></td>
+<td>Interaction to Next Paint</td>
+<td>最差交互的响应延迟</td>
+<td>≤ 200ms</td>
+<td>≤ 500ms</td>
+<td>&gt; 500ms</td>
+<td>核心</td>
+</tr>
+<tr>
+<td><strong>CLS</strong></td>
+<td>Cumulative Layout Shift</td>
+<td>累计布局偏移</td>
+<td>≤ 0.1</td>
+<td>≤ 0.25</td>
+<td>&gt; 0.25</td>
+<td>核心</td>
+</tr>
+<tr>
+<td>TTFB</td>
+<td>Time to First Byte</td>
+<td>首字节到达时间</td>
+<td>≤ 0.8s</td>
+<td>≤ 1.8s</td>
+<td>&gt; 1.8s</td>
+<td>诊断</td>
+</tr>
+<tr>
+<td>FCP</td>
+<td>First Contentful Paint</td>
+<td>首次内容渲染</td>
+<td>≤ 1.8s</td>
+<td>≤ 3.0s</td>
+<td>&gt; 3.0s</td>
+<td>诊断</td>
+</tr>
+</tbody></table>
+<p>三个关键口径，理解错会全盘跑偏：</p>
+<ol>
+<li><strong>分位口径</strong>：评分看的是<strong>真实用户数据的 75 分位（p75）</strong>，不是实验室单次跑分。</li>
+<li><strong>实验室 vs 真实</strong>：Lighthouse 是实验室工具（模拟环境），只能用于定位问题；下业务结论必须用真实用户数据（field data）。</li>
+<li><strong>指标是结果不是原因</strong>：LCP 慢可能是网络、资源、渲染任何一环的问题，要配合诊断指标溯源（见第 8 章工具）。</li>
+</ol>
+<h2 id="2-ttfb第一字节的等待">2. TTFB：第一字节的等待</h2>
+<p><strong>定义</strong>：从发起请求到收到响应第一个字节的时间，覆盖 重定向 → DNS → TCP → TLS → 请求 → 服务端处理 → 首字节回程。</p>
+<pre><code class="language-js">// 用 Resource Timing 读 HTML 文档的 TTFB
+const [entry] = performance.getEntriesByType(&#39;navigation&#39;);
+console.log(&#39;TTFB:&#39;, entry.responseStart, &#39;ms&#39;);
+// 各阶段拆解：重定向/ DNS / TCP / TLS 耗时
+console.log(&#39;DNS:&#39;, entry.domainLookupEnd - entry.domainLookupStart);
+console.log(&#39;TCP:&#39;, entry.connectEnd - entry.connectStart);
+console.log(&#39;TLS:&#39;, entry.requestStart - entry.secureConnectionStart);
+</code></pre>
+<p><strong>优化手段</strong>（按收益排序）：</p>
+<ol>
+<li><strong>CDN</strong>：静态资源与 SSR 页面边缘缓存，缩短物理距离；</li>
+<li><strong>强缓存命中</strong>：带 hash 的资源直接从本地/边缘返回（第 3 章第 7 节）；</li>
+<li><strong>提前建连</strong>：<code>&lt;link rel=&quot;preconnect&quot;&gt;</code> 提前完成 DNS/TCP/TLS；</li>
+<li><strong>服务端瘦身</strong>：SSR 渲染耗时、慢 SQL、无谓重定向链（<code>http → https → www</code> 每一跳都计入）。</li>
+</ol>
+<h2 id="3-fcp第一印象">3. FCP：第一印象</h2>
+<p><strong>定义</strong>：页面首次渲染出任何文本、图片、SVG 或 canvas 的时间。它回答「用户是不是觉得页面动起来了」。</p>
+<p><strong>优化手段</strong>：与 LCP 高度重合——减少阻塞渲染的 CSS/JS、关键 CSS 内联、字体用 <code>font-display: swap</code>（见第 3 章）。FCP 快但 LCP 慢，说明「壳先出来了、主内容卡住」，通常是主图/首屏数据请求慢。</p>
+<h2 id="4-lcp最大内容元素何时出现">4. LCP：最大内容元素何时出现</h2>
+<p><strong>定义</strong>：视口内<strong>最大的</strong>图片或文本块渲染完成的时间。注意是「最大的元素」而非「最后加载的元素」。</p>
+<p><strong>LCP 候选元素</strong>只有五类：<code>&lt;img&gt;</code>、内嵌 <code>&lt;image&gt;</code> 的 SVG、带 poster 的 <code>&lt;video&gt;</code>、CSS <code>background-image</code> 元素、块级文本容器（<code>&lt;p&gt;</code>/<code>&lt;h1&gt;</code>/<code>&lt;div&gt;</code> 整段文本）。</p>
+<pre><code class="language-js">// LCP 测量：候选元素会随加载不断更新，取最后一个即为最终 LCP
+new PerformanceObserver((list) =&gt; {
+  const entries = list.getEntries();
+  const last = entries[entries.length - 1];
+  console.log(&#39;LCP:&#39;, last.startTime, &#39;ms，元素:&#39;, last.element, &#39;URL:&#39;, last.url);
+}).observe({ type: &#39;largest-contentful-paint&#39;, buffered: true });
+// 注意：用户首次交互后 LCP 停止更新（交互说明用户已在看内容）
+</code></pre>
+<p><strong>四大优化方向</strong>：</p>
+<table>
+<thead>
+<tr>
+<th>方向</th>
+<th>手段</th>
+<th>章节</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>服务端出字节更快</td>
+<td>CDN、缓存、<code>preconnect</code></td>
+<td>第 3 章 2/7/8 节</td>
+</tr>
+<tr>
+<td>资源本身更小</td>
+<td>主图用 WebP/AVIF、<code>srcset</code> 响应式、首图 <code>fetchpriority=&quot;high&quot;</code></td>
+<td>第 3 章 3/4 节</td>
+</tr>
+<tr>
+<td>更早被发现</td>
+<td>首屏图 <code>&lt;link rel=&quot;preload&quot; as=&quot;image&quot;&gt;</code>，别把首屏图塞进懒加载</td>
+<td>第 3 章 4/8 节</td>
+</tr>
+<tr>
+<td>渲染不被阻塞</td>
+<td>CSS 精简、JS <code>defer</code>、关键 CSS 内联</td>
+<td>第 3 章 1/6 节</td>
+</tr>
+</tbody></table>
+<p><strong>高频反例</strong>：把轮播首图/懒加载逻辑错用在 LCP 元素上（<code>loading=&quot;lazy&quot;</code> 会让首图变慢）；LCP 是 <code>&lt;h1&gt;</code> 文本却用自定义字体且无 <code>font-display</code>，字体下载阻塞文本渲染。</p>
+<h2 id="5-inp交互响应的灵魂拷问">5. INP：交互响应的灵魂拷问</h2>
+<p><strong>定义</strong>：整次页面访问中<strong>最差的一次交互</strong>（点击/触摸/键盘）从输入到下一帧渲染完成的延迟；真实数据取 p98 以剔除离群值。</p>
+<p>一次交互延迟 = <strong>输入延迟</strong>（主线程忙，事件排队）+ <strong>处理时间</strong>（事件回调执行）+ <strong>呈现延迟</strong>（下一帧渲染）。</p>
+<pre><code class="language-js">// INP 的原始测量较复杂（需跟踪每次交互的最差延迟），
+// 生产环境直接用 web-vitals 库（见本章第 7 节）；调试用 Chrome DevTools 事件轨道。
+</code></pre>
+<p><strong>优化手段</strong>（对应三个延迟段）：</p>
+<ol>
+<li><strong>输入延迟</strong>：拆长任务，让主线程随时可响应（第 5 章第 2 节）；</li>
+<li><strong>处理时间</strong>：事件回调里只做同步必要工作，重活（排序、过滤、渲染大列表）延后；</li>
+<li><strong>呈现延迟</strong>：减少 DOM 规模、避免回调里触发大面积同步重排（第 4 章）。</li>
+</ol>
+<pre><code class="language-js">// 文件: 示例片段 —— 长任务切片，避免输入延迟（浏览器调度器 API）
+async function heavyWork(items) {
+  for (const item of items) {
+    process(item);
+    // 每处理完一项让出主线程；不支持的浏览器回退 setTimeout
+    if (&#39;scheduler&#39; in window &amp;&amp; &#39;yield&#39; in scheduler) {
+      await scheduler.yield();
+    } else {
+      await new Promise((r) =&gt; setTimeout(r, 0));
+    }
+  }
+}
+</code></pre>
+<blockquote>
+<p>运行方式：浏览器环境运行；<code>scheduler.yield()</code> 需要 Chrome 129+，代码含能力检测回退。</p>
+</blockquote>
+<h2 id="6-cls布局偏移的元凶排查">6. CLS：布局偏移的元凶排查</h2>
+<p><strong>定义</strong>：整个生命周期内每次「意外布局偏移」得分的累计。单次偏移得分 = <strong>影响比例</strong>（移动面积占视口比例）× <strong>距离比例</strong>（移动距离占视口比例）。</p>
+<pre><code class="language-js">// CLS 测量：只累计「非用户输入引发」的偏移
+let cls = 0;
+new PerformanceObserver((list) =&gt; {
+  for (const entry of list.getEntries()) {
+    if (!entry.hadRecentInput) cls += entry.value; // 输入后 500ms 内的偏移不计入
+  }
+  console.log(&#39;CLS:&#39;, cls);
+}).observe({ type: &#39;layout-shift&#39;, buffered: true });
+</code></pre>
+<p><strong>五大元凶与修复</strong>：</p>
+<table>
+<thead>
+<tr>
+<th>元凶</th>
+<th>修复</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>图片/视频未声明尺寸</td>
+<td>写死 <code>width</code>/<code>height</code> 或 CSS <code>aspect-ratio</code>，让浏览器提前占位</td>
+</tr>
+<tr>
+<td>广告/嵌入内容动态注入</td>
+<td>容器预先定高定宽，占位符兜底</td>
+</tr>
+<tr>
+<td>动态插入内容挤开已有内容</td>
+<td>预留空间，或插入到视口外/已有内容下方</td>
+</tr>
+<tr>
+<td>Web 字体替换（FOUT）</td>
+<td><code>font-display: optional</code> 或 <code>size-adjust</code> 匹配度量</td>
+</tr>
+<tr>
+<td>动画用了 layout 属性</td>
+<td>只动画 <code>transform</code>/<code>opacity</code>（第 4 章第 2 节）</td>
+</tr>
+</tbody></table>
+<h2 id="7-用-web-vitals-库采集真实用户数据">7. 用 web-vitals 库采集真实用户数据</h2>
+<p>生产环境不要手写指标测量（INP 原始测量很复杂），用 Google 官方 <a href="https://www.npmjs.com/package/web-vitals"><code>web-vitals</code></a> 库（约 1KB）：</p>
+<pre><code class="language-bash">npm install web-vitals
+</code></pre>
+<pre><code class="language-js">// 文件: src/perf-report.js —— 三大指标采集与上报（生产可用）
+import { onLCP, onINP, onCLS, onTTFB, onFCP } from &#39;web-vitals&#39;;
+
+function report(metric) {
+  // 用 sendBeacon 在页面卸载时也能可靠送达；降级用 fetch keepalive
+  const payload = JSON.stringify({
+    name: metric.name,       // &#39;LCP&#39; | &#39;INP&#39; | &#39;CLS&#39; | ...
+    value: metric.value,
+    id: metric.id,           // 用于后端按会话聚合
+    rating: metric.rating,   // &#39;good&#39; | &#39;needs-improvement&#39; | &#39;poor&#39;
+    path: location.pathname,
+  });
+  if (navigator.sendBeacon) {
+    navigator.sendBeacon(&#39;/api/perf&#39;, payload);
+  } else {
+    fetch(&#39;/api/perf&#39;, { method: &#39;POST&#39;, body: payload, keepalive: true });
+  }
+}
+
+onLCP(report);
+onINP(report);
+onCLS(report);
+onTTFB(report);
+onFCP(report);
+</code></pre>
+<blockquote>
+<p>运行方式：<code>npm i web-vitals</code> 后在应用入口引入；本地调试可先把 payload 打印到 console。</p>
+</blockquote>
+<p>进阶：<code>import { onLCP } from &#39;web-vitals/attribution&#39;</code> 可拿到<strong>归因信息</strong>（LCP 是哪个元素/哪个阶段慢、CLS 是谁挪了谁），直接缩短定位路径。</p>
+<h2 id="8-最佳实践清单">8. 最佳实践清单</h2>
+<ul>
+<li><input disabled="" type="checkbox"> 团队对齐口径：所有指标讨论默认指真实用户数据 p75</li>
+<li><input disabled="" type="checkbox"> 上线 web-vitals 采集 + 上报，后端按 <code>metric.id</code> 会话聚合出 p75</li>
+<li><input disabled="" type="checkbox"> LCP 优化四查：CDN、图片格式与优先级、preload、渲染阻塞</li>
+<li><input disabled="" type="checkbox"> INP 优化三查：长任务、回调里的大计算、DOM 规模</li>
+<li><input disabled="" type="checkbox"> CLS 优化五查：媒体尺寸、占位、插入位置、字体策略、动画属性</li>
+<li><input disabled="" type="checkbox"> FID 已废弃，老代码里对 FID 的监控迁移到 INP</li>
+<li><input disabled="" type="checkbox"> 每个指标给出「好/需改进/差」三档的目标与告警线</li>
+</ul>
+<hr>
+<h2 id="配套漫画ep02">🎬 配套漫画（EP.02）</h2>
+<blockquote>
+<p><strong>EP.02《快递签收的三门课》</strong> —— 快递站里讲透三大指标：最大包裹何时到（LCP）、门铃响了谁开门（INP）、家具会自己搬家（CLS）。</p>
+<table>
+<thead>
+<tr>
+<th>漫画格</th>
+<th>剧情梗概</th>
+<th>对应本章小节</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>第 1 格</td>
+<td>最大包裹何时送达 = LCP ≤ 2.5s</td>
+<td><a href="#4-lcp%E6%9C%80%E5%A4%A7%E5%86%85%E5%AE%B9%E5%85%83%E7%B4%A0%E4%BD%95%E6%97%B6%E5%87%BA%E7%8E%B0">4. LCP：最大内容元素何时出现</a></td>
+</tr>
+<tr>
+<td>第 2 格</td>
+<td>门铃响了多久开门 = INP ≤ 200ms</td>
+<td><a href="#5-inp%E4%BA%A4%E4%BA%92%E5%93%8D%E5%BA%94%E7%9A%84%E7%81%B5%E9%AD%82%E6%8B%B7%E9%97%AE">5. INP：交互响应的灵魂拷问</a></td>
+</tr>
+<tr>
+<td>第 3 格</td>
+<td>沙发自己挪位摔了客人 = CLS ≤ 0.1</td>
+<td><a href="#6-cls%E5%B8%83%E5%B1%80%E5%81%8F%E7%A7%BB%E7%9A%84%E5%85%83%E5%87%B6%E6%8E%92%E6%9F%A5">6. CLS：布局偏移的元凶排查</a></td>
+</tr>
+<tr>
+<td>第 4 格</td>
+<td>坑点：只看实验室跑分 + 稳叔总结</td>
+<td><a href="#1-%E6%8C%87%E6%A0%87%E5%85%A8%E6%99%AF%E4%B8%8E%E8%AF%84%E5%88%86%E6%A0%87%E5%87%86">1. 指标全景与评分标准</a></td>
+</tr>
+</tbody></table>
+<p>🎬 <a href="../comics/EP.02.svg">打开漫画 EP.02</a> ｜ 📖 <a href="../comics/EP.02.html">漫画讲解稿 EP.02.md</a></p>
+</blockquote>
+
+</main>
+<footer>
+  双形态联动学习体系 ｜ 标准文档 + 漫画剧场 ｜
+  源码仓库 <a href="https://github.com/YZhiJie/frontend-perf-guide">GitHub</a> ｜
+  在线站点 <a href="https://yzhijie.github.io/frontend-perf-guide-pages/">https://yzhijie.github.io/frontend-perf-guide-pages/</a>
+</footer>
+</body>
+</html>

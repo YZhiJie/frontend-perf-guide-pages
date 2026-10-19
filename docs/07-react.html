@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>第 7 章 · React 专项优化方案 · 前端性能优化完全学习指南</title>
+<style>
+:root{--fg:#1f2328;--muted:#57606a;--line:#d0d7de;--accent:#f97316;--link:#0969da;--code-bg:#f6f8fa}
+*{box-sizing:border-box}
+body{margin:0;font-family:-apple-system,BlinkMacSystemFont,'PingFang SC','Microsoft YaHei',sans-serif;color:var(--fg);background:#fff;line-height:1.75}
+header.top{position:sticky;top:0;background:#0f172a;color:#e2e8f0;padding:12px 20px;display:flex;align-items:center;gap:16px;flex-wrap:wrap;z-index:10}
+header.top .brand{font-weight:700;color:#fff}
+header.top .brand em{color:var(--accent);font-style:normal}
+header.top nav{margin-left:auto;display:flex;gap:16px;flex-wrap:wrap}
+header.top nav a{color:#cbd5e1;text-decoration:none;font-size:14px}
+header.top nav a:hover{color:var(--accent)}
+header.top nav a.active{color:#fff;border-bottom:2px solid var(--accent);padding-bottom:2px}
+main{max-width:880px;margin:0 auto;padding:28px 20px 64px}
+main h1{font-size:28px;border-bottom:1px solid var(--line);padding-bottom:.3em}
+main h2{font-size:22px;border-bottom:1px solid var(--line);padding-bottom:.3em;margin-top:2em}
+main h3{font-size:18px;margin-top:1.6em}
+main img{max-width:100%}
+a{color:var(--link)}
+code{background:var(--code-bg);padding:.15em .35em;border-radius:4px;font-size:.9em;font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}
+pre{background:#0f172a;color:#e2e8f0;padding:14px 16px;border-radius:8px;overflow:auto}
+pre code{background:none;color:inherit;padding:0;font-size:13px}
+table{border-collapse:collapse;width:100%;margin:1em 0;display:block;overflow:auto}
+th,td{border:1px solid var(--line);padding:6px 12px;text-align:left}
+th{background:var(--code-bg)}
+blockquote{border-left:4px solid var(--accent);margin:1em 0;padding:.3em 1em;color:var(--muted);background:#fff7ed}
+hr{border:none;border-top:1px solid var(--line);margin:2em 0}
+footer{border-top:1px solid var(--line);color:var(--muted);font-size:13px;text-align:center;padding:20px 16px}
+footer a{color:var(--link);text-decoration:none}
+</style>
+</head>
+<body>
+<header class="top">
+  <span class="brand"><em>前端性能</em>完全指南</span>
+  <nav>
+    <a href="../index.html">首页</a>
+    <a href="../docs/README.html" class="active">标准文档</a>
+    <a href="../comics/index.html">漫画剧场</a>
+    <a href="https://github.com/YZhiJie/frontend-perf-guide">源码仓库</a>
+  </nav>
+</header>
+<main>
+<h1 id="第-7-章-react-专项优化方案">第 7 章 · React 专项优化方案</h1>
+<blockquote>
+<p>🎬 本章配套漫画：<a href="../comics/EP.07.svg">EP.07《React 后厨的调度艺术》</a> ｜ <a href="../comics/EP.07.html">漫画讲解稿</a></p>
+<p>学习目标：理解 React 重渲染的触发与传播机制，掌握渲染控制、状态下放、并发特性与状态订阅粒度优化。
+前置知识：<a href="./04-rendering.html">第 4 章</a> 渲染控制概念、React 函数组件与 Hooks 基础。</p>
+</blockquote>
+<h2 id="0-本章学习地图">0. 本章学习地图</h2>
+<ol>
+<li><a href="#1-%E9%87%8D%E6%B8%B2%E6%9F%93%E7%9A%84%E8%A7%A6%E5%8F%91%E9%93%BE%E6%9D%A1">重渲染的触发链条</a></li>
+<li><a href="#2-%E6%B8%B2%E6%9F%93%E6%8E%A7%E5%88%B6%E4%B8%89%E4%BB%B6%E5%A5%97memo-usememo-%E4%B8%8E-usecallback">渲染控制三件套：memo useMemo 与 useCallback</a></li>
+<li><a href="#3-%E7%8A%B6%E6%80%81%E4%B8%8B%E6%94%BE%E4%B8%8E%E7%BB%84%E4%BB%B6%E7%BB%84%E5%90%88">状态下放与组件组合</a></li>
+<li><a href="#4-%E5%88%97%E8%A1%A8%E6%B8%B2%E6%9F%93%E4%B8%8E-key-%E7%9A%84%E6%AD%A3%E7%A1%AE%E7%94%A8%E6%B3%95">列表渲染与 key 的正确用法</a></li>
+<li><a href="#5-%E4%BB%A3%E7%A0%81%E5%88%86%E5%89%B2lazy-%E4%B8%8E-suspense">代码分割：lazy 与 Suspense</a></li>
+<li><a href="#6-%E5%B9%B6%E5%8F%91%E7%89%B9%E6%80%A7usetransition-%E4%B8%8E-usedeferredvalue">并发特性：useTransition 与 useDeferredValue</a></li>
+<li><a href="#7-%E7%8A%B6%E6%80%81%E7%AE%A1%E7%90%86%E7%9A%84%E8%AE%A2%E9%98%85%E7%B2%92%E5%BA%A6">状态管理的订阅粒度</a></li>
+<li><a href="#8-react-19compiler-%E4%B8%8E%E8%87%AA%E5%8A%A8%E8%AE%B0%E5%BF%86%E5%8C%96">React 19：Compiler 与自动记忆化</a></li>
+<li><a href="#9-%E6%9C%80%E4%BD%B3%E5%AE%9E%E8%B7%B5%E6%B8%85%E5%8D%95">最佳实践清单</a></li>
+</ol>
+<h2 id="1-重渲染的触发链条">1. 重渲染的触发链条</h2>
+<p>组件重渲染只有三个触发源：<strong>自身 state 变化、父组件重渲染（props 未变也会）、消费的 context 变化</strong>。关键事实：</p>
+<ul>
+<li>一个组件重渲染时，<strong>默认递归重渲染它的全部子树</strong>——子组件 props 没变也照样重跑函数体与 diff；</li>
+<li>重渲染的成本 = 函数体执行 + VNode diff + 可能的 DOM commit，组件树越大越贵；</li>
+<li><strong>Profiler 先行</strong>：React DevTools Profiler 录制一次交互，按「耗时排序」找出真热点，再动手优化。</li>
+</ul>
+<pre><code class="language-jsx">// 文件: 示例片段 —— 用 Profiler API 在生产环境量化组件渲染
+import { Profiler } from &#39;react&#39;;
+
+&lt;Profiler id=&quot;FeedList&quot; onRender={(id, phase, duration) =&gt; {
+  if (duration &gt; 16) reportToMonitor({ id, phase, duration }); // 超一帧的渲染上报
+}}&gt;
+  &lt;FeedList items={items} /&gt;
+&lt;/Profiler&gt;
+</code></pre>
+<blockquote>
+<p>运行方式：日常定位用 React DevTools Profiler 面板（火焰图按耗时着色）；线上监控用 Profiler API 上报。</p>
+</blockquote>
+<h2 id="2-渲染控制三件套memo-usememo-与-usecallback">2. 渲染控制三件套：memo useMemo 与 useCallback</h2>
+<p>三件套各自只做一件事，<strong>必须组合使用才生效</strong>：</p>
+<table>
+<thead>
+<tr>
+<th>API</th>
+<th>缓存什么</th>
+<th>单独用的效果</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>React.memo(Comp)</code></td>
+<td>组件的渲染结果（props 浅比较）</td>
+<td>函数 props 每次都是新引用 → memo 形同虚设</td>
+</tr>
+<tr>
+<td><code>useMemo(fn, deps)</code></td>
+<td>值（计算结果/对象/数组引用）</td>
+<td>只省重算，不阻止子组件重渲染</td>
+</tr>
+<tr>
+<td><code>useCallback(fn, deps)</code></td>
+<td>函数引用</td>
+<td>只省函数创建，不阻止子组件重渲染</td>
+</tr>
+</tbody></table>
+<pre><code class="language-jsx">// 文件: src/components/Feed.jsx —— 标准组合：memo 子组件 + 稳定引用 props
+const FeedCard = memo(function FeedCard({ item, onLike }) {
+  return (
+    &lt;article onClick={() =&gt; onLike(item.id)}&gt;
+      &lt;h3&gt;{item.title}&lt;/h3&gt;
+      &lt;p&gt;{item.summary}&lt;/p&gt;
+    &lt;/article&gt;
+  );
+});
+
+function Feed({ items }) {
+  const [liked, setLiked] = useState(new Set());
+  // useCallback 稳定函数引用 → FeedCard 的 memo 才能命中
+  const onLike = useCallback((id) =&gt; {
+    setLiked((prev) =&gt; new Set(prev).add(id));
+  }, []);
+
+  // useMemo 缓存派生数组：items 不变时过滤不重算，引用也稳定
+  const visible = useMemo(() =&gt; items.filter((it) =&gt; it.status === &#39;ok&#39;), [items]);
+
+  return visible.map((it) =&gt; &lt;FeedCard key={it.id} item={it} onLike={onLike} /&gt;);
+}
+</code></pre>
+<blockquote>
+<p>⚠️ 滥用的代价：三件套本身有比较与缓存成本。<strong>Profiler 没证明是热点之前，不要全站包裹</strong>——「先测量再优化」在这里同样成立。</p>
+</blockquote>
+<h2 id="3-状态下放与组件组合">3. 状态下放与组件组合</h2>
+<p>比 memo 更根本的优化是<strong>调整结构，让重渲染范围天然变小</strong>：</p>
+<p><strong>① 状态下放</strong>：状态放在「使用它的组件的最小公共父级」，而不是统一塞顶层：</p>
+<pre><code class="language-jsx">// 文件: src/components/Search.jsx 片段 —— 状态下放
+// ❌ inputText 放在 Page 顶部：每敲一个字整个页面重渲染
+// ✅ 状态收进只含输入框和结果的 SearchBar 内部，页面其他部分纹丝不动
+function SearchBar() {
+  const [text, setText] = useState(&#39;&#39;);
+  return &lt;&gt;&lt;input value={text} onChange={(e) =&gt; setText(e.target.value)} /&gt;&lt;Results q={text} /&gt;&lt;/&gt;;
+}
+</code></pre>
+<p><strong>② 组合模式（children 穿透）</strong>：把「不变的组件」作为 children 传入，父组件重渲染时 children 是同一个引用，直接跳过：</p>
+<pre><code class="language-jsx">// 文件: src/components/ScrollTracker.jsx —— 经典组合技巧
+function ScrollTracker({ children }) {
+  const [y, setY] = useState(0);
+  useEffect(() =&gt; {
+    const onScroll = () =&gt; setY(window.scrollY);
+    window.addEventListener(&#39;scroll&#39;, onScroll, { passive: true });
+    return () =&gt; window.removeEventListener(&#39;scroll&#39;, onScroll);
+  }, []);
+  // children 从外部传入：ScrollTracker 因 y 变化重渲染时，
+  // children 引用不变 → 传进来的昂贵组件完全跳过重渲染
+  return &lt;div data-y={y}&gt;{children}&lt;/div&gt;;
+}
+
+&lt;ScrollTracker&gt;&lt;ExpensiveTree /&gt;&lt;/ScrollTracker&gt;
+</code></pre>
+<p><strong>③ Context 拆分</strong>：context 值一变，所有消费者重渲染。高频变化的（如光标位置）与低频的（主题、用户信息）拆成两个 context。</p>
+<h2 id="4-列表渲染与-key-的正确用法">4. 列表渲染与 key 的正确用法</h2>
+<p><code>key</code> 让 React 识别「谁是谁」，key 错 = 性能与正确性双输：</p>
+<pre><code class="language-jsx">// 文件: 示例片段 —— key 的对与错
+// ❌ 用数组下标当 key：删除中间项后，后续所有项的 key 前移，
+//    React 认为每一项都「变了」→ 全列表重渲染；带输入框等内部状态时会状态错位
+{todos.map((t, i) =&gt; &lt;Todo key={i} todo={t} /&gt;)}
+
+// ✅ 用稳定唯一的业务 id：删除一项只影响那一项
+{todos.map((t) =&gt; &lt;Todo key={t.id} todo={t} /&gt;)}
+
+// ✅ 进阶：刻意用 key 重建子树（如搜索条件变化时重置内部状态）
+&lt;UserProfile key={userId} userId={userId} /&gt;
+</code></pre>
+<h2 id="5-代码分割lazy-与-suspense">5. 代码分割：lazy 与 Suspense</h2>
+<p>React 的路由级分割由 <code>lazy</code> + <code>Suspense</code> 组合完成（与第 3 章第 8 节呼应）：</p>
+<pre><code class="language-jsx">// 文件: src/App.jsx —— 路由级代码分割
+import { lazy, Suspense } from &#39;react&#39;;
+
+// 首屏组件正常 import；二级页面动态加载，自动拆出独立 chunk
+const Admin = lazy(() =&gt; import(&#39;./views/Admin&#39;));
+const Report = lazy(() =&gt; import(&#39;./views/Report&#39;));
+
+export default function App() {
+  return (
+    &lt;Suspense fallback={&lt;PageSkeleton /&gt;}&gt;
+      &lt;Routes&gt;
+        &lt;Route path=&quot;/admin&quot; element={&lt;Admin /&gt;} /&gt;
+        &lt;Route path=&quot;/report&quot; element={&lt;Report /&gt;} /&gt;
+      &lt;/Routes&gt;
+    &lt;/Suspense&gt;
+  );
+}
+</code></pre>
+<blockquote>
+<p>运行方式：<code>npm run build</code> 后查看 dist 的 chunk 拆分；<code>fallback</code> 给骨架屏而非空白，兼顾 CLS（骨架尺寸与内容一致）。</p>
+</blockquote>
+<p>进阶：对「用户大概率会点」的路由，在空闲时预加载：<code>const preload = () =&gt; import(&#39;./views/Report&#39;);</code> 配合 <code>onMouseEnter</code> 或 <code>requestIdleCallback</code> 触发。</p>
+<h2 id="6-并发特性usetransition-与-usedeferredvalue">6. 并发特性：useTransition 与 useDeferredValue</h2>
+<p>React 18+ 的并发特性解决「更新本身太重」导致的交互卡顿（输入延迟，INP 杀手）：</p>
+<pre><code class="language-jsx">// 文件: src/components/BigFilter.jsx —— 输入 + 万级列表过滤的标准解法
+import { useState, useTransition, useDeferredValue } from &#39;react&#39;;
+
+function BigFilter({ items }) {
+  const [query, setQuery] = useState(&#39;&#39;);
+  const [isPending, startTransition] = useTransition();
+
+  // 方案 A：useDeferredValue——给 query 一个「延迟版本」，
+  // 输入框立即响应（高优），大列表用旧值先渲染、新值低优渲染
+  const deferredQuery = useDeferredValue(query);
+
+  // 方案 B：startTransition——把重更新标记为可中断的非紧急更新
+  function onChange(e) {
+    setQuery(e.target.value);                    // 紧急：输入框内容立即更新
+    startTransition(() =&gt; {
+      setResult(filter10k(items, e.target.value)); // 非紧急：可被新输入打断
+    });
+  }
+
+  return (
+    &lt;&gt;
+      &lt;input value={query} onChange={onChange} /&gt;
+      {isPending &amp;&amp; &lt;span&gt;计算中…&lt;/span&gt;}
+      &lt;List q={deferredQuery} /&gt;
+    &lt;/&gt;
+  );
+}
+</code></pre>
+<blockquote>
+<p>运行方式：React 18+ 项目内对比使用前后的输入跟手度；用 DevTools Performance 录制确认输入事件不再被大计算阻塞。</p>
+</blockquote>
+<p>选型：<strong>输入类</strong>优先 <code>useDeferredValue</code>（写法最简）；<strong>多状态联动的重更新</strong>用 <code>startTransition</code> 显式标记。</p>
+<h2 id="7-状态管理的订阅粒度">7. 状态管理的订阅粒度</h2>
+<p>Context 是「全量订阅」：值变，所有消费者重渲染。外部状态库的正确姿势是<strong>按字段订阅（selector）</strong>：</p>
+<pre><code class="language-jsx">// 文件: src/store.js —— zustand 按字段订阅（Redux useSelector 同理）
+import { create } from &#39;zustand&#39;;
+
+const useStore = create((set) =&gt; ({
+  user: null, posts: [], theme: &#39;light&#39;,
+  setTheme: (theme) =&gt; set({ theme }),
+}));
+
+// ❌ 整店订阅：任何字段变化都触发重渲染
+const { user, posts, theme } = useStore();
+
+// ✅ 按字段 selector：只有 user 变化时本组件才重渲染
+const user = useStore((s) =&gt; s.user);
+</code></pre>
+<p>原则：<strong>组件订阅它渲染所需的字段，不多不少</strong>；列表类数据配合 <code>shallow</code> 比较或多 atom 拆分，避免「改一条导致全列表订阅者更新」。</p>
+<h2 id="8-react-19compiler-与自动记忆化">8. React 19：Compiler 与自动记忆化</h2>
+<p>React 19 引入 <strong>React Compiler</strong>（构建期编译器，<code>babel-plugin-react-compiler</code>）：自动分析组件，<strong>自动插入等价于 useMemo/useCallback/memo 的记忆化</strong>，手写三件套的场景大幅减少：</p>
+<pre><code class="language-jsx">// 文件: vite.config.ts 片段 —— 启用 React Compiler
+import react from &#39;@vitejs/plugin-react&#39;;
+
+export default defineConfig({
+  plugins: [react({ babel: { plugins: [[&#39;babel-plugin-react-compiler&#39;, {}]] } })],
+});
+</code></pre>
+<p>启用 Compiler 后的正确心态：</p>
+<ol>
+<li><strong>结构优化仍是根本</strong>：状态下放、组合模式、selector 订阅，Compiler 一样也替代不了；</li>
+<li>代码需符合 Rules of React（纯渲染），违反规则的模式 Compiler 会自动跳过优化（用 <code>eslint-plugin-react-hooks</code> 检查）；</li>
+<li>已有的 <code>useMemo/useCallback</code> 可以保留（编译器会识别并兼容），逐步清理。</li>
+</ol>
+<h2 id="9-最佳实践清单">9. 最佳实践清单</h2>
+<ul>
+<li><input disabled="" type="checkbox"> 优化前先跑 React DevTools Profiler，热点组件用数据说话</li>
+<li><input disabled="" type="checkbox"> memo/useMemo/useCallback 组合使用才有意义，禁止全站无脑包裹</li>
+<li><input disabled="" type="checkbox"> 状态放最小公共父级；不变的子树用 children 组合穿透</li>
+<li><input disabled="" type="checkbox"> Context 按变更频率拆分，高频状态改用 selector 订阅</li>
+<li><input disabled="" type="checkbox"> 列表 key 用稳定业务 id，禁用数组下标</li>
+<li><input disabled="" type="checkbox"> 路由级 lazy + Suspense 全覆盖，fallback 用等高骨架屏</li>
+<li><input disabled="" type="checkbox"> 输入卡顿用 useDeferredValue，重更新用 startTransition</li>
+<li><input disabled="" type="checkbox"> React 19 项目评估启用 Compiler，但结构优化不外包</li>
+</ul>
+<hr>
+<h2 id="配套漫画ep07">🎬 配套漫画（EP.07）</h2>
+<blockquote>
+<p><strong>EP.07《React 后厨的调度艺术》</strong> —— React 餐馆：老板娘一喊全厨房动（重渲染传播）、给盘子贴「没变别重做」标签（memo 三件套）、配菜归配菜台管（状态下放）、不紧急的单让路（useTransition）。</p>
+<table>
+<thead>
+<tr>
+<th>漫画格</th>
+<th>剧情梗概</th>
+<th>对应本章小节</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>第 1 格</td>
+<td>一喊全动 = 重渲染递归传播</td>
+<td><a href="#1-%E9%87%8D%E6%B8%B2%E6%9F%93%E7%9A%84%E8%A7%A6%E5%8F%91%E9%93%BE%E6%9D%A1">1. 重渲染的触发链条</a></td>
+</tr>
+<tr>
+<td>第 2 格</td>
+<td>memo/useMemo/useCallback 标签组合</td>
+<td><a href="#2-%E6%B8%B2%E6%9F%93%E6%8E%A7%E5%88%B6%E4%B8%89%E4%BB%B6%E5%A5%97memo-usememo-%E4%B8%8E-usecallback">2. 渲染控制三件套：memo useMemo 与 useCallback</a></td>
+</tr>
+<tr>
+<td>第 3 格</td>
+<td>状态下放、lazy+Suspense、useTransition</td>
+<td><a href="#3-%E7%8A%B6%E6%80%81%E4%B8%8B%E6%94%BE%E4%B8%8E%E7%BB%84%E4%BB%B6%E7%BB%84%E5%90%88">3. 状态下放与组件组合</a>、<a href="#5-%E4%BB%A3%E7%A0%81%E5%88%86%E5%89%B2lazy-%E4%B8%8E-suspense">5. 代码分割</a>、<a href="#6-%E5%B9%B6%E5%8F%91%E7%89%B9%E6%80%A7usetransition-%E4%B8%8E-usedeferredvalue">6. 并发特性</a></td>
+</tr>
+<tr>
+<td>第 4 格</td>
+<td>坑点：下标 key 上错菜 + 稳叔总结</td>
+<td><a href="#4-%E5%88%97%E8%A1%A8%E6%B8%B2%E6%9F%93%E4%B8%8E-key-%E7%9A%84%E6%AD%A3%E7%A1%AE%E7%94%A8%E6%B3%95">4. 列表渲染与 key 的正确用法</a>、<a href="#8-react-19compiler-%E4%B8%8E%E8%87%AA%E5%8A%A8%E8%AE%B0%E5%BF%86%E5%8C%96">8. React 19：Compiler 与自动记忆化</a></td>
+</tr>
+</tbody></table>
+<p>🎬 <a href="../comics/EP.07.svg">打开漫画 EP.07</a> ｜ 📖 <a href="../comics/EP.07.html">漫画讲解稿 EP.07.md</a></p>
+</blockquote>
+
+</main>
+<footer>
+  双形态联动学习体系 ｜ 标准文档 + 漫画剧场 ｜
+  源码仓库 <a href="https://github.com/YZhiJie/frontend-perf-guide">GitHub</a> ｜
+  在线站点 <a href="https://yzhijie.github.io/frontend-perf-guide-pages/">https://yzhijie.github.io/frontend-perf-guide-pages/</a>
+</footer>
+</body>
+</html>

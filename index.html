@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>前端性能优化完全学习指南 · 前端性能优化完全学习指南</title>
+<style>
+:root{--fg:#1f2328;--muted:#57606a;--line:#d0d7de;--accent:#f97316;--link:#0969da;--code-bg:#f6f8fa}
+*{box-sizing:border-box}
+body{margin:0;font-family:-apple-system,BlinkMacSystemFont,'PingFang SC','Microsoft YaHei',sans-serif;color:var(--fg);background:#fff;line-height:1.75}
+header.top{position:sticky;top:0;background:#0f172a;color:#e2e8f0;padding:12px 20px;display:flex;align-items:center;gap:16px;flex-wrap:wrap;z-index:10}
+header.top .brand{font-weight:700;color:#fff}
+header.top .brand em{color:var(--accent);font-style:normal}
+header.top nav{margin-left:auto;display:flex;gap:16px;flex-wrap:wrap}
+header.top nav a{color:#cbd5e1;text-decoration:none;font-size:14px}
+header.top nav a:hover{color:var(--accent)}
+header.top nav a.active{color:#fff;border-bottom:2px solid var(--accent);padding-bottom:2px}
+main{max-width:880px;margin:0 auto;padding:28px 20px 64px}
+main h1{font-size:28px;border-bottom:1px solid var(--line);padding-bottom:.3em}
+main h2{font-size:22px;border-bottom:1px solid var(--line);padding-bottom:.3em;margin-top:2em}
+main h3{font-size:18px;margin-top:1.6em}
+main img{max-width:100%}
+a{color:var(--link)}
+code{background:var(--code-bg);padding:.15em .35em;border-radius:4px;font-size:.9em;font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}
+pre{background:#0f172a;color:#e2e8f0;padding:14px 16px;border-radius:8px;overflow:auto}
+pre code{background:none;color:inherit;padding:0;font-size:13px}
+table{border-collapse:collapse;width:100%;margin:1em 0;display:block;overflow:auto}
+th,td{border:1px solid var(--line);padding:6px 12px;text-align:left}
+th{background:var(--code-bg)}
+blockquote{border-left:4px solid var(--accent);margin:1em 0;padding:.3em 1em;color:var(--muted);background:#fff7ed}
+hr{border:none;border-top:1px solid var(--line);margin:2em 0}
+footer{border-top:1px solid var(--line);color:var(--muted);font-size:13px;text-align:center;padding:20px 16px}
+footer a{color:var(--link);text-decoration:none}
+</style>
+</head>
+<body>
+<header class="top">
+  <span class="brand"><em>前端性能</em>完全指南</span>
+  <nav>
+    <a href="index.html" class="active">首页</a>
+    <a href="docs/README.html">标准文档</a>
+    <a href="comics/index.html">漫画剧场</a>
+    <a href="https://github.com/YZhiJie/frontend-perf-guide">源码仓库</a>
+  </nav>
+</header>
+<main>
+<h1 id="前端性能优化完全学习指南">前端性能优化完全学习指南</h1>
+<p>一套<strong>双形态深度联动</strong>的前端性能优化学习资料体系：标准技术文档 + 漫画剧场。同一套知识，两种呈现——文档严谨完整可作参考手册，漫画场景化降低理解门槛，双向锚点随时切换。</p>
+<pre><code>frontend-perf-guide/
+├── docs/        # 标准技术文档教程（9 章，系统性 + 按需查阅）
+├── comics/      # 漫画式教程（9 话四格漫画 + 讲解稿 + 阅读器）
+├── examples/    # 可直接运行的示例集（5 个，Node/浏览器）
+└── scripts/     # 双向映射校验门禁（check-mapping.mjs）
+</code></pre>
+<h2 id="仓库与在线地址">仓库与在线地址</h2>
+<table>
+<thead>
+<tr>
+<th>用途</th>
+<th>地址</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>源码仓库（私有）</td>
+<td><a href="https://github.com/YZhiJie/frontend-perf-guide">https://github.com/YZhiJie/frontend-perf-guide</a></td>
+</tr>
+<tr>
+<td>GitHub Pages 部署仓库（公开）</td>
+<td><a href="https://github.com/YZhiJie/frontend-perf-guide-pages">https://github.com/YZhiJie/frontend-perf-guide-pages</a></td>
+</tr>
+<tr>
+<td>线上访问地址</td>
+<td><a href="https://yzhijie.github.io/frontend-perf-guide-pages/">https://yzhijie.github.io/frontend-perf-guide-pages/</a></td>
+</tr>
+</tbody></table>
+<p><strong>在线站点</strong> = <code>docs/</code> 九章标准文档（渲染为 HTML）+ <code>comics/</code> 漫画剧场（四格漫画画廊与逐话阅读器）。两种形态间的双向映射链接在线上可直接点击跳转。</p>
+<h3 id="部署方式">部署方式</h3>
+<p>站点是<strong>纯静态</strong>产物，无需服务端；构建与发布流程：</p>
+<pre><code class="language-bash">npm install            # 首次：安装构建依赖（marked，仅构建期使用）
+npm run build:pages    # 将 markdown 教程渲染为 dist-pages/ 静态站点
+# 再把 dist-pages/ 推送到部署仓库 frontend-perf-guide-pages 的 main 分支
+</code></pre>
+<p>部署仓库已开启 GitHub Pages（Source: <code>main</code> 分支根目录），站点即发布到上述线上地址。源码仓库保持私有，仅部署仓库公开可访问。</p>
+<h2 id="两种内容形态">两种内容形态</h2>
+<table>
+<thead>
+<tr>
+<th></th>
+<th>标准技术文档（<code>docs/</code>）</th>
+<th>漫画式教程（<code>comics/</code>）</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>定位</td>
+<td>系统性学习 + 日常技术参考手册</td>
+<td>快速建立整体认知 + 破除认知误区</td>
+</tr>
+<tr>
+<td>内容</td>
+<td>指标详解、底层原理、可运行代码、工具指南、生产落地流程</td>
+<td>生活化场景故事、四格图解、误区对比表</td>
+</tr>
+<tr>
+<td>适合</td>
+<td>想搞懂「为什么」和「怎么做」</td>
+<td>想先知道「是什么、为什么重要」</td>
+</tr>
+</tbody></table>
+<p><strong>双向关联映射</strong>：文档每章末尾有「🎬 配套漫画」小节（含漫画格 ↔ 小节映射表）；每话漫画讲解稿的每个知识点节点带 <code>📖</code> 链接跳回文档对应小节。该映射由 <a href="scripts/check-mapping.mjs">scripts/check-mapping.mjs</a> 门禁自动强制校验，永不失联。</p>
+<h2 id="学习路径三种入口">学习路径（三种入口）</h2>
+<ul>
+<li><strong>漫画入门（约 30 分钟）</strong>：打开 <a href="comics/index.html">comics/index.html</a> 阅读器，把 9 话漫画刷一遍 → 再进入文档精读感兴趣的小节。</li>
+<li><strong>系统学习</strong>：从 <a href="docs/01-overview.html">docs/01-overview.md</a> 开始按章精读，每章末尾跳漫画巩固 → 适合完整掌握全链路。</li>
+<li><strong>按需查阅</strong>：遇到具体问题直接查对应章节（加载慢 → 第 3 章、滚动卡 → 第 4 章、内存涨 → 第 5 章、框架专项 → 第 6/7 章）。</li>
+</ul>
+<h2 id="双向映射总表">双向映射总表</h2>
+<table>
+<thead>
+<tr>
+<th>漫画</th>
+<th>标题</th>
+<th>对应标准文档</th>
+<th>核心主题</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>EP.01</td>
+<td>小镇的早高峰</td>
+<td><a href="docs/01-overview.html">第 1 章 · 性能优化总览与心智模型</a></td>
+<td>优化全貌、RAIL、收益模型</td>
+</tr>
+<tr>
+<td>EP.02</td>
+<td>快递签收的三门课</td>
+<td><a href="docs/02-core-web-vitals.html">第 2 章 · Core Web Vitals 核心指标详解</a></td>
+<td>LCP / INP / CLS 阈值与测量</td>
+</tr>
+<tr>
+<td>EP.03</td>
+<td>餐厅备菜大作战</td>
+<td><a href="docs/03-loading.html">第 3 章 · 加载性能优化</a></td>
+<td>关键渲染路径、资源优化、代码分割</td>
+</tr>
+<tr>
+<td>EP.04</td>
+<td>装修队的血泪史</td>
+<td><a href="docs/04-rendering.html">第 4 章 · 渲染性能优化</a></td>
+<td>重排重绘、布局抖动、合成层</td>
+</tr>
+<tr>
+<td>EP.05</td>
+<td>仓库整理惊魂</td>
+<td><a href="docs/05-runtime.html">第 5 章 · 运行时性能</a></td>
+<td>事件循环、长任务、GC 与内存泄漏</td>
+</tr>
+<tr>
+<td>EP.06</td>
+<td>Vue 后厨的智慧</td>
+<td><a href="docs/06-vue.html">第 6 章 · Vue 专项优化方案</a></td>
+<td>Proxy 响应式、v-memo、KeepAlive</td>
+</tr>
+<tr>
+<td>EP.07</td>
+<td>React 后厨的调度艺术</td>
+<td><a href="docs/07-react.html">第 7 章 · React 专项优化方案</a></td>
+<td>memo 三件套、并发特性、Compiler</td>
+</tr>
+<tr>
+<td>EP.08</td>
+<td>性能体检中心</td>
+<td><a href="docs/08-tools.html">第 8 章 · 性能检测工具完全指南</a></td>
+<td>Lighthouse / WebPageTest / DevTools</td>
+</tr>
+<tr>
+<td>EP.09</td>
+<td>工厂质检上线记</td>
+<td><a href="docs/09-production.html">第 9 章 · 生产环境落地实践</a></td>
+<td>性能预算、CI 门禁、监控告警</td>
+</tr>
+</tbody></table>
+<h2 id="可运行示例集examples">可运行示例集（examples/）</h2>
+<table>
+<thead>
+<tr>
+<th>文件</th>
+<th>演示内容</th>
+<th>运行方式</th>
+<th>配套章节</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>01-event-loop.mjs</code></td>
+<td>事件循环调度顺序 + 长任务切片对比</td>
+<td><code>node examples/01-event-loop.mjs</code></td>
+<td>第 5 章</td>
+</tr>
+<tr>
+<td><code>02-memory-leak.mjs</code></td>
+<td>四类内存泄漏的堆增长实测</td>
+<td><code>node --expose-gc examples/02-memory-leak.mjs</code></td>
+<td>第 5 章</td>
+</tr>
+<tr>
+<td><code>03-layout-thrashing.html</code></td>
+<td>布局抖动 vs 读写分离对比实验</td>
+<td>浏览器打开</td>
+<td>第 4 章</td>
+</tr>
+<tr>
+<td><code>04-long-task.html</code></td>
+<td>长任务对 INP 的影响 + scheduler.yield 切片</td>
+<td>浏览器打开</td>
+<td>第 5 章</td>
+</tr>
+<tr>
+<td><code>05-web-vitals-demo.html</code></td>
+<td>PerformanceObserver 原生采集 CWV</td>
+<td>浏览器打开</td>
+<td>第 1 章</td>
+</tr>
+</tbody></table>
+<h2 id="框架适配说明">框架适配说明</h2>
+<p>第 6/7 章分别针对 <strong>Vue 3</strong>（Proxy 响应式开销、<code>v-memo</code>/<code>shallowRef</code>/<code>markRaw</code>、KeepAlive、unplugin 按需引入、Pinia 选择器订阅）与 <strong>React 18/19</strong>（memo 三件套、状态下放与 children 穿透、<code>useTransition</code>/<code>useDeferredValue</code>、外部状态库 selector 订阅、React 19 Compiler 自动记忆化）提供专项方案；其余各章的通用方案在两章中均有框架化落地代码，可直接用于生产。</p>
+<h2 id="质量门禁">质量门禁</h2>
+<pre><code class="language-bash">node scripts/check-mapping.mjs            # 全量校验：SVG 规范 + 双向映射 + 死链 + manifest 一致性
+node scripts/check-mapping.mjs --svg-only # 仅校验 SVG 硬规则（供新增漫画时快速自检）
+</code></pre>
+<p>校验范围：SVG 硬规则（viewBox、无外部资源、字号显式、行宽、引用完整性）、文档章末漫画映射、漫画节点回链、全仓库 Markdown 死链（含 GitHub 锚点 slug 规则）、manifest 与磁盘一致性。</p>
+<h2 id="版本管理">版本管理</h2>
+<p>本仓库使用 Git 规范管理，提交信息遵循 Conventional Commits（<code>feat:</code> / <code>docs:</code> / <code>chore:</code>）。</p>
+<h2 id="版本日志">版本日志</h2>
+<h3 id="v1002026-10-18">v1.0.0（2026-10-18）</h3>
+<ul>
+<li>标准技术文档 9 章：总览与心智模型 / Core Web Vitals / 加载 / 渲染 / 运行时 / Vue 专项 / React 专项 / 工具指南 / 生产落地。</li>
+<li>漫画剧场 9 话（EP.01~09）：四格漫画 + 讲解稿 + 纯静态阅读器（<code>comics/index.html</code>，双击即用，file:// 兼容）。</li>
+<li>双向映射机制：文档章末映射表 + 漫画节点回链，<code>check-mapping.mjs</code> 门禁强制校验。</li>
+<li>可运行示例集 5 个，覆盖事件循环、内存泄漏、布局抖动、长任务切片、CWV 采集。</li>
+</ul>
+
+</main>
+<footer>
+  双形态联动学习体系 ｜ 标准文档 + 漫画剧场 ｜
+  源码仓库 <a href="https://github.com/YZhiJie/frontend-perf-guide">GitHub</a> ｜
+  在线站点 <a href="https://yzhijie.github.io/frontend-perf-guide-pages/">https://yzhijie.github.io/frontend-perf-guide-pages/</a>
+</footer>
+</body>
+</html>

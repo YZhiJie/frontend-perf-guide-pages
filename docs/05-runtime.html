@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>第 5 章 · 运行时性能：主线程、内存与泄漏 · 前端性能优化完全学习指南</title>
+<style>
+:root{--fg:#1f2328;--muted:#57606a;--line:#d0d7de;--accent:#f97316;--link:#0969da;--code-bg:#f6f8fa}
+*{box-sizing:border-box}
+body{margin:0;font-family:-apple-system,BlinkMacSystemFont,'PingFang SC','Microsoft YaHei',sans-serif;color:var(--fg);background:#fff;line-height:1.75}
+header.top{position:sticky;top:0;background:#0f172a;color:#e2e8f0;padding:12px 20px;display:flex;align-items:center;gap:16px;flex-wrap:wrap;z-index:10}
+header.top .brand{font-weight:700;color:#fff}
+header.top .brand em{color:var(--accent);font-style:normal}
+header.top nav{margin-left:auto;display:flex;gap:16px;flex-wrap:wrap}
+header.top nav a{color:#cbd5e1;text-decoration:none;font-size:14px}
+header.top nav a:hover{color:var(--accent)}
+header.top nav a.active{color:#fff;border-bottom:2px solid var(--accent);padding-bottom:2px}
+main{max-width:880px;margin:0 auto;padding:28px 20px 64px}
+main h1{font-size:28px;border-bottom:1px solid var(--line);padding-bottom:.3em}
+main h2{font-size:22px;border-bottom:1px solid var(--line);padding-bottom:.3em;margin-top:2em}
+main h3{font-size:18px;margin-top:1.6em}
+main img{max-width:100%}
+a{color:var(--link)}
+code{background:var(--code-bg);padding:.15em .35em;border-radius:4px;font-size:.9em;font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}
+pre{background:#0f172a;color:#e2e8f0;padding:14px 16px;border-radius:8px;overflow:auto}
+pre code{background:none;color:inherit;padding:0;font-size:13px}
+table{border-collapse:collapse;width:100%;margin:1em 0;display:block;overflow:auto}
+th,td{border:1px solid var(--line);padding:6px 12px;text-align:left}
+th{background:var(--code-bg)}
+blockquote{border-left:4px solid var(--accent);margin:1em 0;padding:.3em 1em;color:var(--muted);background:#fff7ed}
+hr{border:none;border-top:1px solid var(--line);margin:2em 0}
+footer{border-top:1px solid var(--line);color:var(--muted);font-size:13px;text-align:center;padding:20px 16px}
+footer a{color:var(--link);text-decoration:none}
+</style>
+</head>
+<body>
+<header class="top">
+  <span class="brand"><em>前端性能</em>完全指南</span>
+  <nav>
+    <a href="../index.html">首页</a>
+    <a href="../docs/README.html" class="active">标准文档</a>
+    <a href="../comics/index.html">漫画剧场</a>
+    <a href="https://github.com/YZhiJie/frontend-perf-guide">源码仓库</a>
+  </nav>
+</header>
+<main>
+<h1 id="第-5-章-运行时性能主线程内存与泄漏">第 5 章 · 运行时性能：主线程、内存与泄漏</h1>
+<blockquote>
+<p>🎬 本章配套漫画：<a href="../comics/EP.05.svg">EP.05《仓库整理惊魂》</a> ｜ <a href="../comics/EP.05.html">漫画讲解稿</a></p>
+<p>学习目标：掌握事件循环与 GC 原理，能识别修复四大内存泄漏模式，会用 Worker 与 Performance API 解决运行时卡顿。
+前置知识：<a href="./04-rendering.html">第 4 章</a> 渲染管线与长任务概念。</p>
+</blockquote>
+<h2 id="0-本章学习地图">0. 本章学习地图</h2>
+<ol>
+<li><a href="#1-%E4%BA%8B%E4%BB%B6%E5%BE%AA%E7%8E%AF%E6%B5%8F%E8%A7%88%E5%99%A8%E7%9A%84%E6%97%B6%E9%97%B4%E5%88%87%E7%89%87%E6%B3%95%E5%88%99">事件循环：浏览器的时间切片法则</a></li>
+<li><a href="#2-%E9%95%BF%E4%BB%BB%E5%8A%A1%E5%88%87%E5%88%86%E4%B8%8E%E8%B0%83%E5%BA%A6">长任务切分与调度</a></li>
+<li><a href="#3-v8-%E5%86%85%E5%AD%98%E7%AE%A1%E7%90%86%E4%B8%8E%E5%9E%83%E5%9C%BE%E5%9B%9E%E6%94%B6">V8 内存管理与垃圾回收</a></li>
+<li><a href="#4-%E5%9B%9B%E5%A4%A7%E5%86%85%E5%AD%98%E6%B3%84%E6%BC%8F%E6%A8%A1%E5%BC%8F">四大内存泄漏模式</a></li>
+<li><a href="#5-web-worker%E6%8A%8A%E9%87%8D%E6%B4%BB%E6%90%AC%E5%87%BA%E4%B8%BB%E7%BA%BF%E7%A8%8B">Web Worker：把重活搬出主线程</a></li>
+<li><a href="#6-%E7%94%A8-performance-api-%E7%BB%99%E4%BB%A3%E7%A0%81%E6%8E%90%E8%A1%A8">用 Performance API 给代码掐表</a></li>
+<li><a href="#7-%E6%A1%86%E6%9E%B6%E8%90%BD%E5%9C%B0%E7%BB%84%E4%BB%B6%E5%8D%B8%E8%BD%BD%E6%97%B6%E7%9A%84%E8%B5%84%E6%BA%90%E6%B8%85%E7%90%86">框架落地：组件卸载时的资源清理</a></li>
+<li><a href="#8-%E6%9C%80%E4%BD%B3%E5%AE%9E%E8%B7%B5%E6%B8%85%E5%8D%95">最佳实践清单</a></li>
+</ol>
+<h2 id="1-事件循环浏览器的时间切片法则">1. 事件循环：浏览器的时间切片法则</h2>
+<p>浏览器同一时刻只有一个主线程，靠事件循环调度三类工作：</p>
+<pre><code class="language-text">┌─▶ 执行宏任务（script/setTimeout/事件回调）─▶ 清空全部微任务（Promise.then/queueMicrotask）
+│       ─▶ 需要渲染？─▶ rAF 回调 ─▶ Style/Layout/Paint ─▶ Composite
+└────────────────────────────── 循环 ◀──────────────────────────────┘
+</code></pre>
+<p>必须记住的三条规则：</p>
+<ol>
+<li><strong>微任务插队</strong>：每个宏任务跑完，立即清空整个微任务队列——微任务在渲染之前执行，所以 <code>Promise.then</code> 总是先于 <code>setTimeout</code>（同一轮里）。</li>
+<li><strong>渲染发生在任务之间</strong>：一个任务执行多久，用户就卡多久。这就是「50ms 长任务」红线（RAIL 的 Idle 刻度）的由来。</li>
+<li><strong>rAF 在渲染前</strong>：<code>requestAnimationFrame</code> 回调在本轮渲染之前执行，是做帧同步更新的正确位置。</li>
+</ol>
+<pre><code class="language-js">// 文件: 示例片段 —— 经典执行顺序题（Node 与浏览器一致的核心顺序）
+console.log(&#39;1 同步&#39;);
+setTimeout(() =&gt; console.log(&#39;4 宏任务&#39;));
+Promise.resolve().then(() =&gt; console.log(&#39;3 微任务&#39;));
+console.log(&#39;2 同步结束&#39;);
+// 输出：1 → 2 → 3 → 4（同步 → 微任务 → 宏任务）
+</code></pre>
+<blockquote>
+<p>运行方式：<code>node examples/01-event-loop.mjs</code>（完整版含嵌套场景与逐行注释）。</p>
+</blockquote>
+<h2 id="2-长任务切分与调度">2. 长任务切分与调度</h2>
+<p>第 4 章已介绍基本切片，这里补充<strong>调度策略</strong>——切片不是均分，而是按优先级安排：</p>
+<pre><code class="language-js">// 文件: src/utils/scheduler.js —— 带优先级的任务调度器（生产可用骨架）
+const deadlines = { userVisible: 50, background: 5000 };
+
+export async function runChunks(items, fn, { chunk = 200, priority = &#39;userVisible&#39; } = {}) {
+  for (let i = 0; i &lt; items.length; i += chunk) {
+    // scheduler.postTask：告知浏览器优先级，让高优任务插队（Chrome 94+）
+    if (&#39;scheduler&#39; in window) {
+      await scheduler.postTask(() =&gt; {}, { priority, delay: 0 }).catch(() =&gt; {});
+    } else {
+      await new Promise((r) =&gt; setTimeout(r, 0)); // 回退：宏任务让出主线程
+    }
+    items.slice(i, i + chunk).forEach(fn);
+  }
+}
+
+// 用户交互触发的更新用高优先级；埋点上报、预计算用 background 低优先级
+runChunks(feedItems, renderCard, { priority: &#39;userVisible&#39; });
+runChunks(trackQueue, send, { priority: &#39;background&#39; });
+</code></pre>
+<blockquote>
+<p>运行方式：浏览器运行；Performance 面板确认大任务已拆散且不阻塞输入响应。</p>
+</blockquote>
+<p>配套手段：交互后的<strong>非紧急更新</strong>用 <code>requestIdleCallback</code>（空闲时执行）；React 项目直接用 <code>useTransition</code>（第 7 章）。</p>
+<h2 id="3-v8-内存管理与垃圾回收">3. V8 内存管理与垃圾回收</h2>
+<p>JS 内存分<strong>栈</strong>（原始值、引用指针，函数退出即回收）与<strong>堆</strong>（对象、闭包捕获的数据，靠 GC 回收）。V8 的堆采用<strong>分代回收</strong>：</p>
+<table>
+<thead>
+<tr>
+<th>空间</th>
+<th>存放</th>
+<th>回收器</th>
+<th>特点</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>新生代</td>
+<td>短命对象（临时变量、新对象）</td>
+<td>Scavenger（半空间复制）</td>
+<td>高频、极快（毫秒级）</td>
+</tr>
+<tr>
+<td>老生代</td>
+<td>存活久的对象</td>
+<td>Mark-Compact（标记-清除/整理）</td>
+<td>低频、较慢，有增量标记减少停顿</td>
+</tr>
+</tbody></table>
+<p>对业务的三个推论：</p>
+<ol>
+<li><strong>对象分代迁移有成本</strong>：被引用太久的小对象会「晋升」到老生代，晋升越多、老生代越大、主要 GC 越慢——<strong>及时断开不再需要的引用</strong>就是最好的 GC 优化；</li>
+<li><strong>GC 会偷帧</strong>：主要 GC 的停顿可能吃掉一帧甚至几帧，内存峰值高的大页面（如一次性渲染 1 万行表格）滚动时容易看到 GC 锯齿；</li>
+<li><strong>大对象要流式处理</strong>：几十 MB 的 JSON 不要 <code>JSON.parse</code> 整个塞进内存，分页/分片加载。</li>
+</ol>
+<h2 id="4-四大内存泄漏模式">4. 四大内存泄漏模式</h2>
+<p>GC 只回收「不可达」的对象；只要还有一条引用链挂着，内存就永远放不掉。四大泄漏模式：</p>
+<pre><code class="language-js">// 文件: 示例片段 —— 四大内存泄漏模式（生产代码逐条对照自查）
+
+// ① 意外的全局变量：漏写声明，函数退出后数据仍被 window 持有
+function bad() { cache = loadData(); }         // ❌ cache 挂到 window，永不回收
+function good() { const cache = loadData(); }  // ✅ 局部作用域，用完即回收
+
+// ② 被遗忘的定时器/回调：组件销毁了，定时器还活着并闭包引用着大数据
+const timer = setInterval(() =&gt; renderWidget(bigData), 1000);
+clearInterval(timer); // ✅ 销毁时必须清除（框架内见本章第 7 节）
+
+// ③ 游离 DOM（Detached DOM）：JS 变量还引用着已从页面移除的节点
+let detachedBtn = document.querySelector(&#39;#btn&#39;);
+document.body.removeChild(detachedBtn);
+detachedBtn = null; // ✅ 移除后置空引用，整个子树才能被回收
+
+// ④ 闭包持有大数据：小函数拽住了大数组
+function makeHandler() {
+  const hugeList = load100kItems();              // 10 万条数据
+  return () =&gt; track(hugeList.length);           // ❌ 只用了 length，却拽住整个数组
+}
+// ✅ 只捕获需要的值
+function makeHandlerGood() {
+  const total = load100kItems().length;
+  return () =&gt; track(total);
+}
+</code></pre>
+<p><strong>排查三步法</strong>（DevTools Memory 面板）：</p>
+<ol>
+<li>做堆快照 A → 执行可疑操作（打开弹窗/翻页）→ 强制 GC（垃圾桶按钮）→ 做快照 B；</li>
+<li>快照 B 按「Objects allocated between A and B」对比，看哪些对象本应释放；</li>
+<li>选中可疑对象看 Retainers 链，找到是谁拽着它——那条链就是泄漏点。</li>
+</ol>
+<blockquote>
+<p>运行方式：泄漏演示与复现脚本见 <a href="../examples/02-memory-leak.mjs">examples/02-memory-leak.mjs</a>（<code>node --expose-gc</code> 运行）。</p>
+</blockquote>
+<h2 id="5-web-worker把重活搬出主线程">5. Web Worker：把重活搬出主线程</h2>
+<p><strong>判断标准</strong>：一类计算<strong>稳定地</strong>超过 50ms 且与 DOM 无关（大 JSON 解析、复杂排序、图片处理、数据聚合），就该搬进 Worker。偶发的短计算切片即可，不必上 Worker（有通信成本）。</p>
+<pre><code class="language-js">// 文件: src/worker/analytics.worker.js —— 数据聚合在 Worker 中执行
+self.onmessage = (e) =&gt; {
+  const result = heavyAggregate(e.data); // 主线程零阻塞
+  self.postMessage(result);
+};
+
+// 文件: src/pages/report.js —— 主线程发起与接收
+const worker = new Worker(new URL(&#39;./worker/analytics.worker.js&#39;, import.meta.url));
+worker.postMessage(rawRecords);
+worker.onmessage = (e) =&gt; render(e.data); // 结果回来再更新 UI
+// 组件销毁时 terminate()，否则 Worker 线程常驻耗内存
+</code></pre>
+<blockquote>
+<p>运行方式：Vite 原生支持 <code>new Worker(new URL(...), import.meta.url)</code> 语法，<code>npm run dev</code> 直接可用。</p>
+</blockquote>
+<p>要点：Worker <strong>不能操作 DOM</strong>（这是特性不是缺陷——强制你把计算与 UI 分离）；大数据传递用 Transferable（如 <code>ArrayBuffer</code> 转移所有权，零拷贝）。</p>
+<h2 id="6-用-performance-api-给代码掐表">6. 用 Performance API 给代码掐表</h2>
+<p>优化前先量化，<code>performance.mark/measure</code> 是标准化的掐表工具：</p>
+<pre><code class="language-js">// 文件: 示例片段 —— User Timing：给关键路径打点，Performance 面板可视化
+performance.mark(&#39;filter-start&#39;);
+const filtered = applyFilters(rawRows);   // 疑似瓶颈的函数
+performance.mark(&#39;filter-end&#39;);
+performance.measure(&#39;筛选耗时&#39;, &#39;filter-start&#39;, &#39;filter-end&#39;);
+
+const [m] = performance.getEntriesByName(&#39;筛选耗时&#39;);
+console.log(`${m.name}: ${m.duration.toFixed(1)}ms`); // 与 setInterval 心跳对比定位抖动来源
+performance.clearMeasures(); // 清理，避免重复上报
+</code></pre>
+<blockquote>
+<p>运行方式：浏览器运行后打开 Performance 面板，Timings 轨道会显示这些测量条；<code>node examples/</code> 中同 API 在 Node 亦可用。</p>
+</blockquote>
+<h2 id="7-框架落地组件卸载时的资源清理">7. 框架落地：组件卸载时的资源清理</h2>
+<p>内存泄漏在框架项目里最常见的形态：<strong>组件销毁了，副作用还活着</strong>。两个框架的清理范式：</p>
+<p><strong>Vue 3</strong>：<code>onUnmounted</code>（或 <code>onScopeDispose</code>）清理；封装成组合式函数一劳永逸：</p>
+<pre><code class="language-js">// 文件: src/composables/useResizeListener.js —— 自动清理的事件订阅
+import { onUnmounted } from &#39;vue&#39;;
+
+export function useResizeListener(handler) {
+  window.addEventListener(&#39;resize&#39;, handler, { passive: true });
+  // 组件卸载自动移除——调用方不可能「忘记清理」
+  onUnmounted(() =&gt; window.removeEventListener(&#39;resize&#39;, handler));
+}
+</code></pre>
+<p><strong>React</strong>：<code>useEffect</code> 返回清理函数，依赖数组里<strong>放定时器外的一切可变引用</strong>：</p>
+<pre><code class="language-jsx">// 文件: src/hooks/usePolling.js —— 轮询 hook：StrictMode 双挂载与卸载都安全
+export function usePolling(fn, interval = 5000) {
+  useEffect(() =&gt; {
+    const timer = setInterval(fn, interval);
+    return () =&gt; clearInterval(timer); // 清理函数：卸载时必执行
+  }, [fn, interval]);
+}
+</code></pre>
+<p>自查清单：组件里创建过的每一类资源（定时器、事件监听、Observer、Worker、WebSocket、第三方实例），是否都有对应的销毁路径？</p>
+<h2 id="8-最佳实践清单">8. 最佳实践清单</h2>
+<ul>
+<li><input disabled="" type="checkbox"> 能背出事件循环顺序：同步 → 微任务 → 渲染前 rAF → 宏任务</li>
+<li><input disabled="" type="checkbox"> 所有稳定超 50ms 的计算：切片（交互相关）或 Worker（DOM 无关）</li>
+<li><input disabled="" type="checkbox"> 上报 longtask 观测，INP 劣化时先看长任务曲线</li>
+<li><input disabled="" type="checkbox"> 四大泄漏模式纳入 Code Review 清单：全局变量、忘清定时器、游离 DOM、闭包大对象</li>
+<li><input disabled="" type="checkbox"> 每次发版前用 Memory 面板做一次「操作前后堆快照」对比</li>
+<li><input disabled="" type="checkbox"> 框架组件的每个副作用都有销毁路径（组合式函数/hook 封装固化）</li>
+<li><input disabled="" type="checkbox"> 大数据流式处理，不做整包 <code>JSON.parse</code></li>
+</ul>
+<hr>
+<h2 id="配套漫画ep05">🎬 配套漫画（EP.05）</h2>
+<blockquote>
+<p><strong>EP.05《仓库整理惊魂》</strong> —— 仓库=内存，工人=主线程：超大货物卡住所有订单（长任务），作废订单挂满墙（内存泄漏），拆小份+贴丢弃标签（切片+清理）。</p>
+<table>
+<thead>
+<tr>
+<th>漫画格</th>
+<th>剧情梗概</th>
+<th>对应本章小节</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>第 1 格</td>
+<td>工人被大件卡住，订单全排队 = 长任务</td>
+<td><a href="#1-%E4%BA%8B%E4%BB%B6%E5%BE%AA%E7%8E%AF%E6%B5%8F%E8%A7%88%E5%99%A8%E7%9A%84%E6%97%B6%E9%97%B4%E5%88%87%E7%89%87%E6%B3%95%E5%88%99">1. 事件循环：浏览器的时间切片法则</a>、<a href="#2-%E9%95%BF%E4%BB%BB%E5%8A%A1%E5%88%87%E5%88%86%E4%B8%8E%E8%B0%83%E5%BA%A6">2. 长任务切分与调度</a></td>
+</tr>
+<tr>
+<td>第 2 格</td>
+<td>查库存账本：作废订单还挂着 = 泄漏</td>
+<td><a href="#4-%E5%9B%9B%E5%A4%A7%E5%86%85%E5%AD%98%E6%B3%84%E6%BC%8F%E6%A8%A1%E5%BC%8F">4. 四大内存泄漏模式</a></td>
+</tr>
+<tr>
+<td>第 3 格</td>
+<td>拆小份穿插干 + 及时清走 = 切片与清理</td>
+<td><a href="#5-web-worker%E6%8A%8A%E9%87%8D%E6%B4%BB%E6%90%AC%E5%87%BA%E4%B8%BB%E7%BA%BF%E7%A8%8B">5. Web Worker：把重活搬出主线程</a></td>
+</tr>
+<tr>
+<td>第 4 格</td>
+<td>坑点：闭包拽住整间仓库 + 稳叔总结</td>
+<td><a href="#3-v8-%E5%86%85%E5%AD%98%E7%AE%A1%E7%90%86%E4%B8%8E%E5%9E%83%E5%9C%BE%E5%9B%9E%E6%94%B6">3. V8 内存管理与垃圾回收</a></td>
+</tr>
+</tbody></table>
+<p>🎬 <a href="../comics/EP.05.svg">打开漫画 EP.05</a> ｜ 📖 <a href="../comics/EP.05.html">漫画讲解稿 EP.05.md</a></p>
+</blockquote>
+
+</main>
+<footer>
+  双形态联动学习体系 ｜ 标准文档 + 漫画剧场 ｜
+  源码仓库 <a href="https://github.com/YZhiJie/frontend-perf-guide">GitHub</a> ｜
+  在线站点 <a href="https://yzhijie.github.io/frontend-perf-guide-pages/">https://yzhijie.github.io/frontend-perf-guide-pages/</a>
+</footer>
+</body>
+</html>

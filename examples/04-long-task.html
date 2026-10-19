@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<title>示例 04：长任务切片 —— 对 INP / TBT 的影响</title>
+<!-- 配套文档：docs/05-runtime.md 第 1~2 节（长任务与时间切片） -->
+<!--
+  运行方式：浏览器打开本文件，点击"任务"按钮后立刻连续点击"响应"按钮，
+  对比两种执行方式下响应按钮的延迟感受与 Long Task 日志。
+-->
+<style>
+  body { font-family: system-ui, sans-serif; max-width: 680px; margin: 40px auto; padding: 0 16px; }
+  button { padding: 10px 18px; margin-right: 10px; font-size: 15px; cursor: pointer; }
+  #resp { background: #ffd54f; }
+  ul { font-size: 13px; }
+</style>
+</head>
+<body>
+<h1>长任务 vs 时间切片</h1>
+<p>操作步骤：点「① 执行任务」→ 马上狂点「② 响应测试」，观察两次的延迟差异。</p>
+<button id="bad">① 执行任务（整块 350ms）</button>
+<button id="good">① 执行任务（切片 50ms/片）</button>
+<button id="resp">② 响应测试</button>
+<ul id="log"></ul>
+
+<script>
+const log = (msg) => {
+  const li = document.createElement('li');
+  li.textContent = new Date().toLocaleTimeString() + ' ' + msg;
+  document.getElementById('log').prepend(li);
+};
+
+// 响应延迟测量：点击后到真正执行之间隔了多久（INP 的本质）
+document.getElementById('resp').onclick = () => log(`响应执行，点击→执行延迟 ${(performance.now() - respClickedAt).toFixed(1)} ms`);
+let respClickedAt = 0;
+document.getElementById('resp').addEventListener('pointerdown', () => { respClickedAt = performance.now(); });
+
+const spin = (ms) => { const t = performance.now(); while (performance.now() - t < ms); };
+
+// 坏写法：一整块 350ms，期间所有点击事件只能排队
+document.getElementById('bad').onclick = () => {
+  log('—— 整块任务开始 ——');
+  spin(350);
+  log('整块任务结束，若刚才在点响应，延迟 ≈ 350ms');
+};
+
+// 好写法：切片，每片之间让出主线程（浏览器优先 scheduler.yield，降级 setTimeout）
+async function chunked(msPerChunk = 50, total = 350) {
+  log('—— 切片任务开始 ——');
+  let done = 0;
+  while (done < total) {
+    const budget = Math.min(msPerChunk, total - done);
+    spin(budget);
+    done += budget;
+    const yieldToMain = scheduler?.yield
+      ? scheduler.yield()
+      : new Promise((r) => setTimeout(r, 0));
+    await yieldToMain;
+  }
+  log('切片任务结束，点击响应可穿插在每片之间执行，延迟显著更低');
+}
+document.getElementById('good').onclick = () => chunked();
+
+// 观测长任务：>50ms 的任务都会被 PerformanceObserver 捕获
+new PerformanceObserver((list) => {
+  for (const e of list.getEntries()) log(`⚠ Long Task：${e.duration.toFixed(1)} ms`);
+}).observe({ type: 'longtask', buffered: true });
+</script>
+</body>
+</html>

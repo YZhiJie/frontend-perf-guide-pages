@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>EP.08 · 《性能体检中心》 · 前端性能优化完全学习指南</title>
+<style>
+:root{--fg:#1f2328;--muted:#57606a;--line:#d0d7de;--accent:#f97316;--link:#0969da;--code-bg:#f6f8fa}
+*{box-sizing:border-box}
+body{margin:0;font-family:-apple-system,BlinkMacSystemFont,'PingFang SC','Microsoft YaHei',sans-serif;color:var(--fg);background:#fff;line-height:1.75}
+header.top{position:sticky;top:0;background:#0f172a;color:#e2e8f0;padding:12px 20px;display:flex;align-items:center;gap:16px;flex-wrap:wrap;z-index:10}
+header.top .brand{font-weight:700;color:#fff}
+header.top .brand em{color:var(--accent);font-style:normal}
+header.top nav{margin-left:auto;display:flex;gap:16px;flex-wrap:wrap}
+header.top nav a{color:#cbd5e1;text-decoration:none;font-size:14px}
+header.top nav a:hover{color:var(--accent)}
+header.top nav a.active{color:#fff;border-bottom:2px solid var(--accent);padding-bottom:2px}
+main{max-width:880px;margin:0 auto;padding:28px 20px 64px}
+main h1{font-size:28px;border-bottom:1px solid var(--line);padding-bottom:.3em}
+main h2{font-size:22px;border-bottom:1px solid var(--line);padding-bottom:.3em;margin-top:2em}
+main h3{font-size:18px;margin-top:1.6em}
+main img{max-width:100%}
+a{color:var(--link)}
+code{background:var(--code-bg);padding:.15em .35em;border-radius:4px;font-size:.9em;font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}
+pre{background:#0f172a;color:#e2e8f0;padding:14px 16px;border-radius:8px;overflow:auto}
+pre code{background:none;color:inherit;padding:0;font-size:13px}
+table{border-collapse:collapse;width:100%;margin:1em 0;display:block;overflow:auto}
+th,td{border:1px solid var(--line);padding:6px 12px;text-align:left}
+th{background:var(--code-bg)}
+blockquote{border-left:4px solid var(--accent);margin:1em 0;padding:.3em 1em;color:var(--muted);background:#fff7ed}
+hr{border:none;border-top:1px solid var(--line);margin:2em 0}
+footer{border-top:1px solid var(--line);color:var(--muted);font-size:13px;text-align:center;padding:20px 16px}
+footer a{color:var(--link);text-decoration:none}
+</style>
+</head>
+<body>
+<header class="top">
+  <span class="brand"><em>前端性能</em>完全指南</span>
+  <nav>
+    <a href="../index.html">首页</a>
+    <a href="../docs/README.html">标准文档</a>
+    <a href="../comics/index.html" class="active">漫画剧场</a>
+    <a href="https://github.com/YZhiJie/frontend-perf-guide">源码仓库</a>
+  </nav>
+</header>
+<main>
+<h1 id="ep08-性能体检中心">EP.08 · 《性能体检中心》</h1>
+<blockquote>
+<p>🎬 漫画：<a href="./EP.08.svg">EP.08.svg</a> ｜ 📄 对应文档：<a href="../docs/08-tools.html">第 8 章 · 性能检测工具完全指南</a></p>
+<p>本话主旨：选对工具做对事——测试台找问题，真实用户数据下结论。</p>
+</blockquote>
+<h2 id="本话剧情">本话剧情</h2>
+<p>小奔的网站「不舒服」，稳叔带它去性能体检中心：Lighthouse 医生（灯塔造型）打 62 分并开出改进清单；CT 机（DevTools Performance）录一段日常操作，火焰图上找到堵住的血管（长任务）；WebPageTest 异地专家换 3G 弱网再测一遍；最后戴上 web-vitals 手环，24 小时监测真实用户。小奔这才知道：体检报告的分数会晃，手环上的数据才是病人真实的生活。</p>
+<h2 id="知识点节点">知识点节点</h2>
+<h3 id="节点-1-lighthouse体检报告与改进清单漫画第-1-格">节点 1 · Lighthouse：体检报告与改进清单（漫画第 1 格）</h3>
+<ul>
+<li><strong>生活映射</strong>：体检打分（性能分五维加权）+ 开药方（按预估节省排序的改进项）。</li>
+<li><strong>技术对应</strong>：TBT/LCP/CLS 权重最高优先修；移动端口径是模拟节流；分数波动 ±5 分是正常噪声。</li>
+<li><strong>深入阅读</strong>：📖 <a href="../docs/08-tools.html#2-lighthouse%E4%BB%8E%E8%B7%91%E5%88%86%E5%88%B0%E6%94%B9%E8%BF%9B%E9%A1%B9">2. Lighthouse：从跑分到改进项</a></li>
+</ul>
+<h3 id="节点-2-performance-ct-机火焰图找堵点漫画第-2-格">节点 2 · Performance CT 机：火焰图找堵点（漫画第 2 格）</h3>
+<ul>
+<li><strong>生活映射</strong>：CT 扫描找堵住的血管 = 录制操作后看火焰图找超 50ms 的长任务，Bottom-Up 按 Self Time 排序揪出元凶函数。</li>
+<li><strong>技术对应</strong>：先设 CPU 4x + Slow 4G 节流再录制；紫色锯齿 = 布局抖动；Network 面板看瀑布图串行链。</li>
+<li><strong>深入阅读</strong>：📖 <a href="../docs/08-tools.html#4-performance-%E9%9D%A2%E6%9D%BF%E7%81%AB%E7%84%B0%E5%9B%BE%E7%B2%BE%E8%AF%BB">4. Performance 面板：火焰图精读</a>、<a href="../docs/08-tools.html#5-network-%E9%9D%A2%E6%9D%BF%E7%80%91%E5%B8%83%E5%9B%BE%E4%B8%8E%E4%BC%98%E5%85%88%E7%BA%A7">5. Network 面板：瀑布图与优先级</a></li>
+</ul>
+<h3 id="节点-3-异地会诊与-24-小时手环漫画第-3-格">节点 3 · 异地会诊与 24 小时手环（漫画第 3 格）</h3>
+<ul>
+<li><strong>生活映射</strong>：换个城市的医院用真实设备复诊（WebPageTest 地域/弱网矩阵）；出院后戴手环持续监测（web-vitals RUM）。</li>
+<li><strong>技术对应</strong>：WebPageTest 看首访 vs 回访；RUM 看板按 p75 口径聚合、按路由/设备分片、设环比告警。</li>
+<li><strong>深入阅读</strong>：📖 <a href="../docs/08-tools.html#6-webpagetest%E7%9C%9F%E5%AE%9E%E7%BD%91%E7%BB%9C%E7%8E%AF%E5%A2%83%E4%BC%9A%E8%AF%8A">6. WebPageTest：真实网络环境会诊</a>、<a href="../docs/08-tools.html#7-rum-%E4%B8%8E%E7%9C%9F%E5%AE%9E%E7%94%A8%E6%88%B7%E6%95%B0%E6%8D%AE">7. RUM 与真实用户数据</a></li>
+</ul>
+<h3 id="节点-4-最大坑点实验室分数-真实体验漫画第-4-格">节点 4 · 最大坑点：实验室分数 ≠ 真实体验（漫画第 4 格）</h3>
+<ul>
+<li><strong>误区</strong>：把 Lighthouse 单次分数当业务结论汇报——环境、缓存、插件都会让分数晃动。</li>
+<li><strong>正解</strong>：实验室工具定位问题，真实用户数据（p75）下结论；CI 分数用于防回归（看趋势不纠结单次）。</li>
+<li><strong>深入阅读</strong>：📖 <a href="../docs/08-tools.html#1-%E5%B7%A5%E5%85%B7%E5%85%A8%E6%99%AF%E9%80%89%E5%AF%B9%E5%B7%A5%E5%85%B7%E5%81%9A%E5%AF%B9%E4%BA%8B">1. 工具全景：选对工具做对事</a>、<a href="../docs/08-tools.html#3-lighthouse-ci%E6%8A%8A%E5%88%86%E6%95%B0%E5%85%B3%E8%BF%9B%E6%B5%81%E6%B0%B4%E7%BA%BF">3. Lighthouse CI：把分数关进流水线</a></li>
+</ul>
+<h2 id="常见认知误区">常见认知误区</h2>
+<table>
+<thead>
+<tr>
+<th>误区</th>
+<th>真相</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>一次 Lighthouse 100 分 = 优化完成</td>
+<td>单次快照而已；无 RUM 数据支撑的「优化完成」都是幻觉</td>
+</tr>
+<tr>
+<td>Performance 面板默认设置直接录</td>
+<td>不开节流等于在体检中心量运动员的心率，结论失真</td>
+</tr>
+<tr>
+<td>看板只看全站平均</td>
+<td>平均值会掩盖长尾；p75 为主、p98 防长尾、按路由分片</td>
+</tr>
+</tbody></table>
+<h2 id="一句话带走">一句话带走</h2>
+<p><strong>测试台找问题（Lighthouse/DevTools/WebPageTest），真实用户数据下结论（RUM p75）——工具选对，病才看得准。</strong></p>
+<hr>
+<blockquote>
+<p>📚 下一话预告：<a href="./EP.09.html">EP.09《工厂质检上线记》</a>——生产环境落地全流程 ｜ 跳转：<a href="../docs/09-production.html">第 9 章 · 生产环境落地实践</a></p>
+</blockquote>
+
+</main>
+<footer>
+  双形态联动学习体系 ｜ 标准文档 + 漫画剧场 ｜
+  源码仓库 <a href="https://github.com/YZhiJie/frontend-perf-guide">GitHub</a> ｜
+  在线站点 <a href="https://yzhijie.github.io/frontend-perf-guide-pages/">https://yzhijie.github.io/frontend-perf-guide-pages/</a>
+</footer>
+</body>
+</html>

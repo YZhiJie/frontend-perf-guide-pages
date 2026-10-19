@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>EP.07 · 《React 后厨的调度艺术》 · 前端性能优化完全学习指南</title>
+<style>
+:root{--fg:#1f2328;--muted:#57606a;--line:#d0d7de;--accent:#f97316;--link:#0969da;--code-bg:#f6f8fa}
+*{box-sizing:border-box}
+body{margin:0;font-family:-apple-system,BlinkMacSystemFont,'PingFang SC','Microsoft YaHei',sans-serif;color:var(--fg);background:#fff;line-height:1.75}
+header.top{position:sticky;top:0;background:#0f172a;color:#e2e8f0;padding:12px 20px;display:flex;align-items:center;gap:16px;flex-wrap:wrap;z-index:10}
+header.top .brand{font-weight:700;color:#fff}
+header.top .brand em{color:var(--accent);font-style:normal}
+header.top nav{margin-left:auto;display:flex;gap:16px;flex-wrap:wrap}
+header.top nav a{color:#cbd5e1;text-decoration:none;font-size:14px}
+header.top nav a:hover{color:var(--accent)}
+header.top nav a.active{color:#fff;border-bottom:2px solid var(--accent);padding-bottom:2px}
+main{max-width:880px;margin:0 auto;padding:28px 20px 64px}
+main h1{font-size:28px;border-bottom:1px solid var(--line);padding-bottom:.3em}
+main h2{font-size:22px;border-bottom:1px solid var(--line);padding-bottom:.3em;margin-top:2em}
+main h3{font-size:18px;margin-top:1.6em}
+main img{max-width:100%}
+a{color:var(--link)}
+code{background:var(--code-bg);padding:.15em .35em;border-radius:4px;font-size:.9em;font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}
+pre{background:#0f172a;color:#e2e8f0;padding:14px 16px;border-radius:8px;overflow:auto}
+pre code{background:none;color:inherit;padding:0;font-size:13px}
+table{border-collapse:collapse;width:100%;margin:1em 0;display:block;overflow:auto}
+th,td{border:1px solid var(--line);padding:6px 12px;text-align:left}
+th{background:var(--code-bg)}
+blockquote{border-left:4px solid var(--accent);margin:1em 0;padding:.3em 1em;color:var(--muted);background:#fff7ed}
+hr{border:none;border-top:1px solid var(--line);margin:2em 0}
+footer{border-top:1px solid var(--line);color:var(--muted);font-size:13px;text-align:center;padding:20px 16px}
+footer a{color:var(--link);text-decoration:none}
+</style>
+</head>
+<body>
+<header class="top">
+  <span class="brand"><em>前端性能</em>完全指南</span>
+  <nav>
+    <a href="../index.html">首页</a>
+    <a href="../docs/README.html">标准文档</a>
+    <a href="../comics/index.html" class="active">漫画剧场</a>
+    <a href="https://github.com/YZhiJie/frontend-perf-guide">源码仓库</a>
+  </nav>
+</header>
+<main>
+<h1 id="ep07-react-后厨的调度艺术">EP.07 · 《React 后厨的调度艺术》</h1>
+<blockquote>
+<p>🎬 漫画：<a href="./EP.07.svg">EP.07.svg</a> ｜ 📄 对应文档：<a href="../docs/07-react.html">第 7 章 · React 专项优化方案</a></p>
+<p>本话主旨：React 的性能之道——先修结构（状态下放/组合），再上记忆化（memo 三件套），用并发特性保交互。</p>
+</blockquote>
+<h2 id="本话剧情">本话剧情</h2>
+<p>小奔到 React 餐馆后厨，发现规矩奇特：老板娘（状态）一喊单，全厨房连不相干的灶台都重做一遍（重渲染递归传播）。稳叔教调度艺术：给盘子贴「React.memo 没变别重做」标签（配合 useMemo/useCallback 才有效）、配菜的状态归配菜台管（状态下放）、大菜单拆成小房间（lazy + Suspense）、不紧急的切菜让给急单（useTransition）。最后踩坑：列表 key 用数组下标，删一道菜全桌上错菜。</p>
+<h2 id="知识点节点">知识点节点</h2>
+<h3 id="节点-1-一喊全动重渲染的传播漫画第-1-格">节点 1 · 一喊全动：重渲染的传播（漫画第 1 格）</h3>
+<ul>
+<li><strong>生活映射</strong>：老板娘一喊单全厨房动 = 父组件重渲染时默认递归重渲染全部子树，props 没变也重跑。</li>
+<li><strong>技术对应</strong>：三个触发源（state/父组件/context）；先跑 Profiler 找热点再动手。</li>
+<li><strong>深入阅读</strong>：📖 <a href="../docs/07-react.html#1-%E9%87%8D%E6%B8%B2%E6%9F%93%E7%9A%84%E8%A7%A6%E5%8F%91%E9%93%BE%E6%9D%A1">1. 重渲染的触发链条</a></li>
+</ul>
+<h3 id="节点-2-贴标签memo-三件套的组合拳漫画第-2-格">节点 2 · 贴标签：memo 三件套的组合拳（漫画第 2 格）</h3>
+<ul>
+<li><strong>生活映射</strong>：盘子贴「没变别重做」（memo）+ 备好半成品（useMemo）+ 备好餐具（useCallback）——三样缺一不可。</li>
+<li><strong>技术对应</strong>：memo 浅比较 props；函数 props 不稳定则 memo 失效；先测量再缓存，禁止全站包裹。</li>
+<li><strong>深入阅读</strong>：📖 <a href="../docs/07-react.html#2-%E6%B8%B2%E6%9F%93%E6%8E%A7%E5%88%B6%E4%B8%89%E4%BB%B6%E5%A5%97memo-usememo-%E4%B8%8E-usecallback">2. 渲染控制三件套：memo useMemo 与 useCallback</a></li>
+</ul>
+<h3 id="节点-3-状态下沉与插队结构优化与并发漫画第-3-格">节点 3 · 状态下沉与插队：结构优化与并发（漫画第 3 格）</h3>
+<ul>
+<li><strong>生活映射</strong>：配菜的状态归配菜台（状态下放）；不紧急的切菜让给急单（useTransition 低优先级更新）。</li>
+<li><strong>技术对应</strong>：状态放最小公共父级、children 组合穿透、Context 按频率拆分；useDeferredValue 保输入跟手。</li>
+<li><strong>深入阅读</strong>：📖 <a href="../docs/07-react.html#3-%E7%8A%B6%E6%80%81%E4%B8%8B%E6%94%BE%E4%B8%8E%E7%BB%84%E4%BB%B6%E7%BB%84%E5%90%88">3. 状态下放与组件组合</a>、<a href="../docs/07-react.html#6-%E5%B9%B6%E5%8F%91%E7%89%B9%E6%80%A7usetransition-%E4%B8%8E-usedeferredvalue">6. 并发特性：useTransition 与 useDeferredValue</a></li>
+</ul>
+<h3 id="节点-4-最大坑点下标-key-上错菜漫画第-4-格">节点 4 · 最大坑点：下标 key 上错菜（漫画第 4 格）</h3>
+<ul>
+<li><strong>误区</strong>：列表 key 用数组下标——删除中间项后所有 key 前移，React 全列表重渲染，带输入状态的行还会状态错位。</li>
+<li><strong>正解</strong>：key 用稳定唯一业务 id；React 19 可启用 Compiler 自动记忆化，但结构优化仍是根本。</li>
+<li><strong>深入阅读</strong>：📖 <a href="../docs/07-react.html#4-%E5%88%97%E8%A1%A8%E6%B8%B2%E6%9F%93%E4%B8%8E-key-%E7%9A%84%E6%AD%A3%E7%A1%AE%E7%94%A8%E6%B3%95">4. 列表渲染与 key 的正确用法</a>、<a href="../docs/07-react.html#8-react-19compiler-%E4%B8%8E%E8%87%AA%E5%8A%A8%E8%AE%B0%E5%BF%86%E5%8C%96">8. React 19：Compiler 与自动记忆化</a></li>
+</ul>
+<h2 id="常见认知误区">常见认知误区</h2>
+<table>
+<thead>
+<tr>
+<th>误区</th>
+<th>真相</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>用了 memo 性能就好</td>
+<td>函数 props 每次新引用时 memo 形同虚设，必须配 useCallback/useMemo</td>
+</tr>
+<tr>
+<td>useMemo/useCallback 越多越好</td>
+<td>比较与缓存本身有成本，热点组件才值得</td>
+</tr>
+<tr>
+<td>React 19 Compiler 能自动救一切</td>
+<td>它替代的是手动记忆化，替代不了状态下放/订阅粒度等结构优化</td>
+</tr>
+</tbody></table>
+<h2 id="一句话带走">一句话带走</h2>
+<p><strong>结构对了才谈优化：状态下放缩小范围、三件套精准缓存、并发特性保交互——React 优化的本质是控制「谁该重渲染」。</strong></p>
+<hr>
+<blockquote>
+<p>📚 下一话预告：<a href="./EP.08.html">EP.08《性能体检中心》</a>——性能工具完全指南 ｜ 跳转：<a href="../docs/08-tools.html">第 8 章 · 性能检测工具完全指南</a></p>
+</blockquote>
+
+</main>
+<footer>
+  双形态联动学习体系 ｜ 标准文档 + 漫画剧场 ｜
+  源码仓库 <a href="https://github.com/YZhiJie/frontend-perf-guide">GitHub</a> ｜
+  在线站点 <a href="https://yzhijie.github.io/frontend-perf-guide-pages/">https://yzhijie.github.io/frontend-perf-guide-pages/</a>
+</footer>
+</body>
+</html>
