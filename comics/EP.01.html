@@ -97,6 +97,22 @@ footer a{color:var(--link);text-decoration:none}
 <td>实验室分数只是代理指标，真实用户数据才是裁判</td>
 </tr>
 </tbody></table>
+<h2 id="自测三题">自测三题</h2>
+<p><strong>1. 性能优化应该从哪里开始？</strong></p>
+<p>A. 先把所有组件包上 memo　B. 先量化：用真实用户数据定位瓶颈　C. 先上 CDN</p>
+<blockquote>
+<p>答案：B。没有测量的优化只是猜测，先定基线、找到最大瓶颈再动手。</p>
+</blockquote>
+<p><strong>2. 衡量用户真实体验的核心指标是哪一组？</strong></p>
+<p>A. CPU / 内存 / 磁盘　B. LCP / INP / CLS　C. PV / UV / 转化率</p>
+<blockquote>
+<p>答案：B。Core Web Vitals 分别覆盖加载速度、交互响应与视觉稳定性。</p>
+</blockquote>
+<p><strong>3. 「加载快」和「交互不卡」是什么关系？</strong></p>
+<p>A. 同一件事　B. 加载优化好，交互自然不卡　C. 两件事，分别对应加载与运行时优化</p>
+<blockquote>
+<p>答案：C。首屏快不等于操作流畅，需要分别治理。</p>
+</blockquote>
 <h2 id="一句话带走">一句话带走</h2>
 <p><strong>先度量、再定位、小步优化、用数据验证——性能优化是工程，不是玄学。</strong></p>
 <hr>

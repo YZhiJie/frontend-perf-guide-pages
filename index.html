@@ -48,7 +48,7 @@ footer a{color:var(--link);text-decoration:none}
 <p>一套<strong>双形态深度联动</strong>的前端性能优化学习资料体系：标准技术文档 + 漫画剧场。同一套知识，两种呈现——文档严谨完整可作参考手册，漫画场景化降低理解门槛，双向锚点随时切换。</p>
 <pre><code>frontend-perf-guide/
 ├── docs/        # 标准技术文档教程（9 章，系统性 + 按需查阅）
-├── comics/      # 漫画式教程（9 话四格漫画 + 讲解稿 + 阅读器）
+├── comics/      # 漫画式教程（9 话四格漫画 + 讲解稿 + 整合阅读器 + 风格规范）
 ├── examples/    # 可直接运行的示例集（5 个，Node/浏览器）
 └── scripts/     # 双向映射校验门禁（check-mapping.mjs）
 </code></pre>
@@ -73,7 +73,7 @@ footer a{color:var(--link);text-decoration:none}
 <td><a href="https://yzhijie.github.io/frontend-perf-guide-pages/">https://yzhijie.github.io/frontend-perf-guide-pages/</a></td>
 </tr>
 </tbody></table>
-<p><strong>在线站点</strong> = <code>docs/</code> 九章标准文档（渲染为 HTML）+ <code>comics/</code> 漫画剧场（四格漫画画廊与逐话阅读器）。两种形态间的双向映射链接在线上可直接点击跳转。</p>
+<p><strong>在线站点</strong> = <code>docs/</code> 九章标准文档（渲染为 HTML）+ <code>comics/</code> 漫画剧场（封面、话目总览、翻页/长卷双模式、讲解抽屉与深链）。两种形态间的双向映射链接在线上可直接点击跳转。</p>
 <h3 id="部署方式">部署方式</h3>
 <p>站点是<strong>纯静态</strong>产物，无需服务端；构建与发布流程：</p>
 <pre><code class="language-bash">npm install            # 首次：安装构建依赖（marked，仅构建期使用）
@@ -109,7 +109,10 @@ npm run build:pages    # 将 markdown 教程渲染为 dist-pages/ 静态站点
 <p><strong>双向关联映射</strong>：文档每章末尾有「🎬 配套漫画」小节（含漫画格 ↔ 小节映射表）；每话漫画讲解稿的每个知识点节点带 <code>📖</code> 链接跳回文档对应小节。该映射由 <a href="scripts/check-mapping.mjs">scripts/check-mapping.mjs</a> 门禁自动强制校验，永不失联。</p>
 <h2 id="学习路径三种入口">学习路径（三种入口）</h2>
 <ul>
-<li><strong>漫画入门（约 30 分钟）</strong>：打开 <a href="comics/index.html">comics/index.html</a> 阅读器，把 9 话漫画刷一遍 → 再进入文档精读感兴趣的小节。</li>
+<li><strong>漫画入门（约 30 分钟）</strong>：打开 <a href="comics/index.html">comics/index.html</a> 阅读器，按分册把 9 话漫画刷一遍（<code>←/→</code> 切话、<code>N</code> 开讲解、<code>G</code> 看话目）→ 再进入文档精读感兴趣的小节。<blockquote>
+<p>阅读器运行时读取 <code>manifest.json</code> 与讲解稿，需通过 HTTP 访问（本地 <code>python3 -m http.server</code>，或直接用上面的线上地址）。</p>
+</blockquote>
+</li>
 <li><strong>系统学习</strong>：从 <a href="docs/01-overview.html">docs/01-overview.md</a> 开始按章精读，每章末尾跳漫画巩固 → 适合完整掌握全链路。</li>
 <li><strong>按需查阅</strong>：遇到具体问题直接查对应章节（加载慢 → 第 3 章、滚动卡 → 第 4 章、内存涨 → 第 5 章、框架专项 → 第 6/7 章）。</li>
 </ul>
@@ -224,11 +227,20 @@ npm run build:pages    # 将 markdown 教程渲染为 dist-pages/ 静态站点
 <h2 id="质量门禁">质量门禁</h2>
 <pre><code class="language-bash">node scripts/check-mapping.mjs            # 全量校验：SVG 规范 + 双向映射 + 死链 + manifest 一致性
 node scripts/check-mapping.mjs --svg-only # 仅校验 SVG 硬规则（供新增漫画时快速自检）
+node comics/check-comics.mjs              # manifest 一致性 + SVG 良构 / 文本溢出 + 讲解稿完整性
+node comics/check-renderer.mjs            # 内置 Markdown 渲染器对 9 话讲解稿的渲染自测
 </code></pre>
-<p>校验范围：SVG 硬规则（viewBox、无外部资源、字号显式、行宽、引用完整性）、文档章末漫画映射、漫画节点回链、全仓库 Markdown 死链（含 GitHub 锚点 slug 规则）、manifest 与磁盘一致性。</p>
+<p>校验范围：SVG 硬规则（viewBox、无外部资源、字号显式、行宽、引用完整性）、文档章末漫画映射、漫画节点回链、全仓库 Markdown 死链（含 GitHub 锚点 slug 规则）、<code>manifest.json</code> 与磁盘一致性、讲解稿结构（标题 / 对应正文 / 自测三题）、渲染器输出。</p>
 <h2 id="版本管理">版本管理</h2>
 <p>本仓库使用 Git 规范管理，提交信息遵循 Conventional Commits（<code>feat:</code> / <code>docs:</code> / <code>chore:</code>）。</p>
 <h2 id="版本日志">版本日志</h2>
+<h3 id="v2002026-10-21">v2.0.0（2026-10-21）</h3>
+<ul>
+<li>漫画阅读器重构为<strong>整合阅读器</strong>：封面、话目总览（按九章分册分组 + 搜索）、<code>paged</code> 翻页 / <code>scroll</code> 长卷双模式、讲解抽屉（内置 Markdown 渲染器）、进度记忆、<code>#ep-07</code> 深链、键盘导航。</li>
+<li>新增 <code>comics/manifest.json</code>（替代 <code>manifest.js</code>）、<code>comics/style-guide.md</code>（性能小镇风格规范）、<code>comics/samples/character-sheet.svg</code>。</li>
+<li>新增 <code>comics/check-comics.mjs</code> 与 <code>comics/check-renderer.mjs</code> 校验脚本；九话讲解稿补齐「自测三题」。</li>
+<li>站点构建同步适配新阅读器（托管 <code>manifest.json</code> 并改写讲解稿内链接）。</li>
+</ul>
 <h3 id="v1002026-10-18">v1.0.0（2026-10-18）</h3>
 <ul>
 <li>标准技术文档 9 章：总览与心智模型 / Core Web Vitals / 加载 / 渲染 / 运行时 / Vue 专项 / React 专项 / 工具指南 / 生产落地。</li>

@@ -100,6 +100,22 @@ footer a{color:var(--link);text-decoration:none}
 <td>用户输入后 500ms 内的偏移不计入（如手风琴展开）</td>
 </tr>
 </tbody></table>
+<h2 id="自测三题">自测三题</h2>
+<p><strong>1. LCP 衡量的是什么？</strong></p>
+<p>A. 首次绘制时间　B. 视口内最大内容元素的渲染时刻　C. 页面 onload 完成时间</p>
+<blockquote>
+<p>答案：B。LCP 用最大内容元素的出现时间代表「主要内容可见」的时刻。</p>
+</blockquote>
+<p><strong>2. INP 取代了哪个旧指标？</strong></p>
+<p>A. FCP　B. FID　C. TTFB</p>
+<blockquote>
+<p>答案：B。FID 只测首次输入延迟，INP 覆盖整个会话的交互响应。</p>
+</blockquote>
+<p><strong>3. CLS 最常见的原因是什么？</strong></p>
+<p>A. 脚本执行太慢　B. 图片/广告/字体未预留尺寸导致布局位移　C. 服务器响应慢</p>
+<blockquote>
+<p>答案：B。为媒体预留尺寸、避免内容插入顶动布局，是控制 CLS 的关键。</p>
+</blockquote>
 <h2 id="一句话带走">一句话带走</h2>
 <p><strong>大东西快出现（LCP≤2.5s）、点了有反应（INP≤200ms）、东西别乱跳（CLS≤0.1）——用真实用户 p75 数据说话。</strong></p>
 <hr>

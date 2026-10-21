@@ -47,7 +47,7 @@ footer a{color:var(--link);text-decoration:none}
 <h1 id="漫画教程-性能小镇">🎬 漫画教程 · 性能小镇</h1>
 <blockquote>
 <p>用生活化场景建立性能直觉：每个知识点节点都标注了跳转链接，指向标准文档中对应的详细技术说明。
-两种打开方式：直接浏览 <a href="./index.html">index.html</a> 阅读器（支持 file:// 双击打开），或按下表逐话阅读 SVG + 讲解稿。</p>
+打开 <a href="./index.html">index.html</a> 进入<strong>整合阅读器</strong>（封面 → 话目总览 → 逐话阅读 → 讲解抽屉），也可按下表逐话阅读 SVG + 讲解稿。</p>
 </blockquote>
 <h2 id="角色">角色</h2>
 <table>
@@ -66,6 +66,7 @@ footer a{color:var(--link);text-decoration:none}
 <td>紫衣白发眼镜的资深性能工程师，负责点破误区、给出正解</td>
 </tr>
 </tbody></table>
+<p>定妆稿见 <a href="./samples/character-sheet.svg">samples/character-sheet.svg</a>，完整视觉与叙事规范见 <a href="./style-guide.html">style-guide.md</a>。</p>
 <h2 id="分话目录">分话目录</h2>
 <table>
 <thead>
@@ -131,12 +132,57 @@ footer a{color:var(--link);text-decoration:none}
 <td><a href="../docs/09-production.html">第 9 章 · 生产环境落地实践</a></td>
 </tr>
 </tbody></table>
+<h2 id="阅读器">阅读器</h2>
+<p><code>index.html</code> 是零依赖单文件阅读器，内容序列来自 <a href="./manifest.json">manifest.json</a>。</p>
+<table>
+<thead>
+<tr>
+<th>能力</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>封面</td>
+<td>系列徽章、书名、话数与分册数、继续阅读（进度记忆）</td>
+</tr>
+<tr>
+<td>双模式</td>
+<td><code>paged</code> 一屏一话翻页 / <code>scroll</code> 长卷连续滚动</td>
+</tr>
+<tr>
+<td>讲解抽屉</td>
+<td>右侧滑出当前话讲解稿，内置 Markdown 渲染器；可打开原始 Markdown</td>
+</tr>
+<tr>
+<td>话目总览</td>
+<td>按分册（九章）分组的网格，支持关键词搜索与进度标记</td>
+</tr>
+<tr>
+<td>深链</td>
+<td><code>#ep-07</code> 直达第 7 话；<code>#ep-07/p3</code> 直达第 3 格</td>
+</tr>
+<tr>
+<td>键盘</td>
+<td><code>←/→</code> 上下话、<code>↑/↓</code> 翻页、<code>N</code> 讲解抽屉、<code>G</code> 话目总览、<code>Esc</code> 关闭</td>
+</tr>
+</tbody></table>
+<blockquote>
+<p>⚠️ 阅读器在运行时 <code>fetch</code> 读取 <code>manifest.json</code> 与讲解稿，<strong>必须通过 HTTP 访问</strong>：
+本地运行 <code>python3 -m http.server 8899</code> 后打开 <code>http://127.0.0.1:8899/comics/index.html</code>；
+直接双击 <code>file://</code> 打开会被浏览器安全策略拦截（可改用上表直接看 SVG 与 MD）。</p>
+</blockquote>
 <h2 id="与标准文档的联动规则">与标准文档的联动规则</h2>
 <ul>
 <li>每话讲解稿（EP.N.md）的知识点节点都带 <code>📖</code> 链接，<strong>精准跳转到标准文档对应小节</strong>；</li>
+<li>讲解稿末的「自测三题」用于快速检验理解，答案折叠在引用块中；</li>
 <li>标准文档每章末尾的「🎬 配套漫画」小节给出<strong>漫画格 ↔ 文档小节</strong>的双向映射表；</li>
-<li>双向链接由门禁脚本自动校验：<code>node scripts/check-mapping.mjs</code>。</li>
+<li>双向链接由门禁脚本自动校验。</li>
 </ul>
+<h2 id="校验">校验</h2>
+<pre><code class="language-bash">node comics/check-comics.mjs     # manifest 一致性 + SVG 良构 / 文本溢出 + MD 完整性
+node comics/check-renderer.mjs   # 内置渲染器对全部讲解稿的渲染自测
+node scripts/check-mapping.mjs   # 文档 ↔ 漫画双向映射与锚点死链
+</code></pre>
 
 </main>
 <footer>

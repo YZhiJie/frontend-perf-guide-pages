@@ -8,7 +8,7 @@
  *     - docs/0N-*.md 末尾必须含「🎬 配套漫画」小节，且指向 comics/EP.0N.svg 与 EP.0N.md
  *     - comics/EP.0N.md 必须含 ≥3 个「### 节点」知识点，每个节点都有指向对应文档锚点的链接
  *  3. 全仓库 md 链接校验（GitHub 风格 slug，含去重后缀），死链即报错
- *  4. comics/manifest.js 与磁盘文件一致性校验
+ *  4. comics/manifest.json 与磁盘文件一致性校验
  *
  * 用法：
  *   node scripts/check-mapping.mjs             # 全量校验
@@ -207,39 +207,48 @@ function checkStructure() {
     }
   }
 
-  // 3) manifest 与磁盘一致性
-  const manifestPath = join(COMICS_DIR, "manifest.js");
+  // 3) manifest.json 与磁盘一致性
+  const manifestPath = join(COMICS_DIR, "manifest.json");
   if (existsSync(manifestPath)) {
-    const src = readFileSync(manifestPath, "utf8");
-    const seen = new Set();
-    for (const m of src.matchAll(
-      /\{\s*id:\s*'EP\.(\d{2})'[\s\S]*?svg:\s*'([^']+)'[\s\S]*?notes:\s*'([^']+)'[\s\S]*?doc:\s*'([^']+)'/g,
-    )) {
-      const tag = m[1];
-      seen.add(tag);
-      for (const [label, rel] of [
-        ["svg", m[2]],
-        ["notes", m[3]],
-      ]) {
-        const p = resolve(COMICS_DIR, rel);
-        if (!existsSync(p))
-          err(manifestPath, `EP.${tag} 的 ${label} 文件不存在：${rel}`);
-      }
-      const docAbs = resolve(COMICS_DIR, m[4]);
-      if (!existsSync(docAbs))
-        err(manifestPath, `EP.${tag} 的 doc 不存在：${m[4]}`);
-      if (!m[4].includes(`/${tag}-`))
-        err(manifestPath, `EP.${tag} 的 doc 未指向第 ${tag} 章：${m[4]}`);
+    let manifest = null;
+    try {
+      manifest = JSON.parse(readFileSync(manifestPath, "utf8"));
+    } catch (e) {
+      err(manifestPath, `manifest.json 解析失败：${e.message}`);
     }
-    const expected = ["01", "02", "03", "04", "05", "06", "07", "08", "09"];
-    if (seen.size !== 9 || !expected.every((t) => seen.has(t))) {
-      err(
-        manifestPath,
-        `manifest 应包含 EP.01~EP.09 全部 9 话（当前 ${seen.size} 话）`,
-      );
+    if (manifest) {
+      const eps = Array.isArray(manifest.episodes) ? manifest.episodes : [];
+      const seen = new Set();
+      for (const ep of eps) {
+        const tag = String(ep.ep).padStart(2, "0");
+        seen.add(tag);
+        if (ep.slug !== `EP.${tag}`)
+          err(manifestPath, `EP.${tag} 的 slug 应为 "EP.${tag}"，实际为 "${ep.slug}"`);
+        for (const [label, rel] of [
+          ["svg", `${ep.slug}.svg`],
+          ["notes", `${ep.slug}.md`],
+        ]) {
+          if (!existsSync(resolve(COMICS_DIR, rel)))
+            err(manifestPath, `EP.${tag} 的 ${label} 文件不存在：${rel}`);
+        }
+        const docRel = `../docs/${ep.part}`;
+        if (!existsSync(resolve(COMICS_DIR, docRel)))
+          err(manifestPath, `EP.${tag} 的对应文档不存在：${docRel}`);
+        if (!String(ep.part).startsWith(`${tag}-`))
+          err(manifestPath, `EP.${tag} 的 part 未指向第 ${tag} 章：${ep.part}`);
+      }
+      const expected = ["01", "02", "03", "04", "05", "06", "07", "08", "09"];
+      if (seen.size !== 9 || !expected.every((t) => seen.has(t))) {
+        err(manifestPath, `manifest 应包含 EP.01~EP.09 全部 9 话（当前 ${seen.size} 话）`);
+      }
+      const partFiles = new Set((manifest.parts || []).map((p) => p.file));
+      for (const ep of eps) {
+        if (!partFiles.has(ep.part))
+          err(manifestPath, `parts 缺少 EP.${String(ep.ep).padStart(2, "0")} 的映射：${ep.part}`);
+      }
     }
   } else if (!SVG_ONLY) {
-    err(manifestPath, "缺少 comics/manifest.js");
+    err(manifestPath, "缺少 comics/manifest.json");
   }
 }
 

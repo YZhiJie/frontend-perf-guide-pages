@@ -1,0 +1,74 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 560" font-family="'PingFang SC','Hiragino Sans GB','Microsoft YaHei',sans-serif">
+  <defs>
+    <linearGradient id="sheetBg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#eff6ff"/>
+      <stop offset="1" stop-color="#dbeafe"/>
+    </linearGradient>
+    <linearGradient id="sheetHdr" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#1e293b"/>
+      <stop offset="1" stop-color="#475569"/>
+    </linearGradient>
+    <g id="uncle">
+      <rect x="-16" y="-36" width="11" height="36" rx="4" fill="#334155"/>
+      <rect x="5" y="-36" width="11" height="36" rx="4" fill="#334155"/>
+      <rect x="-34" y="-98" width="12" height="50" rx="6" fill="#6d28d9"/>
+      <rect x="22" y="-98" width="12" height="50" rx="6" fill="#6d28d9"/>
+      <circle cx="-28" cy="-44" r="6.5" fill="#fcd9b8"/>
+      <circle cx="28" cy="-44" r="6.5" fill="#fcd9b8"/>
+      <rect x="-25" y="-104" width="50" height="72" rx="15" fill="#7c3aed"/>
+      <circle cx="0" cy="-122" r="25" fill="#fcd9b8"/>
+      <path d="M-25,-124 a25,25 0 0 1 50,0 z" fill="#e2e8f0"/>
+      <circle cx="-10" cy="-120" r="7.5" fill="#ffffff" stroke="#1e293b" stroke-width="1.6"/>
+      <circle cx="10" cy="-120" r="7.5" fill="#ffffff" stroke="#1e293b" stroke-width="1.6"/>
+      <line x1="-3" y1="-120" x2="3" y2="-120" stroke="#1e293b" stroke-width="1.6"/>
+      <circle cx="-10" cy="-120" r="2" fill="#1e293b"/>
+      <circle cx="10" cy="-120" r="2" fill="#1e293b"/>
+      <path d="M-6,-108 q6,4 12,0" stroke="#b45309" stroke-width="1.6" fill="none" stroke-linecap="round"/>
+      <ellipse cx="0" cy="-102" rx="9" ry="4.5" fill="#e2e8f0"/>
+    </g>
+    <g id="ben">
+      <rect x="-15" y="-32" width="11" height="32" rx="4" fill="#1e293b"/>
+      <rect x="4" y="-32" width="11" height="32" rx="4" fill="#1e293b"/>
+      <rect x="-33" y="-94" width="12" height="48" rx="6" fill="#0284c7"/>
+      <rect x="21" y="-94" width="12" height="48" rx="6" fill="#0284c7"/>
+      <circle cx="-27" cy="-42" r="6" fill="#fcd9b8"/>
+      <circle cx="27" cy="-42" r="6" fill="#fcd9b8"/>
+      <rect x="-24" y="-100" width="48" height="70" rx="15" fill="#0ea5e9"/>
+      <path d="M-24,-88 q24,14 48,0" stroke="#7dd3fc" stroke-width="3" fill="none"/>
+      <circle cx="0" cy="-118" r="23" fill="#fcd9b8"/>
+      <path d="M-23,-120 a23,23 0 0 1 46,0 z" fill="#0f172a"/>
+      <path d="M-14,-136 l3,-10 5,8 z" fill="#0f172a"/>
+      <path d="M6,-138 l4,-10 5,9 z" fill="#0f172a"/>
+      <circle cx="-8" cy="-116" r="2.4" fill="#1e293b"/>
+      <circle cx="8" cy="-116" r="2.4" fill="#1e293b"/>
+      <ellipse cx="0" cy="-104" rx="4" ry="5" fill="#7c2d12"/>
+    </g>
+  </defs>
+
+  <rect width="1200" height="560" fill="url(#sheetBg)"/>
+  <rect x="20" y="16" width="1160" height="56" rx="14" fill="url(#sheetHdr)"/>
+  <rect x="36" y="28" width="120" height="32" rx="9" fill="#f97316"/>
+  <text x="96" y="50" text-anchor="middle" font-size="17" font-weight="bold" fill="#ffffff">CHARACTERS</text>
+  <text x="176" y="52" font-size="25" font-weight="bold" fill="#ffffff">性能小镇 · 角色定妆稿</text>
+  <text x="1164" y="50" text-anchor="end" font-size="14" fill="#cbd5e1">comics/samples/character-sheet.svg</text>
+
+  <rect x="24" y="88" width="556" height="404" rx="16" fill="#ffffff"/>
+  <rect x="620" y="88" width="556" height="404" rx="16" fill="#ffffff"/>
+  <rect x="24" y="88" width="556" height="4" rx="2" fill="#0ea5e9"/>
+  <rect x="620" y="88" width="556" height="4" rx="2" fill="#7c3aed"/>
+
+  <use href="#ben" transform="translate(302,442) scale(2.4)"/>
+  <use href="#uncle" transform="translate(898,442) scale(2.4)"/>
+
+  <text x="302" y="466" text-anchor="middle" font-size="20" font-weight="bold" fill="#0f172a">小奔</text>
+  <text x="302" y="490" text-anchor="middle" font-size="14" fill="#475569">急于求成的年轻开发者 · 蓝卫衣 · 提出问题</text>
+  <text x="898" y="466" text-anchor="middle" font-size="20" font-weight="bold" fill="#0f172a">稳叔</text>
+  <text x="898" y="490" text-anchor="middle" font-size="14" fill="#475569">资深性能工程师 · 紫外套 · 圆眼镜 · 给出正解</text>
+
+  <text x="60" y="130" font-size="15" font-weight="bold" fill="#0ea5e9">defs id: #ben</text>
+  <text x="656" y="130" font-size="15" font-weight="bold" fill="#7c3aed">defs id: #uncle</text>
+  <text x="60" y="154" font-size="12" fill="#94a3b8">translate(x,y) 的 (x,y) 为脚底中心</text>
+  <text x="656" y="154" font-size="12" fill="#94a3b8">缩放用 scale(s)，建议 1.2~2.6</text>
+
+  <text x="24" y="530" font-size="12" fill="#94a3b8">配色：橙 #f97316 ｜ 蓝 #0ea5e9 ｜ 紫 #7c3aed ｜ 绿 #059669 ｜ 深底 #334155</text>
+</svg>

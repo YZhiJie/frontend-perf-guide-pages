@@ -97,6 +97,22 @@ footer a{color:var(--link);text-decoration:none}
 <td>图片/字体已是压缩格式，二次压缩白费 CPU；首选 Brotli 预压缩</td>
 </tr>
 </tbody></table>
+<h2 id="自测三题">自测三题</h2>
+<p><strong>1. 关键渲染路径中，什么会阻塞首屏渲染？</strong></p>
+<p>A. 图片　B. 同步 CSS 与阻塞脚本　C. 字体文件</p>
+<blockquote>
+<p>答案：B。CSS 阻塞渲染，同步脚本阻塞 HTML 解析。</p>
+</blockquote>
+<p><strong>2. 静态资源长期缓存的关键做法是？</strong></p>
+<p>A. 文件名带内容 hash + 长 max-age　B. 每次发版换目录　C. 关闭缓存</p>
+<blockquote>
+<p>答案：A。内容变则文件名变，未变则永久命中缓存。</p>
+</blockquote>
+<p><strong>3. preconnect 与 preload 的区别是？</strong></p>
+<p>A. 前者提前建立连接，后者提前拉取具体资源　B. 完全相同　C. 前者拉资源，后者建连接</p>
+<blockquote>
+<p>答案：A。preconnect 省握手，preload 提前下载关键资源。</p>
+</blockquote>
 <h2 id="一句话带走">一句话带走</h2>
 <p><strong>少加载（分割与按需）、早加载（预热与优先级）、按需加载（懒加载）——先减少量，再优化时序。</strong></p>
 <hr>

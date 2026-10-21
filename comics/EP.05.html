@@ -97,6 +97,22 @@ footer a{color:var(--link);text-decoration:none}
 <td>它仍占主线程执行时间；重计算要切片或上 Worker，不能只靠延迟</td>
 </tr>
 </tbody></table>
+<h2 id="自测三题">自测三题</h2>
+<p><strong>1. 长任务的判定阈值是多少？</strong></p>
+<p>A. 16ms　B. 50ms　C. 100ms</p>
+<blockquote>
+<p>答案：B。超过 50ms 的任务会阻塞输入响应，直接推高 INP。</p>
+</blockquote>
+<p><strong>2. 下列哪种不属于典型内存泄漏？</strong></p>
+<p>A. 忘记清理 setInterval　B. 闭包持有超大数组　C. 用 const 声明变量</p>
+<blockquote>
+<p>答案：C。const 只是绑定不可变，与泄漏无关。</p>
+</blockquote>
+<p><strong>3. 纯计算型重活应优先怎么处理？</strong></p>
+<p>A. 拆成微任务　B. 放进 Web Worker　C. 用 requestAnimationFrame</p>
+<blockquote>
+<p>答案：B。Worker 不占主线程；微任务与 rAF 仍在主线程执行。</p>
+</blockquote>
 <h2 id="一句话带走">一句话带走</h2>
 <p><strong>主线程要会休息（切片 + Worker），内存要舍得扔（及时清理引用）——卡顿与泄漏都是「不肯放手」造成的。</strong></p>
 <hr>

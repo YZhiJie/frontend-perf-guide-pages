@@ -162,14 +162,28 @@ for (const f of readdirSync(join(ROOT, "comics")).filter((n) => /^EP\.\d{2}\.svg
   cpSync(join(ROOT, "comics", f), join(OUT, "comics", f));
 }
 
-// 5) 复制并改写漫画阅读器与清单（.md → .html）
+// 5) 复制漫画阅读器、清单与讲解稿
+//    阅读器在运行时 fetch manifest.json 与 EP.*.md，因此按原样复制；
+//    讲解稿中的 ../docs/*.md 与 ./EP.*.md 链接改写为 .html，保证线上抽屉内跳转可用。
 {
-  const reader = readFileSync(join(ROOT, "comics", "index.html"), "utf8")
-    .replace(/\.md(?=["#)])/g, ".html")
-    .replace(/\.md"/g, '.html"');
-  write("comics/index.html", reader);
-  const manifest = readFileSync(join(ROOT, "comics", "manifest.js"), "utf8").replace(/\.md'/g, ".html'");
-  write("comics/manifest.js", manifest);
+  write("comics/index.html", readFileSync(join(ROOT, "comics", "index.html"), "utf8"));
+  write("comics/manifest.json", readFileSync(join(ROOT, "comics", "manifest.json"), "utf8"));
+  for (const f of readdirSync(join(ROOT, "comics")).filter((n) => /^EP\.\d{2}\.md$/.test(n))) {
+    const md = readFileSync(join(ROOT, "comics", f), "utf8")
+      .replace(/\]\(\.\.\/docs\/([^)#]+)\.md(#[^)]*)?\)/g, "](" + "../docs/$1.html$2)")
+      .replace(/\]\(\.\/(EP\.\d{2})\.md\)/g, "](./$1.html)")
+      .replace(/\]\(\.\/README\.md\)/g, "](./README.html)");
+    write(`comics/${f}`, md);
+  }
+}
+
+// 5b) 风格规范页与角色定妆稿
+{
+  const md = readFileSync(join(ROOT, "comics", "style-guide.md"), "utf8");
+  write("comics/style-guide.html",
+    shell({ title: titleOf(md, "漫画剧场风格规范"), rel: "../", body: render(md), active: "comics" }));
+  cpSync(join(ROOT, "comics", "samples"), join(OUT, "comics", "samples"), { recursive: true });
+  pages++;
 }
 
 // 6) 复制示例集（文档中 ../examples/... 链接指向这些可运行示例）

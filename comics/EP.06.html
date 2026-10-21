@@ -97,6 +97,22 @@ footer a{color:var(--link);text-decoration:none}
 <td>无界缓存等于内存泄漏温床，必须 include/max</td>
 </tr>
 </tbody></table>
+<h2 id="自测三题">自测三题</h2>
+<p><strong>1. Vue 的更新粒度是？</strong></p>
+<p>A. 节点级　B. 组件级　C. 属性级</p>
+<blockquote>
+<p>答案：B。一个响应式变化会触发所在组件整体重渲染。</p>
+</blockquote>
+<p><strong>2. 大数组只做整体替换、不做深层响应式，应使用？</strong></p>
+<p>A. ref　B. shallowRef　C. computed</p>
+<blockquote>
+<p>答案：B。shallowRef 只代理第一层，避免逐条 Proxy 开销。</p>
+</blockquote>
+<p><strong>3. KeepAlive 不设 include / max 的风险是？</strong></p>
+<p>A. 首屏变慢　B. 缓存无界增长导致内存膨胀　C. 路由失效</p>
+<blockquote>
+<p>答案：B。无界缓存是内存泄漏的温床。</p>
+</blockquote>
 <h2 id="一句话带走">一句话带走</h2>
 <p><strong>让组件少算（拆分与 computed）、缓存（v-memo 与 KeepAlive）、按需渲染（v-if 与懒加载）——Vue 优化的本质是缩小更新范围。</strong></p>
 <hr>

@@ -97,6 +97,22 @@ footer a{color:var(--link);text-decoration:none}
 <td>它替代的是手动记忆化，替代不了状态下放/订阅粒度等结构优化</td>
 </tr>
 </tbody></table>
+<h2 id="自测三题">自测三题</h2>
+<p><strong>1. React.memo 失效的常见原因是？</strong></p>
+<p>A. props 是每次新建的函数或对象　B. 组件没有 state　C. 使用了 JSX</p>
+<blockquote>
+<p>答案：A。浅比较失败；需配合 useCallback / useMemo 稳定引用。</p>
+</blockquote>
+<p><strong>2. 让紧急输入优先、列表更新降级，应该用？</strong></p>
+<p>A. useMemo　B. useTransition　C. useEffect</p>
+<blockquote>
+<p>答案：B。useTransition 把非紧急更新标记为可中断的低优先级。</p>
+</blockquote>
+<p><strong>3. 列表 key 使用数组下标会有什么后果？</strong></p>
+<p>A. 渲染更快　B. 删除中间项后状态错位并触发多余重渲染　C. 完全无影响</p>
+<blockquote>
+<p>答案：B。key 前移导致 React 复用错误的节点实例。</p>
+</blockquote>
 <h2 id="一句话带走">一句话带走</h2>
 <p><strong>结构对了才谈优化：状态下放缩小范围、三件套精准缓存、并发特性保交互——React 优化的本质是控制「谁该重渲染」。</strong></p>
 <hr>

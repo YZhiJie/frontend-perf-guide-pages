@@ -97,6 +97,22 @@ footer a{color:var(--link);text-decoration:none}
 <td>平均值会掩盖长尾；p75 为主、p98 防长尾、按路由分片</td>
 </tr>
 </tbody></table>
+<h2 id="自测三题">自测三题</h2>
+<p><strong>1. Lighthouse 性能分中权重最高的指标之一是？</strong></p>
+<p>A. FCP　B. TBT　C. SEO</p>
+<blockquote>
+<p>答案：B。实验室口径下 TBT 权重约 30%，直接反映主线程阻塞。</p>
+</blockquote>
+<p><strong>2. 要定位某个函数占用了多少主线程时间，应看？</strong></p>
+<p>A. Network 瀑布图　B. Performance 火焰图的 Bottom-Up　C. Lighthouse 报告</p>
+<blockquote>
+<p>答案：B。Bottom-Up 按 Self Time 排序，能直接揪出元凶函数。</p>
+</blockquote>
+<p><strong>3. 实验室分数与真实用户体验的关系是？</strong></p>
+<p>A. 完全等价　B. 分数高就一定体验好　C. 实验室找问题，RUM p75 下结论</p>
+<blockquote>
+<p>答案：C。实验室数据用于防回归，真实用户数据才代表体验。</p>
+</blockquote>
 <h2 id="一句话带走">一句话带走</h2>
 <p><strong>测试台找问题（Lighthouse/DevTools/WebPageTest），真实用户数据下结论（RUM p75）——工具选对，病才看得准。</strong></p>
 <hr>

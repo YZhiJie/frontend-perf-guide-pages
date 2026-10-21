@@ -97,6 +97,22 @@ footer a{color:var(--link);text-decoration:none}
 <td>它只解决 DOM 规模问题；行内布局抖动/重渲染该用读写分离与 v-memo</td>
 </tr>
 </tbody></table>
+<h2 id="自测三题">自测三题</h2>
+<p><strong>1. 布局抖动（强制同步布局）的典型写法是？</strong></p>
+<p>A. 先批量读、再批量写　B. 读-写-读-写交错执行　C. 用 transform 做动画</p>
+<blockquote>
+<p>答案：B。读写交错会迫使浏览器反复同步计算布局。</p>
+</blockquote>
+<p><strong>2. 渲染成本从低到高排序正确的是？</strong></p>
+<p>A. 合成 &lt; 重绘 &lt; 重排　B. 重排 &lt; 重绘 &lt; 合成　C. 重绘 &lt; 重排 &lt; 合成</p>
+<blockquote>
+<p>答案：A。重排代价最高，合成最低。</p>
+</blockquote>
+<p><strong>3. 想只触发合成层动画，应修改哪个属性？</strong></p>
+<p>A. width　B. top / left　C. transform / opacity</p>
+<blockquote>
+<p>答案：C。transform 与 opacity 可只走合成阶段。</p>
+</blockquote>
 <h2 id="一句话带走">一句话带走</h2>
 <p><strong>读写分离、优先 transform 与 opacity、合成层省着用——让浏览器每帧只干最少的活。</strong></p>
 <hr>

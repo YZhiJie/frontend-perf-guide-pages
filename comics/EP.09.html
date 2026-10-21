@@ -97,6 +97,22 @@ footer a{color:var(--link);text-decoration:none}
 <td>从「当前值 +5% 容差」起步逐步收紧，太严会被绕过</td>
 </tr>
 </tbody></table>
+<h2 id="自测三题">自测三题</h2>
+<p><strong>1. 性能预算应该写在哪里？</strong></p>
+<p>A. 只写在文档里　B. 写进工具链并由 CI 强制执行　C. 口头约定</p>
+<blockquote>
+<p>答案：B。不能自动拦截的预算等于没有预算。</p>
+</blockquote>
+<p><strong>2. CI 门禁阈值怎么定更可持续？</strong></p>
+<p>A. 一上来就设最严　B. 从当前值 + 容差起步，逐步收紧　C. 不设阈值</p>
+<blockquote>
+<p>答案：B。过严的门禁会被绕过，渐进收紧才能长期执行。</p>
+</blockquote>
+<p><strong>3. 判断线上体验是否劣化，应以什么为准？</strong></p>
+<p>A. 实验室单次分数　B. 真实用户 RUM 的 p75 趋势　C. 开发者本机表现</p>
+<blockquote>
+<p>答案：B。p75 趋势能反映真实用户的整体体验变化。</p>
+</blockquote>
 <h2 id="一句话带走">一句话带走</h2>
 <p><strong>预算先行、CI 把关、RUM 盯梢——性能不是一次性运动，而是需要流水线守护的持续工程。</strong></p>
 <hr>
