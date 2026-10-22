@@ -1,0 +1,169 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 840" font-family="'PingFang SC','Hiragino Sans GB','Microsoft YaHei',sans-serif">
+  <defs>
+    <linearGradient id="bgG" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#eff6ff"/>
+      <stop offset="1" stop-color="#dbeafe"/>
+    </linearGradient>
+    <linearGradient id="hdrG" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#1e293b"/>
+      <stop offset="1" stop-color="#475569"/>
+    </linearGradient>
+    <clipPath id="pc1"><rect x="3" y="37" width="554" height="320" rx="13"/></clipPath>
+    <clipPath id="pc2"><rect x="3" y="37" width="554" height="320" rx="13"/></clipPath>
+    <clipPath id="pc3"><rect x="3" y="37" width="554" height="320" rx="13"/></clipPath>
+    <clipPath id="pc4"><rect x="3" y="37" width="554" height="320" rx="13"/></clipPath>
+    <g id="uncle">
+      <rect x="-16" y="-36" width="11" height="36" rx="4" fill="#334155"/>
+      <rect x="5" y="-36" width="11" height="36" rx="4" fill="#334155"/>
+      <rect x="-34" y="-98" width="12" height="50" rx="6" fill="#6d28d9"/>
+      <rect x="22" y="-98" width="12" height="50" rx="6" fill="#6d28d9"/>
+      <circle cx="-28" cy="-44" r="6.5" fill="#fcd9b8"/>
+      <circle cx="28" cy="-44" r="6.5" fill="#fcd9b8"/>
+      <rect x="-25" y="-104" width="50" height="72" rx="15" fill="#7c3aed"/>
+      <circle cx="0" cy="-122" r="25" fill="#fcd9b8"/>
+      <path d="M-25,-124 a25,25 0 0 1 50,0 z" fill="#e2e8f0"/>
+      <circle cx="-10" cy="-120" r="7.5" fill="#ffffff" stroke="#1e293b" stroke-width="1.6"/>
+      <circle cx="10" cy="-120" r="7.5" fill="#ffffff" stroke="#1e293b" stroke-width="1.6"/>
+      <line x1="-3" y1="-120" x2="3" y2="-120" stroke="#1e293b" stroke-width="1.6"/>
+      <circle cx="-10" cy="-120" r="2" fill="#1e293b"/>
+      <circle cx="10" cy="-120" r="2" fill="#1e293b"/>
+      <path d="M-6,-108 q6,4 12,0" stroke="#b45309" stroke-width="1.6" fill="none" stroke-linecap="round"/>
+      <ellipse cx="0" cy="-102" rx="9" ry="4.5" fill="#e2e8f0"/>
+    </g>
+    <g id="ben">
+      <rect x="-15" y="-32" width="11" height="32" rx="4" fill="#1e293b"/>
+      <rect x="4" y="-32" width="11" height="32" rx="4" fill="#1e293b"/>
+      <rect x="-33" y="-94" width="12" height="48" rx="6" fill="#0284c7"/>
+      <rect x="21" y="-94" width="12" height="48" rx="6" fill="#0284c7"/>
+      <circle cx="-27" cy="-42" r="6" fill="#fcd9b8"/>
+      <circle cx="27" cy="-42" r="6" fill="#fcd9b8"/>
+      <rect x="-24" y="-100" width="48" height="70" rx="15" fill="#0ea5e9"/>
+      <path d="M-24,-88 q24,14 48,0" stroke="#7dd3fc" stroke-width="3" fill="none"/>
+      <circle cx="0" cy="-118" r="23" fill="#fcd9b8"/>
+      <path d="M-23,-120 a23,23 0 0 1 46,0 z" fill="#0f172a"/>
+      <path d="M-14,-136 l3,-10 5,8 z" fill="#0f172a"/>
+      <path d="M6,-138 l4,-10 5,9 z" fill="#0f172a"/>
+      <circle cx="-8" cy="-116" r="2.4" fill="#1e293b"/>
+      <circle cx="8" cy="-116" r="2.4" fill="#1e293b"/>
+      <ellipse cx="0" cy="-104" rx="4" ry="5" fill="#7c2d12"/>
+    </g>
+  </defs>
+
+  <rect width="1200" height="840" fill="url(#bgG)"/>
+
+  <!-- 头部横幅 -->
+  <rect x="20" y="16" width="1160" height="56" rx="14" fill="url(#hdrG)"/>
+  <rect x="36" y="28" width="88" height="32" rx="9" fill="#f97316"/>
+  <text x="80" y="50" text-anchor="middle" font-size="18" font-weight="bold" fill="#ffffff">EP.08</text>
+  <text x="142" y="52" font-size="25" font-weight="bold" fill="#ffffff">性能体检中心 —— 检测工具指南</text>
+  <text x="1164" y="50" text-anchor="end" font-size="14" fill="#cbd5e1">性能小镇 · 配套文档 docs/08-tools.md</text>
+
+  <!-- 第 1 格 · 三类体检工具 -->
+  <g transform="translate(20,84)">
+    <rect width="560" height="360" rx="16" fill="#ffffff"/>
+    <g clip-path="url(#pc1)">
+      <rect x="3" y="37" width="554" height="320" fill="#f1f5f9"/>
+      <rect x="24" y="64" width="166" height="120" rx="10" fill="#ffffff" stroke="#0ea5e9" stroke-width="2"/>
+      <text x="107" y="96" text-anchor="middle" font-size="14" font-weight="bold" fill="#0369a1">实验室体检</text>
+      <text x="107" y="126" text-anchor="middle" font-size="13" fill="#475569">Lighthouse</text>
+      <text x="107" y="150" text-anchor="middle" font-size="13" fill="#475569">可控环境打分</text>
+      <rect x="200" y="64" width="166" height="120" rx="10" fill="#ffffff" stroke="#0ea5e9" stroke-width="2"/>
+      <text x="283" y="96" text-anchor="middle" font-size="14" font-weight="bold" fill="#0369a1">现场体检</text>
+      <text x="283" y="126" text-anchor="middle" font-size="13" fill="#475569">WebPageTest</text>
+      <text x="283" y="150" text-anchor="middle" font-size="13" fill="#475569">真实网络设备</text>
+      <rect x="376" y="64" width="166" height="120" rx="10" fill="#ffffff" stroke="#0ea5e9" stroke-width="2"/>
+      <text x="459" y="96" text-anchor="middle" font-size="14" font-weight="bold" fill="#0369a1">显微镜</text>
+      <text x="459" y="126" text-anchor="middle" font-size="13" fill="#475569">DevTools</text>
+      <text x="459" y="150" text-anchor="middle" font-size="13" fill="#475569">火焰图看长任务</text>
+      <text x="24" y="216" font-size="13" fill="#0f172a">三类工具互补：实验室看结论，</text>
+      <text x="24" y="242" font-size="13" fill="#475569">现场看真实，显微镜看原因。</text>
+      <use href="#uncle" transform="translate(452,330) scale(0.7)"/>
+      <use href="#ben" transform="translate(520,330) scale(0.68)"/>
+    </g>
+    <path d="M0,34 L0,16 Q0,0 16,0 L544,0 Q560,0 560,16 L560,34 Z" fill="#e2e8f0"/>
+    <text x="18" y="24" font-size="16" font-weight="bold" fill="#0f172a">第 1 格 · 三类体检工具</text>
+    <rect width="560" height="360" rx="16" fill="none" stroke="#0f172a" stroke-width="2"/>
+  </g>
+
+  <!-- 第 2 格 · Lighthouse 报告 -->
+  <g transform="translate(608,84)">
+    <rect width="560" height="360" rx="16" fill="#ffffff"/>
+    <g clip-path="url(#pc2)">
+      <rect x="3" y="37" width="554" height="320" fill="#eff6ff"/>
+      <rect x="40" y="56" width="300" height="250" rx="10" fill="#ffffff" stroke="#0f172a" stroke-width="2"/>
+      <text x="190" y="84" text-anchor="middle" font-size="13" font-weight="bold" fill="#0f172a">体检报告单</text>
+      <circle cx="100" cy="140" r="30" fill="none" stroke="#0cce6b" stroke-width="8"/>
+      <text x="100" y="146" text-anchor="middle" font-size="16" font-weight="bold" fill="#0cce6b">98</text>
+      <text x="100" y="188" text-anchor="middle" font-size="11" fill="#475569">性能</text>
+      <circle cx="190" cy="140" r="30" fill="none" stroke="#ffa400" stroke-width="8"/>
+      <text x="190" y="146" text-anchor="middle" font-size="16" font-weight="bold" fill="#b45309">72</text>
+      <text x="190" y="188" text-anchor="middle" font-size="11" fill="#475569">可访问性</text>
+      <circle cx="280" cy="140" r="30" fill="none" stroke="#0cce6b" stroke-width="8"/>
+      <text x="280" y="146" text-anchor="middle" font-size="16" font-weight="bold" fill="#0cce6b">100</text>
+      <text x="280" y="188" text-anchor="middle" font-size="11" fill="#475569">最佳实践</text>
+      <text x="60" y="222" font-size="12" fill="#475569">LCP 1.8s  INP 120ms  CLS 0.02</text>
+      <text x="60" y="244" font-size="12" fill="#475569">TBT 180ms  未使用 JS 24KB</text>
+      <rect x="360" y="80" width="180" height="130" rx="10" fill="#ffffff" stroke="#93c5fd" stroke-width="2"/>
+      <text x="450" y="108" text-anchor="middle" font-size="13" font-weight="bold" fill="#1d4ed8">权重三巨头</text>
+      <text x="380" y="138" font-size="12" fill="#475569">TBT 30%</text>
+      <text x="380" y="162" font-size="12" fill="#475569">LCP 25%</text>
+      <text x="380" y="186" font-size="12" fill="#475569">CLS 25%</text>
+      <use href="#uncle" transform="translate(430,330) scale(0.7)"/>
+      <use href="#ben" transform="translate(500,330) scale(0.68)"/>
+    </g>
+    <path d="M0,34 L0,16 Q0,0 16,0 L544,0 Q560,0 560,16 L560,34 Z" fill="#e2e8f0"/>
+    <text x="18" y="24" font-size="16" font-weight="bold" fill="#0f172a">第 2 格 · Lighthouse：一次全身体检</text>
+    <rect width="560" height="360" rx="16" fill="none" stroke="#0f172a" stroke-width="2"/>
+  </g>
+
+  <!-- 第 3 格 · DevTools 火焰图 -->
+  <g transform="translate(20,462)">
+    <rect width="560" height="360" rx="16" fill="#ffffff"/>
+    <g clip-path="url(#pc3)">
+      <rect x="3" y="37" width="554" height="320" fill="#ecfdf5"/>
+      <text x="40" y="70" font-size="13" font-weight="bold" fill="#0f172a">DevTools Performance 面板</text>
+      <rect x="40" y="84" width="480" height="42" rx="6" fill="#e2e8f0"/>
+      <rect x="44" y="88" width="150" height="34" fill="#fca5a5"/>
+      <text x="119" y="110" text-anchor="middle" font-size="11" fill="#7f1d1d">脚本 320ms</text>
+      <rect x="198" y="88" width="90" height="34" fill="#fcd34d"/>
+      <text x="243" y="110" text-anchor="middle" font-size="11" fill="#78350f">渲染</text>
+      <rect x="292" y="88" width="130" height="34" fill="#93c5fd"/>
+      <text x="357" y="110" text-anchor="middle" font-size="11" fill="#1e3a8a">绘制</text>
+      <rect x="426" y="88" width="90" height="34" fill="#86efac"/>
+      <text x="471" y="110" text-anchor="middle" font-size="11" fill="#14532d">空闲</text>
+      <path d="M104,126 L104,142" stroke="#dc2626" stroke-width="3"/>
+      <rect x="60" y="142" width="160" height="34" rx="8" fill="#fef2f2" stroke="#dc2626" stroke-width="2"/>
+      <text x="140" y="164" text-anchor="middle" font-size="12" font-weight="bold" fill="#b91c1c">长任务 320ms</text>
+      <rect x="40" y="194" width="480" height="48" rx="6" fill="#e2e8f0"/>
+      <text x="60" y="218" font-size="12" fill="#475569">截图带：白屏与内容出现的时刻</text>
+      <text x="60" y="238" font-size="12" fill="#475569">一眼看到「先崩后美」的全过程</text>
+      <text x="40" y="284" font-size="13" fill="#065f46">只看一次抓拍不够，要放大到帧级找原因。</text>
+    </g>
+    <path d="M0,34 L0,16 Q0,0 16,0 L544,0 Q560,0 560,16 L560,34 Z" fill="#e2e8f0"/>
+    <text x="18" y="24" font-size="16" font-weight="bold" fill="#0f172a">第 3 格 · DevTools：显微镜看火焰图</text>
+    <rect width="560" height="360" rx="16" fill="none" stroke="#0f172a" stroke-width="2"/>
+  </g>
+
+  <!-- 第 4 格 · 坑点与稳叔总结 -->
+  <g transform="translate(608,462)">
+    <rect width="560" height="360" rx="16" fill="#ffffff"/>
+    <g clip-path="url(#pc4)">
+      <rect x="3" y="37" width="554" height="320" fill="#fff7ed"/>
+      <rect x="24" y="54" width="96" height="34" rx="9" fill="#f97316"/>
+      <text x="72" y="77" text-anchor="middle" font-size="17" font-weight="bold" fill="#ffffff">坑点</text>
+      <rect x="24" y="102" width="512" height="88" rx="12" fill="#ffffff" stroke="#f97316" stroke-width="2"/>
+      <text x="44" y="132" font-size="15" fill="#7c2d12">只看实验室分数，不看真机真网——</text>
+      <text x="44" y="160" font-size="15" fill="#7c2d12">分数很好看，用户照样卡。</text>
+      <rect x="24" y="210" width="420" height="116" rx="12" fill="#ecfdf5" stroke="#10b981" stroke-width="2"/>
+      <text x="44" y="240" font-size="16" font-weight="bold" fill="#059669">稳叔总结</text>
+      <text x="44" y="268" font-size="15" fill="#065f46">实验室看结论，现场看真实，</text>
+      <text x="44" y="294" font-size="15" fill="#065f46">显微镜看原因，三视角互相印证。</text>
+      <use href="#uncle" transform="translate(486,352) scale(0.72)"/>
+      <use href="#ben" transform="translate(536,352) scale(0.7)"/>
+      <text x="24" y="344" font-size="12" fill="#64748b">本格对应第 8 章 1~7 节 ｜ 详细讲解见 EP.08.md</text>
+    </g>
+    <path d="M0,34 L0,16 Q0,0 16,0 L544,0 Q560,0 560,16 L560,34 Z" fill="#e2e8f0"/>
+    <text x="18" y="24" font-size="16" font-weight="bold" fill="#0f172a">第 4 格 · 坑点与稳叔总结</text>
+    <rect width="560" height="360" rx="16" fill="none" stroke="#0f172a" stroke-width="2"/>
+  </g>
+</svg>

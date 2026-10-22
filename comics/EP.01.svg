@@ -1,0 +1,243 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 840" font-family="'PingFang SC','Hiragino Sans GB','Microsoft YaHei',sans-serif">
+  <defs>
+    <linearGradient id="bgG" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#eff6ff"/>
+      <stop offset="1" stop-color="#dbeafe"/>
+    </linearGradient>
+    <linearGradient id="hdrG" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#1e293b"/>
+      <stop offset="1" stop-color="#475569"/>
+    </linearGradient>
+    <clipPath id="pc1"><rect x="3" y="37" width="554" height="320" rx="13"/></clipPath>
+    <clipPath id="pc2"><rect x="3" y="37" width="554" height="320" rx="13"/></clipPath>
+    <clipPath id="pc3"><rect x="3" y="37" width="554" height="320" rx="13"/></clipPath>
+    <clipPath id="pc4"><rect x="3" y="37" width="554" height="320" rx="13"/></clipPath>
+    <!-- 稳叔：资深性能工程师（紫衣白发眼镜，原点在脚底中心） -->
+    <g id="uncle">
+      <rect x="-16" y="-36" width="11" height="36" rx="4" fill="#334155"/>
+      <rect x="5" y="-36" width="11" height="36" rx="4" fill="#334155"/>
+      <rect x="-34" y="-98" width="12" height="50" rx="6" fill="#6d28d9"/>
+      <rect x="22" y="-98" width="12" height="50" rx="6" fill="#6d28d9"/>
+      <circle cx="-28" cy="-44" r="6.5" fill="#fcd9b8"/>
+      <circle cx="28" cy="-44" r="6.5" fill="#fcd9b8"/>
+      <rect x="-25" y="-104" width="50" height="72" rx="15" fill="#7c3aed"/>
+      <circle cx="0" cy="-122" r="25" fill="#fcd9b8"/>
+      <path d="M-25,-124 a25,25 0 0 1 50,0 z" fill="#e2e8f0"/>
+      <circle cx="-10" cy="-120" r="7.5" fill="#ffffff" stroke="#1e293b" stroke-width="1.6"/>
+      <circle cx="10" cy="-120" r="7.5" fill="#ffffff" stroke="#1e293b" stroke-width="1.6"/>
+      <line x1="-3" y1="-120" x2="3" y2="-120" stroke="#1e293b" stroke-width="1.6"/>
+      <circle cx="-10" cy="-120" r="2" fill="#1e293b"/>
+      <circle cx="10" cy="-120" r="2" fill="#1e293b"/>
+      <path d="M-6,-108 q6,4 12,0" stroke="#b45309" stroke-width="1.6" fill="none" stroke-linecap="round"/>
+      <ellipse cx="0" cy="-102" rx="9" ry="4.5" fill="#e2e8f0"/>
+    </g>
+    <!-- 小奔：急于求成的年轻开发者（蓝色卫衣，原点在脚底中心） -->
+    <g id="ben">
+      <rect x="-15" y="-32" width="11" height="32" rx="4" fill="#1e293b"/>
+      <rect x="4" y="-32" width="11" height="32" rx="4" fill="#1e293b"/>
+      <rect x="-33" y="-94" width="12" height="48" rx="6" fill="#0284c7"/>
+      <rect x="21" y="-94" width="12" height="48" rx="6" fill="#0284c7"/>
+      <circle cx="-27" cy="-42" r="6" fill="#fcd9b8"/>
+      <circle cx="27" cy="-42" r="6" fill="#fcd9b8"/>
+      <rect x="-24" y="-100" width="48" height="70" rx="15" fill="#0ea5e9"/>
+      <path d="M-24,-88 q24,14 48,0" stroke="#7dd3fc" stroke-width="3" fill="none"/>
+      <circle cx="0" cy="-118" r="23" fill="#fcd9b8"/>
+      <path d="M-23,-120 a23,23 0 0 1 46,0 z" fill="#0f172a"/>
+      <path d="M-14,-136 l3,-10 5,8 z" fill="#0f172a"/>
+      <path d="M6,-138 l4,-10 5,9 z" fill="#0f172a"/>
+      <circle cx="-8" cy="-116" r="2.4" fill="#1e293b"/>
+      <circle cx="8" cy="-116" r="2.4" fill="#1e293b"/>
+      <ellipse cx="0" cy="-104" rx="4" ry="5" fill="#7c2d12"/>
+    </g>
+  </defs>
+
+  <rect width="1200" height="840" fill="url(#bgG)"/>
+
+  <!-- 头部横幅 -->
+  <rect x="20" y="16" width="1160" height="56" rx="14" fill="url(#hdrG)"/>
+  <rect x="36" y="28" width="88" height="32" rx="9" fill="#f97316"/>
+  <text x="80" y="50" text-anchor="middle" font-size="18" font-weight="bold" fill="#ffffff">EP.01</text>
+  <text x="142" y="52" font-size="25" font-weight="bold" fill="#ffffff">小镇的早高峰 —— 性能优化总览与心智模型</text>
+  <text x="1164" y="50" text-anchor="end" font-size="14" fill="#cbd5e1">性能小镇 · 配套文档 docs/01-overview.md</text>
+
+  <!-- 第 1 格 · 早高峰大堵车 -->
+  <g transform="translate(20,84)">
+    <rect width="560" height="360" rx="16" fill="#ffffff"/>
+    <g clip-path="url(#pc1)">
+      <rect x="3" y="37" width="554" height="320" fill="#e0f2fe"/>
+      <circle cx="508" cy="82" r="22" fill="#fbbf24"/>
+      <rect x="36" y="120" width="70" height="120" fill="#94a3b8"/>
+      <rect x="48" y="134" width="12" height="12" fill="#dbeafe"/>
+      <rect x="80" y="134" width="12" height="12" fill="#dbeafe"/>
+      <rect x="122" y="92" width="58" height="148" fill="#a8b5c6"/>
+      <rect x="134" y="108" width="12" height="12" fill="#dbeafe"/>
+      <rect x="166" y="108" width="12" height="12" fill="#dbeafe"/>
+      <rect x="196" y="132" width="64" height="108" fill="#9fb0c3"/>
+      <rect x="286" y="104" width="52" height="136" fill="#94a3b8"/>
+      <rect x="296" y="120" width="12" height="12" fill="#dbeafe"/>
+      <rect x="318" y="120" width="12" height="12" fill="#dbeafe"/>
+      <rect x="3" y="262" width="554" height="95" fill="#334155"/>
+      <rect x="16" y="306" width="40" height="6" fill="#fbbf24"/>
+      <rect x="96" y="306" width="40" height="6" fill="#fbbf24"/>
+      <rect x="176" y="306" width="40" height="6" fill="#fbbf24"/>
+      <rect x="256" y="306" width="40" height="6" fill="#fbbf24"/>
+      <rect x="336" y="306" width="40" height="6" fill="#fbbf24"/>
+      <rect x="416" y="306" width="40" height="6" fill="#fbbf24"/>
+      <rect x="496" y="306" width="40" height="6" fill="#fbbf24"/>
+      <g transform="translate(42,274)">
+        <rect x="14" y="-16" width="46" height="22" rx="8" fill="#ef4444"/>
+        <rect width="78" height="30" rx="9" fill="#ef4444"/>
+        <rect x="20" y="-11" width="34" height="15" rx="4" fill="#bae6fd"/>
+        <circle cx="29" cy="-4" r="3" fill="#0f172a"/>
+        <circle cx="45" cy="-4" r="3" fill="#0f172a"/>
+        <circle cx="16" cy="30" r="8" fill="#0f172a"/>
+        <circle cx="62" cy="30" r="8" fill="#0f172a"/>
+      </g>
+      <ellipse cx="120" cy="246" rx="4" ry="7" fill="#38bdf8"/>
+      <ellipse cx="130" cy="238" rx="3.5" ry="6" fill="#38bdf8"/>
+      <text x="76" y="240" font-size="18" font-weight="bold" fill="#dc2626">！！</text>
+      <g transform="translate(132,274)">
+        <rect x="14" y="-16" width="46" height="22" rx="8" fill="#f59e0b"/>
+        <rect width="78" height="30" rx="9" fill="#f59e0b"/>
+        <rect x="20" y="-11" width="34" height="15" rx="4" fill="#bae6fd"/>
+        <circle cx="16" cy="30" r="8" fill="#0f172a"/>
+        <circle cx="62" cy="30" r="8" fill="#0f172a"/>
+      </g>
+      <g transform="translate(222,274)">
+        <rect x="14" y="-16" width="46" height="22" rx="8" fill="#10b981"/>
+        <rect width="78" height="30" rx="9" fill="#10b981"/>
+        <rect x="20" y="-11" width="34" height="15" rx="4" fill="#bae6fd"/>
+        <circle cx="16" cy="30" r="8" fill="#0f172a"/>
+        <circle cx="62" cy="30" r="8" fill="#0f172a"/>
+      </g>
+      <g transform="translate(312,274)">
+        <rect x="14" y="-16" width="46" height="22" rx="8" fill="#6366f1"/>
+        <rect width="78" height="30" rx="9" fill="#6366f1"/>
+        <rect x="20" y="-11" width="34" height="15" rx="4" fill="#bae6fd"/>
+        <circle cx="16" cy="30" r="8" fill="#0f172a"/>
+        <circle cx="62" cy="30" r="8" fill="#0f172a"/>
+      </g>
+      <g transform="translate(402,274)">
+        <rect x="14" y="-16" width="46" height="22" rx="8" fill="#ec4899"/>
+        <rect width="78" height="30" rx="9" fill="#ec4899"/>
+        <rect x="20" y="-11" width="34" height="15" rx="4" fill="#bae6fd"/>
+        <circle cx="16" cy="30" r="8" fill="#0f172a"/>
+        <circle cx="62" cy="30" r="8" fill="#0f172a"/>
+      </g>
+      <circle cx="500" cy="252" r="5" fill="#94a3b8" opacity="0.7"/>
+      <circle cx="512" cy="244" r="4" fill="#94a3b8" opacity="0.7"/>
+      <rect x="30" y="150" width="220" height="68" rx="12" fill="#ffffff" stroke="#334155" stroke-width="1.6"/>
+      <path d="M76,218 L102,218 L88,240 Z" fill="#ffffff" stroke="#334155" stroke-width="1.6"/>
+      <rect x="82" y="212" width="16" height="8" fill="#ffffff"/>
+      <text x="46" y="177" font-size="15" fill="#0f172a">完蛋，又堵死了……</text>
+      <text x="46" y="201" font-size="15" fill="#0f172a">40 分钟了，一动不动！</text>
+      <text x="280" y="344" text-anchor="middle" font-size="14" fill="#e2e8f0">用户等 3 秒就关页 —— 比上班迟到更容易发生</text>
+    </g>
+    <path d="M0,34 L0,16 Q0,0 16,0 L544,0 Q560,0 560,16 L560,34 Z" fill="#e2e8f0"/>
+    <text x="18" y="24" font-size="16" font-weight="bold" fill="#0f172a">第 1 格 · 早高峰大堵车</text>
+    <rect width="560" height="360" rx="16" fill="none" stroke="#0f172a" stroke-width="2"/>
+  </g>
+
+  <!-- 第 2 格 · 指挥中心的账本 -->
+  <g transform="translate(608,84)">
+    <rect width="560" height="360" rx="16" fill="#ffffff"/>
+    <g clip-path="url(#pc2)">
+      <rect x="3" y="37" width="554" height="320" fill="#f1f5f9"/>
+      <rect x="56" y="72" width="448" height="140" rx="10" fill="#0f172a" stroke="#94a3b8" stroke-width="2"/>
+      <text x="280" y="94" text-anchor="middle" font-size="13" fill="#94a3b8">转化率 vs 加载时长（示意）</text>
+      <rect x="110" y="108" width="52" height="88" fill="#34d399"/>
+      <rect x="210" y="138" width="52" height="58" fill="#fbbf24"/>
+      <rect x="310" y="160" width="52" height="36" fill="#fb923c"/>
+      <rect x="410" y="178" width="52" height="18" fill="#f87171"/>
+      <text x="136" y="102" text-anchor="middle" font-size="13" fill="#ffffff">100%</text>
+      <text x="236" y="132" text-anchor="middle" font-size="13" fill="#ffffff">64%</text>
+      <text x="336" y="154" text-anchor="middle" font-size="13" fill="#ffffff">40%</text>
+      <text x="436" y="172" text-anchor="middle" font-size="13" fill="#ffffff">22%</text>
+      <line x1="90" y1="196" x2="490" y2="196" stroke="#64748b" stroke-width="1.5"/>
+      <text x="136" y="214" text-anchor="middle" font-size="13" fill="#94a3b8">1s</text>
+      <text x="236" y="214" text-anchor="middle" font-size="13" fill="#94a3b8">2s</text>
+      <text x="336" y="214" text-anchor="middle" font-size="13" fill="#94a3b8">3s</text>
+      <text x="436" y="214" text-anchor="middle" font-size="13" fill="#94a3b8">5s</text>
+      <rect x="3" y="344" width="554" height="13" fill="#cbd5e1"/>
+      <use href="#uncle" transform="translate(452,344) scale(0.8)"/>
+      <ellipse cx="100" cy="224" rx="4" ry="7" fill="#38bdf8"/>
+      <use href="#ben" transform="translate(100,344) scale(0.8)"/>
+      <rect x="170" y="244" width="250" height="64" rx="12" fill="#ffffff" stroke="#334155" stroke-width="1.6"/>
+      <path d="M392,308 L412,308 L430,330 Z" fill="#ffffff" stroke="#334155" stroke-width="1.6"/>
+      <rect x="396" y="303" width="18" height="7" fill="#ffffff"/>
+      <text x="186" y="270" font-size="15" fill="#0f172a">记住这本账：加载每慢 1 秒，</text>
+      <text x="186" y="292" font-size="15" fill="#0f172a">转化率就往下掉一截。</text>
+    </g>
+    <path d="M0,34 L0,16 Q0,0 16,0 L544,0 Q560,0 560,16 L560,34 Z" fill="#e2e8f0"/>
+    <text x="18" y="24" font-size="16" font-weight="bold" fill="#0f172a">第 2 格 · 指挥中心的账本</text>
+    <rect width="560" height="360" rx="16" fill="none" stroke="#0f172a" stroke-width="2"/>
+  </g>
+
+  <!-- 第 3 格 · 修路三步法 -->
+  <g transform="translate(20,462)">
+    <rect width="560" height="360" rx="16" fill="#ffffff"/>
+    <g clip-path="url(#pc3)">
+      <rect x="3" y="37" width="554" height="320" fill="#ecfdf5"/>
+      <rect x="26" y="52" width="252" height="56" rx="10" fill="#ffffff" stroke="#0f172a" stroke-width="1.5"/>
+      <circle cx="52" cy="80" r="15" fill="#10b981"/>
+      <text x="52" y="86" text-anchor="middle" font-size="16" font-weight="bold" fill="#ffffff">1</text>
+      <text x="78" y="87" font-size="15" fill="#065f46">先测量：拿到真实数据</text>
+      <path d="M150,112 L162,112 L156,124 Z" fill="#10b981"/>
+      <rect x="26" y="124" width="252" height="56" rx="10" fill="#ffffff" stroke="#0f172a" stroke-width="1.5"/>
+      <circle cx="52" cy="152" r="15" fill="#10b981"/>
+      <text x="52" y="158" text-anchor="middle" font-size="16" font-weight="bold" fill="#ffffff">2</text>
+      <text x="78" y="159" font-size="15" fill="#065f46">再定位：找到最堵路口</text>
+      <path d="M150,184 L162,184 L156,196 Z" fill="#10b981"/>
+      <rect x="26" y="196" width="252" height="56" rx="10" fill="#ffffff" stroke="#0f172a" stroke-width="1.5"/>
+      <circle cx="52" cy="224" r="15" fill="#10b981"/>
+      <text x="52" y="230" text-anchor="middle" font-size="16" font-weight="bold" fill="#ffffff">3</text>
+      <text x="78" y="231" font-size="15" fill="#065f46">后优化：修一个测一次</text>
+      <rect x="3" y="282" width="554" height="75" fill="#475569"/>
+      <rect x="16" y="315" width="40" height="6" fill="#fbbf24"/>
+      <rect x="96" y="315" width="40" height="6" fill="#fbbf24"/>
+      <rect x="176" y="315" width="40" height="6" fill="#fbbf24"/>
+      <rect x="256" y="315" width="40" height="6" fill="#fbbf24"/>
+      <rect x="336" y="315" width="40" height="6" fill="#fbbf24"/>
+      <rect x="416" y="315" width="40" height="6" fill="#fbbf24"/>
+      <rect x="496" y="315" width="40" height="6" fill="#fbbf24"/>
+      <circle cx="408" cy="320" r="34" fill="none" stroke="#f97316" stroke-width="4" stroke-dasharray="9 7"/>
+      <text x="408" y="278" text-anchor="middle" font-size="13" fill="#c2410c">最堵的路口</text>
+      <use href="#uncle" transform="translate(310,284) scale(0.85)"/>
+      <use href="#ben" transform="translate(508,284) scale(0.8)"/>
+      <rect x="300" y="60" width="160" height="44" rx="10" fill="#ffffff" stroke="#334155" stroke-width="1.6"/>
+      <path d="M316,104 L336,104 L322,148 Z" fill="#ffffff" stroke="#334155" stroke-width="1.6"/>
+      <rect x="320" y="99" width="16" height="7" fill="#ffffff"/>
+      <text x="316" y="87" font-size="14" fill="#0f172a">先修最堵的那个</text>
+      <rect x="372" y="110" width="178" height="46" rx="10" fill="#ffffff" stroke="#334155" stroke-width="1.6"/>
+      <path d="M486,156 L506,156 L514,176 Z" fill="#ffffff" stroke="#334155" stroke-width="1.6"/>
+      <rect x="490" y="151" width="16" height="7" fill="#ffffff"/>
+      <text x="388" y="138" font-size="14" fill="#0f172a">我想一口气全修！</text>
+    </g>
+    <path d="M0,34 L0,16 Q0,0 16,0 L544,0 Q560,0 560,16 L560,34 Z" fill="#e2e8f0"/>
+    <text x="18" y="24" font-size="16" font-weight="bold" fill="#0f172a">第 3 格 · 修路三步法</text>
+    <rect width="560" height="360" rx="16" fill="none" stroke="#0f172a" stroke-width="2"/>
+  </g>
+
+  <!-- 第 4 格 · 坑点与稳叔总结 -->
+  <g transform="translate(608,462)">
+    <rect width="560" height="360" rx="16" fill="#ffffff"/>
+    <g clip-path="url(#pc4)">
+      <rect x="3" y="37" width="554" height="320" fill="#fff7ed"/>
+      <rect x="24" y="54" width="96" height="34" rx="9" fill="#f97316"/>
+      <text x="72" y="77" text-anchor="middle" font-size="17" font-weight="bold" fill="#ffffff">坑点</text>
+      <rect x="24" y="102" width="512" height="88" rx="12" fill="#ffffff" stroke="#f97316" stroke-width="2"/>
+      <text x="44" y="132" font-size="15" fill="#7c2d12">没测量就动手优化，等于闭着眼睛修路——</text>
+      <text x="44" y="160" font-size="15" fill="#7c2d12">凭感觉改代码，越改越堵，还说不清改对了没。</text>
+      <rect x="24" y="210" width="420" height="116" rx="12" fill="#ecfdf5" stroke="#10b981" stroke-width="2"/>
+      <text x="44" y="240" font-size="16" font-weight="bold" fill="#059669">稳叔总结</text>
+      <text x="44" y="268" font-size="15" fill="#065f46">性能优化是工程不是玄学：先度量、再定位、</text>
+      <text x="44" y="294" font-size="15" fill="#065f46">小步迭代、用数据验证——每一步都有账可查。</text>
+      <use href="#uncle" transform="translate(486,352) scale(0.72)"/>
+      <use href="#ben" transform="translate(536,352) scale(0.7)"/>
+      <text x="24" y="344" font-size="12" fill="#64748b">本格对应第 1 章 1~5 节 ｜ 详细讲解见 EP.01.md</text>
+    </g>
+    <path d="M0,34 L0,16 Q0,0 16,0 L544,0 Q560,0 560,16 L560,34 Z" fill="#e2e8f0"/>
+    <text x="18" y="24" font-size="16" font-weight="bold" fill="#0f172a">第 4 格 · 坑点与稳叔总结</text>
+    <rect width="560" height="360" rx="16" fill="none" stroke="#0f172a" stroke-width="2"/>
+  </g>
+</svg>

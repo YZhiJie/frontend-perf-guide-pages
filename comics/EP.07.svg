@@ -1,0 +1,165 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 840" font-family="'PingFang SC','Hiragino Sans GB','Microsoft YaHei',sans-serif">
+  <defs>
+    <linearGradient id="bgG" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#eff6ff"/>
+      <stop offset="1" stop-color="#dbeafe"/>
+    </linearGradient>
+    <linearGradient id="hdrG" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#1e293b"/>
+      <stop offset="1" stop-color="#475569"/>
+    </linearGradient>
+    <clipPath id="pc1"><rect x="3" y="37" width="554" height="320" rx="13"/></clipPath>
+    <clipPath id="pc2"><rect x="3" y="37" width="554" height="320" rx="13"/></clipPath>
+    <clipPath id="pc3"><rect x="3" y="37" width="554" height="320" rx="13"/></clipPath>
+    <clipPath id="pc4"><rect x="3" y="37" width="554" height="320" rx="13"/></clipPath>
+    <g id="uncle">
+      <rect x="-16" y="-36" width="11" height="36" rx="4" fill="#334155"/>
+      <rect x="5" y="-36" width="11" height="36" rx="4" fill="#334155"/>
+      <rect x="-34" y="-98" width="12" height="50" rx="6" fill="#6d28d9"/>
+      <rect x="22" y="-98" width="12" height="50" rx="6" fill="#6d28d9"/>
+      <circle cx="-28" cy="-44" r="6.5" fill="#fcd9b8"/>
+      <circle cx="28" cy="-44" r="6.5" fill="#fcd9b8"/>
+      <rect x="-25" y="-104" width="50" height="72" rx="15" fill="#7c3aed"/>
+      <circle cx="0" cy="-122" r="25" fill="#fcd9b8"/>
+      <path d="M-25,-124 a25,25 0 0 1 50,0 z" fill="#e2e8f0"/>
+      <circle cx="-10" cy="-120" r="7.5" fill="#ffffff" stroke="#1e293b" stroke-width="1.6"/>
+      <circle cx="10" cy="-120" r="7.5" fill="#ffffff" stroke="#1e293b" stroke-width="1.6"/>
+      <line x1="-3" y1="-120" x2="3" y2="-120" stroke="#1e293b" stroke-width="1.6"/>
+      <circle cx="-10" cy="-120" r="2" fill="#1e293b"/>
+      <circle cx="10" cy="-120" r="2" fill="#1e293b"/>
+      <path d="M-6,-108 q6,4 12,0" stroke="#b45309" stroke-width="1.6" fill="none" stroke-linecap="round"/>
+      <ellipse cx="0" cy="-102" rx="9" ry="4.5" fill="#e2e8f0"/>
+    </g>
+    <g id="ben">
+      <rect x="-15" y="-32" width="11" height="32" rx="4" fill="#1e293b"/>
+      <rect x="4" y="-32" width="11" height="32" rx="4" fill="#1e293b"/>
+      <rect x="-33" y="-94" width="12" height="48" rx="6" fill="#0284c7"/>
+      <rect x="21" y="-94" width="12" height="48" rx="6" fill="#0284c7"/>
+      <circle cx="-27" cy="-42" r="6" fill="#fcd9b8"/>
+      <circle cx="27" cy="-42" r="6" fill="#fcd9b8"/>
+      <rect x="-24" y="-100" width="48" height="70" rx="15" fill="#0ea5e9"/>
+      <path d="M-24,-88 q24,14 48,0" stroke="#7dd3fc" stroke-width="3" fill="none"/>
+      <circle cx="0" cy="-118" r="23" fill="#fcd9b8"/>
+      <path d="M-23,-120 a23,23 0 0 1 46,0 z" fill="#0f172a"/>
+      <path d="M-14,-136 l3,-10 5,8 z" fill="#0f172a"/>
+      <path d="M6,-138 l4,-10 5,9 z" fill="#0f172a"/>
+      <circle cx="-8" cy="-116" r="2.4" fill="#1e293b"/>
+      <circle cx="8" cy="-116" r="2.4" fill="#1e293b"/>
+      <ellipse cx="0" cy="-104" rx="4" ry="5" fill="#7c2d12"/>
+    </g>
+  </defs>
+
+  <rect width="1200" height="840" fill="url(#bgG)"/>
+
+  <!-- 头部横幅 -->
+  <rect x="20" y="16" width="1160" height="56" rx="14" fill="url(#hdrG)"/>
+  <rect x="36" y="28" width="88" height="32" rx="9" fill="#f97316"/>
+  <text x="80" y="50" text-anchor="middle" font-size="18" font-weight="bold" fill="#ffffff">EP.07</text>
+  <text x="142" y="52" font-size="25" font-weight="bold" fill="#ffffff">React 后厨的调度艺术 —— 专项优化</text>
+  <text x="1164" y="50" text-anchor="end" font-size="14" fill="#cbd5e1">性能小镇 · 配套文档 docs/07-react.md</text>
+
+  <!-- 第 1 格 · memo 三件套 -->
+  <g transform="translate(20,84)">
+    <rect width="560" height="360" rx="16" fill="#ffffff"/>
+    <g clip-path="url(#pc1)">
+      <rect x="3" y="37" width="554" height="320" fill="#f1f5f9"/>
+      <rect x="24" y="64" width="166" height="120" rx="10" fill="#ffffff" stroke="#0ea5e9" stroke-width="2"/>
+      <text x="44" y="92" font-size="15" font-weight="bold" fill="#0369a1">React.memo</text>
+      <text x="44" y="122" font-size="13" fill="#475569">props 没变就跳过</text>
+      <text x="44" y="144" font-size="13" fill="#475569">这次渲染</text>
+      <rect x="200" y="64" width="166" height="120" rx="10" fill="#ffffff" stroke="#0ea5e9" stroke-width="2"/>
+      <text x="220" y="92" font-size="15" font-weight="bold" fill="#0369a1">useMemo</text>
+      <text x="220" y="122" font-size="13" fill="#475569">重算很贵就把</text>
+      <text x="220" y="144" font-size="13" fill="#475569">结果缓存起来</text>
+      <rect x="376" y="64" width="166" height="120" rx="10" fill="#ffffff" stroke="#0ea5e9" stroke-width="2"/>
+      <text x="396" y="92" font-size="15" font-weight="bold" fill="#0369a1">useCallback</text>
+      <text x="396" y="122" font-size="13" fill="#475569">函数别再新建，</text>
+      <text x="396" y="144" font-size="13" fill="#475569">引用才稳定</text>
+      <text x="24" y="216" font-size="13" fill="#0f172a">三件套只解决重复渲染，不解决渲染太重。</text>
+      <text x="24" y="242" font-size="13" fill="#475569">渲染太重，要靠状态下放与并发特性。</text>
+      <use href="#uncle" transform="translate(452,330) scale(0.7)"/>
+      <use href="#ben" transform="translate(520,330) scale(0.68)"/>
+    </g>
+    <path d="M0,34 L0,16 Q0,0 16,0 L544,0 Q560,0 560,16 L560,34 Z" fill="#e2e8f0"/>
+    <text x="18" y="24" font-size="16" font-weight="bold" fill="#0f172a">第 1 格 · 三件套：memo、useMemo、useCallback</text>
+    <rect width="560" height="360" rx="16" fill="none" stroke="#0f172a" stroke-width="2"/>
+  </g>
+
+  <!-- 第 2 格 · 并发特性 -->
+  <g transform="translate(608,84)">
+    <rect width="560" height="360" rx="16" fill="#ffffff"/>
+    <g clip-path="url(#pc2)">
+      <rect x="3" y="37" width="554" height="320" fill="#eff6ff"/>
+      <rect x="30" y="90" width="330" height="46" rx="8" fill="#dcfce7" stroke="#16a34a" stroke-width="2"/>
+      <text x="48" y="118" font-size="14" font-weight="bold" fill="#15803d">急单（高优先级）：立刻上灶</text>
+      <rect x="30" y="156" width="330" height="46" rx="8" fill="#f1f5f9" stroke="#94a3b8" stroke-width="2"/>
+      <text x="48" y="184" font-size="14" fill="#64748b">慢单（低优先级）：可被打断</text>
+      <rect x="378" y="90" width="162" height="112" rx="10" fill="#ffffff" stroke="#2563eb" stroke-width="2"/>
+      <text x="459" y="116" text-anchor="middle" font-size="13" font-weight="bold" fill="#1d4ed8">useTransition</text>
+      <text x="459" y="146" text-anchor="middle" font-size="12" fill="#475569">长列表重排不急</text>
+      <text x="459" y="168" text-anchor="middle" font-size="12" fill="#475569">输入先响应</text>
+      <text x="459" y="190" text-anchor="middle" font-size="12" fill="#475569">再补上结果</text>
+      <rect x="30" y="216" width="290" height="76" rx="12" fill="#ffffff" stroke="#334155" stroke-width="1.6"/>
+      <path d="M60,292 L84,292 L70,314 Z" fill="#ffffff" stroke="#334155" stroke-width="1.6"/>
+      <rect x="66" y="286" width="16" height="8" fill="#ffffff"/>
+      <text x="48" y="244" font-size="14" fill="#0f172a">急单先出，慢单可被打断——</text>
+      <text x="48" y="270" font-size="14" fill="#0f172a">这就是并发的意义。</text>
+      <use href="#uncle" transform="translate(430,330) scale(0.7)"/>
+      <use href="#ben" transform="translate(500,330) scale(0.68)"/>
+    </g>
+    <path d="M0,34 L0,16 Q0,0 16,0 L544,0 Q560,0 560,16 L560,34 Z" fill="#e2e8f0"/>
+    <text x="18" y="24" font-size="16" font-weight="bold" fill="#0f172a">第 2 格 · 急单先出：并发的优先级</text>
+    <rect width="560" height="360" rx="16" fill="none" stroke="#0f172a" stroke-width="2"/>
+  </g>
+
+  <!-- 第 3 格 · 状态下放与 Compiler -->
+  <g transform="translate(20,462)">
+    <rect width="560" height="360" rx="16" fill="#ffffff"/>
+    <g clip-path="url(#pc3)">
+      <rect x="3" y="37" width="554" height="320" fill="#ecfdf5"/>
+      <rect x="40" y="80" width="150" height="200" rx="8" fill="#ffffff" stroke="#dc2626" stroke-width="2"/>
+      <rect x="52" y="92" width="126" height="34" rx="6" fill="#fecaca"/>
+      <text x="115" y="114" text-anchor="middle" font-size="12" fill="#b91c1c">状态在顶层</text>
+      <rect x="52" y="140" width="126" height="28" rx="6" fill="#f1f5f9"/>
+      <text x="115" y="159" text-anchor="middle" font-size="12" fill="#94a3b8">整栋重渲染</text>
+      <text x="115" y="200" text-anchor="middle" font-size="12" fill="#b91c1c">牵一发动全身</text>
+      <path d="M200,180 L340,180" stroke="#16a34a" stroke-width="4"/>
+      <path d="M330,169 L352,180 L330,191 Z" fill="#16a34a"/>
+      <text x="270" y="160" text-anchor="middle" font-size="13" font-weight="bold" fill="#15803d">状态下放</text>
+      <rect x="360" y="80" width="150" height="200" rx="8" fill="#ffffff" stroke="#16a34a" stroke-width="2"/>
+      <rect x="372" y="92" width="126" height="28" rx="6" fill="#f1f5f9"/>
+      <text x="435" y="111" text-anchor="middle" font-size="12" fill="#94a3b8">上层不动</text>
+      <text x="435" y="170" text-anchor="middle" font-size="12" fill="#15803d">只重渲染一小块</text>
+      <rect x="372" y="240" width="126" height="28" rx="6" fill="#bbf7d0"/>
+      <text x="435" y="259" text-anchor="middle" font-size="12" fill="#15803d">状态在低层</text>
+      <rect x="40" y="292" width="470" height="40" rx="10" fill="#ffffff" stroke="#7c3aed" stroke-width="2"/>
+      <text x="58" y="318" font-size="13" font-weight="bold" fill="#6d28d9">React 19 Compiler 自动做记忆化，手写 memo 可退场</text>
+    </g>
+    <path d="M0,34 L0,16 Q0,0 16,0 L544,0 Q560,0 560,16 L560,34 Z" fill="#e2e8f0"/>
+    <text x="18" y="24" font-size="16" font-weight="bold" fill="#0f172a">第 3 格 · 状态下放与 React 19 Compiler</text>
+    <rect width="560" height="360" rx="16" fill="none" stroke="#0f172a" stroke-width="2"/>
+  </g>
+
+  <!-- 第 4 格 · 坑点与稳叔总结 -->
+  <g transform="translate(608,462)">
+    <rect width="560" height="360" rx="16" fill="#ffffff"/>
+    <g clip-path="url(#pc4)">
+      <rect x="3" y="37" width="554" height="320" fill="#fff7ed"/>
+      <rect x="24" y="54" width="96" height="34" rx="9" fill="#f97316"/>
+      <text x="72" y="77" text-anchor="middle" font-size="17" font-weight="bold" fill="#ffffff">坑点</text>
+      <rect x="24" y="102" width="512" height="88" rx="12" fill="#ffffff" stroke="#f97316" stroke-width="2"/>
+      <text x="44" y="132" font-size="15" fill="#7c2d12">memo 包了组件，props 却每次都是新对象——</text>
+      <text x="44" y="160" font-size="15" fill="#7c2d12">等于没包。</text>
+      <rect x="24" y="210" width="420" height="116" rx="12" fill="#ecfdf5" stroke="#10b981" stroke-width="2"/>
+      <text x="44" y="240" font-size="16" font-weight="bold" fill="#059669">稳叔总结</text>
+      <text x="44" y="268" font-size="15" fill="#065f46">状态下放，把活儿派给最近的厨师。</text>
+      <text x="44" y="294" font-size="15" fill="#065f46">急单先出，其余交给并发与编译器。</text>
+      <use href="#uncle" transform="translate(486,352) scale(0.72)"/>
+      <use href="#ben" transform="translate(536,352) scale(0.7)"/>
+      <text x="24" y="344" font-size="12" fill="#64748b">本格对应第 7 章 1~7 节 ｜ 详细讲解见 EP.07.md</text>
+    </g>
+    <path d="M0,34 L0,16 Q0,0 16,0 L544,0 Q560,0 560,16 L560,34 Z" fill="#e2e8f0"/>
+    <text x="18" y="24" font-size="16" font-weight="bold" fill="#0f172a">第 4 格 · 坑点与稳叔总结</text>
+    <rect width="560" height="360" rx="16" fill="none" stroke="#0f172a" stroke-width="2"/>
+  </g>
+</svg>

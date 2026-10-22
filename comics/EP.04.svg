@@ -1,0 +1,159 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 840" font-family="'PingFang SC','Hiragino Sans GB','Microsoft YaHei',sans-serif">
+  <defs>
+    <linearGradient id="bgG" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#eff6ff"/>
+      <stop offset="1" stop-color="#dbeafe"/>
+    </linearGradient>
+    <linearGradient id="hdrG" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#1e293b"/>
+      <stop offset="1" stop-color="#475569"/>
+    </linearGradient>
+    <clipPath id="pc1"><rect x="3" y="37" width="554" height="320" rx="13"/></clipPath>
+    <clipPath id="pc2"><rect x="3" y="37" width="554" height="320" rx="13"/></clipPath>
+    <clipPath id="pc3"><rect x="3" y="37" width="554" height="320" rx="13"/></clipPath>
+    <clipPath id="pc4"><rect x="3" y="37" width="554" height="320" rx="13"/></clipPath>
+    <g id="uncle">
+      <rect x="-16" y="-36" width="11" height="36" rx="4" fill="#334155"/>
+      <rect x="5" y="-36" width="11" height="36" rx="4" fill="#334155"/>
+      <rect x="-34" y="-98" width="12" height="50" rx="6" fill="#6d28d9"/>
+      <rect x="22" y="-98" width="12" height="50" rx="6" fill="#6d28d9"/>
+      <circle cx="-28" cy="-44" r="6.5" fill="#fcd9b8"/>
+      <circle cx="28" cy="-44" r="6.5" fill="#fcd9b8"/>
+      <rect x="-25" y="-104" width="50" height="72" rx="15" fill="#7c3aed"/>
+      <circle cx="0" cy="-122" r="25" fill="#fcd9b8"/>
+      <path d="M-25,-124 a25,25 0 0 1 50,0 z" fill="#e2e8f0"/>
+      <circle cx="-10" cy="-120" r="7.5" fill="#ffffff" stroke="#1e293b" stroke-width="1.6"/>
+      <circle cx="10" cy="-120" r="7.5" fill="#ffffff" stroke="#1e293b" stroke-width="1.6"/>
+      <line x1="-3" y1="-120" x2="3" y2="-120" stroke="#1e293b" stroke-width="1.6"/>
+      <circle cx="-10" cy="-120" r="2" fill="#1e293b"/>
+      <circle cx="10" cy="-120" r="2" fill="#1e293b"/>
+      <path d="M-6,-108 q6,4 12,0" stroke="#b45309" stroke-width="1.6" fill="none" stroke-linecap="round"/>
+      <ellipse cx="0" cy="-102" rx="9" ry="4.5" fill="#e2e8f0"/>
+    </g>
+    <g id="ben">
+      <rect x="-15" y="-32" width="11" height="32" rx="4" fill="#1e293b"/>
+      <rect x="4" y="-32" width="11" height="32" rx="4" fill="#1e293b"/>
+      <rect x="-33" y="-94" width="12" height="48" rx="6" fill="#0284c7"/>
+      <rect x="21" y="-94" width="12" height="48" rx="6" fill="#0284c7"/>
+      <circle cx="-27" cy="-42" r="6" fill="#fcd9b8"/>
+      <circle cx="27" cy="-42" r="6" fill="#fcd9b8"/>
+      <rect x="-24" y="-100" width="48" height="70" rx="15" fill="#0ea5e9"/>
+      <path d="M-24,-88 q24,14 48,0" stroke="#7dd3fc" stroke-width="3" fill="none"/>
+      <circle cx="0" cy="-118" r="23" fill="#fcd9b8"/>
+      <path d="M-23,-120 a23,23 0 0 1 46,0 z" fill="#0f172a"/>
+      <path d="M-14,-136 l3,-10 5,8 z" fill="#0f172a"/>
+      <path d="M6,-138 l4,-10 5,9 z" fill="#0f172a"/>
+      <circle cx="-8" cy="-116" r="2.4" fill="#1e293b"/>
+      <circle cx="8" cy="-116" r="2.4" fill="#1e293b"/>
+      <ellipse cx="0" cy="-104" rx="4" ry="5" fill="#7c2d12"/>
+    </g>
+  </defs>
+
+  <rect width="1200" height="840" fill="url(#bgG)"/>
+
+  <!-- 头部横幅 -->
+  <rect x="20" y="16" width="1160" height="56" rx="14" fill="url(#hdrG)"/>
+  <rect x="36" y="28" width="88" height="32" rx="9" fill="#f97316"/>
+  <text x="80" y="50" text-anchor="middle" font-size="18" font-weight="bold" fill="#ffffff">EP.04</text>
+  <text x="142" y="52" font-size="25" font-weight="bold" fill="#ffffff">装修队的血泪史 —— 渲染性能优化</text>
+  <text x="1164" y="50" text-anchor="end" font-size="14" fill="#cbd5e1">性能小镇 · 配套文档 docs/04-rendering.md</text>
+
+  <!-- 第 1 格 · 布局抖动 -->
+  <g transform="translate(20,84)">
+    <rect width="560" height="360" rx="16" fill="#ffffff"/>
+    <g clip-path="url(#pc1)">
+      <rect x="3" y="37" width="554" height="320" fill="#f1f5f9"/>
+      <rect x="3" y="330" width="554" height="27" fill="#cbd5e1"/>
+      <rect x="40" y="96" width="180" height="234" fill="#e2e8f0" stroke="#94a3b8" stroke-width="2"/>
+      <path d="M52,130 h156 M52,160 h156 M52,190 h156 M52,220 h156 M52,250 h156 M52,280 h156" stroke="#cbd5e1" stroke-width="1.5"/>
+      <rect x="30" y="84" width="200" height="10" rx="5" fill="#fbbf24" stroke="#b45309" stroke-width="1.2"/>
+      <text x="130" y="70" text-anchor="middle" font-size="13" fill="#b45309">量一次尺寸</text>
+      <path d="M286,158 a34,34 0 1 1 -32,48" stroke="#dc2626" stroke-width="4" fill="none"/>
+      <path d="M248,196 L264,206 L250,214 Z" fill="#dc2626"/>
+      <text x="290" y="240" text-anchor="middle" font-size="14" font-weight="bold" fill="#b91c1c">量→改→量→改</text>
+      <use href="#uncle" transform="translate(420,330) scale(0.72)"/>
+      <use href="#ben" transform="translate(492,330) scale(0.7)"/>
+      <rect x="300" y="42" width="254" height="74" rx="12" fill="#ffffff" stroke="#334155" stroke-width="1.6"/>
+      <path d="M330,116 L354,116 L340,138 Z" fill="#ffffff" stroke="#334155" stroke-width="1.6"/>
+      <rect x="326" y="110" width="16" height="8" fill="#ffffff"/>
+      <text x="318" y="70" font-size="14" fill="#0f172a">读一次尺寸、改一次墙——</text>
+      <text x="318" y="96" font-size="14" fill="#0f172a">每次都要全屋重算。</text>
+    </g>
+    <path d="M0,34 L0,16 Q0,0 16,0 L544,0 Q560,0 560,16 L560,34 Z" fill="#e2e8f0"/>
+    <text x="18" y="24" font-size="16" font-weight="bold" fill="#0f172a">第 1 格 · 布局抖动：量一次改一次</text>
+    <rect width="560" height="360" rx="16" fill="none" stroke="#0f172a" stroke-width="2"/>
+  </g>
+
+  <!-- 第 2 格 · 成本阶梯 -->
+  <g transform="translate(608,84)">
+    <rect width="560" height="360" rx="16" fill="#ffffff"/>
+    <g clip-path="url(#pc2)">
+      <rect x="3" y="37" width="554" height="320" fill="#ecfdf5"/>
+      <rect x="24" y="66" width="360" height="56" rx="10" fill="#ffffff" stroke="#dc2626" stroke-width="2"/>
+      <text x="44" y="92" font-size="15" font-weight="bold" fill="#b91c1c">重排：改 width、top</text>
+      <text x="44" y="112" font-size="13" fill="#7f1d1d">推倒重来整间屋 —— 最贵</text>
+      <rect x="248" y="98" width="120" height="10" rx="5" fill="#dc2626"/>
+      <rect x="24" y="132" width="360" height="56" rx="10" fill="#ffffff" stroke="#f59e0b" stroke-width="2"/>
+      <text x="44" y="158" font-size="15" font-weight="bold" fill="#b45309">重绘：改 color、背景</text>
+      <text x="44" y="178" font-size="13" fill="#92400e">只刷漆不动家具 —— 中等</text>
+      <rect x="296" y="164" width="72" height="10" rx="5" fill="#f59e0b"/>
+      <rect x="24" y="198" width="360" height="56" rx="10" fill="#ffffff" stroke="#10b981" stroke-width="2"/>
+      <text x="44" y="224" font-size="15" font-weight="bold" fill="#047857">合成：transform、opacity</text>
+      <text x="44" y="244" font-size="13" fill="#065f46">换窗帘不进房间 —— 最便宜</text>
+      <rect x="336" y="230" width="32" height="10" rx="5" fill="#10b981"/>
+      <text x="204" y="286" text-anchor="middle" font-size="14" fill="#065f46">换窗帘不搬家 = 纯合成</text>
+      <use href="#uncle" transform="translate(420,330) scale(0.72)"/>
+      <use href="#ben" transform="translate(492,330) scale(0.7)"/>
+    </g>
+    <path d="M0,34 L0,16 Q0,0 16,0 L544,0 Q560,0 560,16 L560,34 Z" fill="#e2e8f0"/>
+    <text x="18" y="24" font-size="16" font-weight="bold" fill="#0f172a">第 2 格 · 成本阶梯：换窗帘不搬家</text>
+    <rect width="560" height="360" rx="16" fill="none" stroke="#0f172a" stroke-width="2"/>
+  </g>
+
+  <!-- 第 3 格 · 合成层 -->
+  <g transform="translate(20,462)">
+    <rect width="560" height="360" rx="16" fill="#ffffff"/>
+    <g clip-path="url(#pc3)">
+      <rect x="3" y="37" width="554" height="320" fill="#eff6ff"/>
+      <rect x="3" y="330" width="554" height="27" fill="#cbd5e1"/>
+      <text x="251" y="76" text-anchor="middle" font-size="14" font-weight="bold" fill="#1d4ed8">常改的元素单独开一间房</text>
+      <rect x="34" y="92" width="130" height="130" rx="8" fill="#ffffff" stroke="#94a3b8" stroke-width="2"/>
+      <text x="99" y="162" text-anchor="middle" font-size="14" fill="#475569">主屋</text>
+      <rect x="186" y="92" width="130" height="130" rx="8" fill="#fff7ed" stroke="#f97316" stroke-width="3" stroke-dasharray="10 6"/>
+      <text x="251" y="148" text-anchor="middle" font-size="14" font-weight="bold" fill="#c2410c">独立图层</text>
+      <text x="251" y="174" text-anchor="middle" font-size="13" fill="#c2410c">GPU 单独合成</text>
+      <rect x="338" y="92" width="130" height="130" rx="8" fill="#ffffff" stroke="#94a3b8" stroke-width="2"/>
+      <text x="403" y="162" text-anchor="middle" font-size="14" fill="#475569">主屋</text>
+      <text x="36" y="256" font-size="13" fill="#b91c1c">房间开太多，电工（显存）也跑断腿。</text>
+      <text x="36" y="282" font-size="13" fill="#1d4ed8">will-change 要克制，用完就撤。</text>
+      <use href="#uncle" transform="translate(420,330) scale(0.72)"/>
+      <use href="#ben" transform="translate(492,330) scale(0.7)"/>
+    </g>
+    <path d="M0,34 L0,16 Q0,0 16,0 L544,0 Q560,0 560,16 L560,34 Z" fill="#e2e8f0"/>
+    <text x="18" y="24" font-size="16" font-weight="bold" fill="#0f172a">第 3 格 · 合成层：常改的东西单独放房</text>
+    <rect width="560" height="360" rx="16" fill="none" stroke="#0f172a" stroke-width="2"/>
+  </g>
+
+  <!-- 第 4 格 · 坑点与稳叔总结 -->
+  <g transform="translate(608,462)">
+    <rect width="560" height="360" rx="16" fill="#ffffff"/>
+    <g clip-path="url(#pc4)">
+      <rect x="3" y="37" width="554" height="320" fill="#fff7ed"/>
+      <rect x="24" y="54" width="96" height="34" rx="9" fill="#f97316"/>
+      <text x="72" y="77" text-anchor="middle" font-size="17" font-weight="bold" fill="#ffffff">坑点</text>
+      <rect x="24" y="102" width="512" height="88" rx="12" fill="#ffffff" stroke="#f97316" stroke-width="2"/>
+      <text x="44" y="132" font-size="15" fill="#7c2d12">加上 will-change 就以为会变快——</text>
+      <text x="44" y="160" font-size="15" fill="#7c2d12">它只是提前建图层的声明，滥用占显存。</text>
+      <rect x="24" y="210" width="420" height="116" rx="12" fill="#ecfdf5" stroke="#10b981" stroke-width="2"/>
+      <text x="44" y="240" font-size="16" font-weight="bold" fill="#059669">稳叔总结</text>
+      <text x="44" y="268" font-size="15" fill="#065f46">读写分离、只用 transform 与 opacity。</text>
+      <text x="44" y="294" font-size="15" fill="#065f46">合成层省着用，用完就撤。</text>
+      <use href="#uncle" transform="translate(486,352) scale(0.72)"/>
+      <use href="#ben" transform="translate(536,352) scale(0.7)"/>
+      <text x="24" y="344" font-size="12" fill="#64748b">本格对应第 4 章 2~8 节 ｜ 详细讲解见 EP.04.md</text>
+    </g>
+    <path d="M0,34 L0,16 Q0,0 16,0 L544,0 Q560,0 560,16 L560,34 Z" fill="#e2e8f0"/>
+    <text x="18" y="24" font-size="16" font-weight="bold" fill="#0f172a">第 4 格 · 坑点与稳叔总结</text>
+    <rect width="560" height="360" rx="16" fill="none" stroke="#0f172a" stroke-width="2"/>
+  </g>
+</svg>

@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="前端性能优化完全学习指南">
+  <!-- 与站点品牌色一致：#4F7CFF → #7B5CFF 蓝紫渐变 -->
+  <defs>
+    <linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#4F7CFF" />
+      <stop offset="1" stop-color="#7B5CFF" />
+    </linearGradient>
+  </defs>
+  <rect width="64" height="64" rx="14" fill="url(#g)" />
+  <!-- 闪电：性能与速度的最简符号，16px 下仍可辨识 -->
+  <path d="M36 8 18 36h11l-3 20 20-30H34l2-18z" fill="#ffffff" />
+</svg>
