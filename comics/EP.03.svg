@@ -1,0 +1,182 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 840" font-family="'PingFang SC','Hiragino Sans GB','Microsoft YaHei',sans-serif">
+  <defs>
+    <linearGradient id="bgG" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#eff6ff"/>
+      <stop offset="1" stop-color="#dbeafe"/>
+    </linearGradient>
+    <linearGradient id="hdrG" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#1e293b"/>
+      <stop offset="1" stop-color="#475569"/>
+    </linearGradient>
+    <clipPath id="pc1"><rect x="3" y="37" width="554" height="320" rx="13"/></clipPath>
+    <clipPath id="pc2"><rect x="3" y="37" width="554" height="320" rx="13"/></clipPath>
+    <clipPath id="pc3"><rect x="3" y="37" width="554" height="320" rx="13"/></clipPath>
+    <clipPath id="pc4"><rect x="3" y="37" width="554" height="320" rx="13"/></clipPath>
+    <g id="uncle">
+      <rect x="-16" y="-36" width="11" height="36" rx="4" fill="#334155"/>
+      <rect x="5" y="-36" width="11" height="36" rx="4" fill="#334155"/>
+      <rect x="-34" y="-98" width="12" height="50" rx="6" fill="#6d28d9"/>
+      <rect x="22" y="-98" width="12" height="50" rx="6" fill="#6d28d9"/>
+      <circle cx="-28" cy="-44" r="6.5" fill="#fcd9b8"/>
+      <circle cx="28" cy="-44" r="6.5" fill="#fcd9b8"/>
+      <rect x="-25" y="-104" width="50" height="72" rx="15" fill="#7c3aed"/>
+      <circle cx="0" cy="-122" r="25" fill="#fcd9b8"/>
+      <path d="M-25,-124 a25,25 0 0 1 50,0 z" fill="#e2e8f0"/>
+      <circle cx="-10" cy="-120" r="7.5" fill="#ffffff" stroke="#1e293b" stroke-width="1.6"/>
+      <circle cx="10" cy="-120" r="7.5" fill="#ffffff" stroke="#1e293b" stroke-width="1.6"/>
+      <line x1="-3" y1="-120" x2="3" y2="-120" stroke="#1e293b" stroke-width="1.6"/>
+      <circle cx="-10" cy="-120" r="2" fill="#1e293b"/>
+      <circle cx="10" cy="-120" r="2" fill="#1e293b"/>
+      <path d="M-6,-108 q6,4 12,0" stroke="#b45309" stroke-width="1.6" fill="none" stroke-linecap="round"/>
+      <ellipse cx="0" cy="-102" rx="9" ry="4.5" fill="#e2e8f0"/>
+    </g>
+    <g id="ben">
+      <rect x="-15" y="-32" width="11" height="32" rx="4" fill="#1e293b"/>
+      <rect x="4" y="-32" width="11" height="32" rx="4" fill="#1e293b"/>
+      <rect x="-33" y="-94" width="12" height="48" rx="6" fill="#0284c7"/>
+      <rect x="21" y="-94" width="12" height="48" rx="6" fill="#0284c7"/>
+      <circle cx="-27" cy="-42" r="6" fill="#fcd9b8"/>
+      <circle cx="27" cy="-42" r="6" fill="#fcd9b8"/>
+      <rect x="-24" y="-100" width="48" height="70" rx="15" fill="#0ea5e9"/>
+      <path d="M-24,-88 q24,14 48,0" stroke="#7dd3fc" stroke-width="3" fill="none"/>
+      <circle cx="0" cy="-118" r="23" fill="#fcd9b8"/>
+      <path d="M-23,-120 a23,23 0 0 1 46,0 z" fill="#0f172a"/>
+      <path d="M-14,-136 l3,-10 5,8 z" fill="#0f172a"/>
+      <path d="M6,-138 l4,-10 5,9 z" fill="#0f172a"/>
+      <circle cx="-8" cy="-116" r="2.4" fill="#1e293b"/>
+      <circle cx="8" cy="-116" r="2.4" fill="#1e293b"/>
+      <ellipse cx="0" cy="-104" rx="4" ry="5" fill="#7c2d12"/>
+    </g>
+  </defs>
+
+  <rect width="1200" height="840" fill="url(#bgG)"/>
+
+  <!-- 头部横幅 -->
+  <rect x="20" y="16" width="1160" height="56" rx="14" fill="url(#hdrG)"/>
+  <rect x="36" y="28" width="88" height="32" rx="9" fill="#f97316"/>
+  <text x="80" y="50" text-anchor="middle" font-size="18" font-weight="bold" fill="#ffffff">EP.03</text>
+  <text x="142" y="52" font-size="25" font-weight="bold" fill="#ffffff">餐厅备菜大作战 —— 加载性能优化</text>
+  <text x="1164" y="50" text-anchor="end" font-size="14" fill="#cbd5e1">性能小镇 · 配套文档 docs/03-loading.md</text>
+
+  <!-- 第 1 格 · 关键路径阻塞 -->
+  <g transform="translate(20,84)">
+    <rect width="560" height="360" rx="16" fill="#ffffff"/>
+    <g clip-path="url(#pc1)">
+      <rect x="3" y="37" width="554" height="320" fill="#fee2e2"/>
+      <rect x="3" y="330" width="554" height="27" fill="#334155"/>
+      <rect x="356" y="150" width="22" height="180" fill="#64748b"/>
+      <rect x="440" y="150" width="22" height="180" fill="#64748b"/>
+      <text x="409" y="140" text-anchor="middle" font-size="13" font-weight="bold" fill="#b91c1c">HTML 入口</text>
+      <path d="M54,310 L330,310" stroke="#b91c1c" stroke-width="3" stroke-dasharray="10 8"/>
+      <rect x="140" y="292" width="34" height="38" rx="4" fill="#fcd34d" stroke="#b45309" stroke-width="1.4"/>
+      <rect x="196" y="292" width="34" height="38" rx="4" fill="#fcd34d" stroke="#b45309" stroke-width="1.4"/>
+      <rect x="252" y="292" width="34" height="38" rx="4" fill="#fcd34d" stroke="#b45309" stroke-width="1.4"/>
+      <rect x="308" y="292" width="34" height="38" rx="4" fill="#fcd34d" stroke="#b45309" stroke-width="1.4"/>
+      <rect x="330" y="60" width="146" height="46" rx="10" fill="#ffffff" stroke="#b91c1c" stroke-width="2"/>
+      <text x="403" y="90" text-anchor="middle" font-size="16" font-weight="bold" fill="#b91c1c">上菜 40 分钟</text>
+      <use href="#uncle" transform="translate(524,330) scale(0.72)"/>
+      <rect x="30" y="52" width="256" height="72" rx="12" fill="#ffffff" stroke="#334155" stroke-width="1.6"/>
+      <path d="M100,124 L124,124 L110,146 Z" fill="#ffffff" stroke="#334155" stroke-width="1.6"/>
+      <rect x="106" y="118" width="16" height="8" fill="#ffffff"/>
+      <text x="48" y="80" font-size="14" fill="#0f172a">样样现拉、层层等待——</text>
+      <text x="48" y="106" font-size="14" fill="#0f172a">CSS 和 JS 串成一条长队。</text>
+    </g>
+    <path d="M0,34 L0,16 Q0,0 16,0 L544,0 Q560,0 560,16 L560,34 Z" fill="#e2e8f0"/>
+    <text x="18" y="24" font-size="16" font-weight="bold" fill="#0f172a">第 1 格 · 关键路径阻塞：样样现拉</text>
+    <rect width="560" height="360" rx="16" fill="none" stroke="#0f172a" stroke-width="2"/>
+  </g>
+
+  <!-- 第 2 格 · 稳叔三板斧 -->
+  <g transform="translate(608,84)">
+    <rect width="560" height="360" rx="16" fill="#ffffff"/>
+    <g clip-path="url(#pc2)">
+      <rect x="3" y="37" width="554" height="320" fill="#ecfdf5"/>
+      <rect x="24" y="58" width="164" height="104" rx="12" fill="#ffffff" stroke="#10b981" stroke-width="2"/>
+      <circle cx="52" cy="84" r="13" fill="#10b981"/>
+      <text x="52" y="89" text-anchor="middle" font-size="14" font-weight="bold" fill="#ffffff">1</text>
+      <text x="76" y="89" font-size="15" font-weight="bold" fill="#065f46">菜就近备</text>
+      <text x="40" y="120" font-size="13" fill="#047857">CDN 边缘节点</text>
+      <text x="40" y="144" font-size="13" fill="#047857">缩短物理距离</text>
+      <rect x="198" y="58" width="164" height="104" rx="12" fill="#ffffff" stroke="#10b981" stroke-width="2"/>
+      <circle cx="226" cy="84" r="13" fill="#10b981"/>
+      <text x="226" y="89" text-anchor="middle" font-size="14" font-weight="bold" fill="#ffffff">2</text>
+      <text x="250" y="89" font-size="15" font-weight="bold" fill="#065f46">半成品预制</text>
+      <text x="214" y="120" font-size="13" fill="#047857">Brotli 再省 20%</text>
+      <text x="214" y="144" font-size="13" fill="#047857">hash 资源缓存一年</text>
+      <rect x="372" y="58" width="164" height="104" rx="12" fill="#ffffff" stroke="#10b981" stroke-width="2"/>
+      <circle cx="400" cy="84" r="13" fill="#10b981"/>
+      <text x="400" y="89" text-anchor="middle" font-size="14" font-weight="bold" fill="#ffffff">3</text>
+      <text x="424" y="89" font-size="15" font-weight="bold" fill="#065f46">热门菜先做</text>
+      <text x="388" y="120" font-size="13" fill="#047857">preconnect 预热</text>
+      <text x="388" y="144" font-size="13" fill="#047857">preload 提优先级</text>
+      <rect x="24" y="182" width="406" height="56" rx="12" fill="#ffffff" stroke="#0f172a" stroke-width="1.6"/>
+      <text x="44" y="202" font-size="13" fill="#64748b">上菜时长</text>
+      <text x="44" y="226" font-size="15" fill="#0f172a">40 分钟</text>
+      <path d="M126,220 L214,220" stroke="#10b981" stroke-width="4"/>
+      <path d="M204,209 L226,220 L204,231 Z" fill="#10b981"/>
+      <text x="238" y="226" font-size="15" font-weight="bold" fill="#047857">8 分钟</text>
+      <use href="#uncle" transform="translate(492,330) scale(0.72)"/>
+      <use href="#ben" transform="translate(540,330) scale(0.68)"/>
+    </g>
+    <path d="M0,34 L0,16 Q0,0 16,0 L544,0 Q560,0 560,16 L560,34 Z" fill="#e2e8f0"/>
+    <text x="18" y="24" font-size="16" font-weight="bold" fill="#0f172a">第 2 格 · 三板斧：就近备、预制、先做</text>
+    <rect width="560" height="360" rx="16" fill="none" stroke="#0f172a" stroke-width="2"/>
+  </g>
+
+  <!-- 第 3 格 · 拆菜单与按需做菜 -->
+  <g transform="translate(20,462)">
+    <rect width="560" height="360" rx="16" fill="#ffffff"/>
+    <g clip-path="url(#pc3)">
+      <rect x="3" y="37" width="554" height="320" fill="#eff6ff"/>
+      <rect x="3" y="330" width="554" height="27" fill="#cbd5e1"/>
+      <rect x="46" y="64" width="140" height="164" rx="8" fill="#ffffff" stroke="#0f172a" stroke-width="2"/>
+      <rect x="62" y="84" width="108" height="8" rx="4" fill="#94a3b8"/>
+      <rect x="62" y="106" width="108" height="8" rx="4" fill="#94a3b8"/>
+      <rect x="62" y="128" width="108" height="8" rx="4" fill="#94a3b8"/>
+      <rect x="62" y="150" width="108" height="8" rx="4" fill="#94a3b8"/>
+      <rect x="62" y="172" width="108" height="8" rx="4" fill="#94a3b8"/>
+      <rect x="62" y="194" width="108" height="8" rx="4" fill="#94a3b8"/>
+      <text x="116" y="250" text-anchor="middle" font-size="13" fill="#334155">一本厚菜单</text>
+      <path d="M196,146 L244,146" stroke="#1d4ed8" stroke-width="4"/>
+      <path d="M234,135 L256,146 L234,157 Z" fill="#1d4ed8"/>
+      <rect x="268" y="76" width="98" height="128" rx="6" fill="#ffffff" stroke="#2563eb" stroke-width="2"/>
+      <rect x="282" y="96" width="70" height="7" rx="3.5" fill="#93c5fd"/>
+      <rect x="282" y="114" width="70" height="7" rx="3.5" fill="#93c5fd"/>
+      <rect x="282" y="132" width="70" height="7" rx="3.5" fill="#93c5fd"/>
+      <text x="317" y="230" text-anchor="middle" font-size="13" fill="#1d4ed8">按路由拆页</text>
+      <use href="#ben" transform="translate(430,330) scale(0.7)"/>
+      <use href="#uncle" transform="translate(506,330) scale(0.7)"/>
+      <rect x="372" y="52" width="182" height="76" rx="12" fill="#ffffff" stroke="#334155" stroke-width="1.6"/>
+      <path d="M400,128 L424,128 L410,150 Z" fill="#ffffff" stroke="#334155" stroke-width="1.6"/>
+      <rect x="396" y="122" width="16" height="8" fill="#ffffff"/>
+      <text x="390" y="80" font-size="14" fill="#0f172a">用到才下载，</text>
+      <text x="390" y="106" font-size="14" fill="#0f172a">首屏只装必需。</text>
+    </g>
+    <path d="M0,34 L0,16 Q0,0 16,0 L544,0 Q560,0 560,16 L560,34 Z" fill="#e2e8f0"/>
+    <text x="18" y="24" font-size="16" font-weight="bold" fill="#0f172a">第 3 格 · 拆菜单与按需做菜</text>
+    <rect width="560" height="360" rx="16" fill="none" stroke="#0f172a" stroke-width="2"/>
+  </g>
+
+  <!-- 第 4 格 · 坑点与稳叔总结 -->
+  <g transform="translate(608,462)">
+    <rect width="560" height="360" rx="16" fill="#ffffff"/>
+    <g clip-path="url(#pc4)">
+      <rect x="3" y="37" width="554" height="320" fill="#fff7ed"/>
+      <rect x="24" y="54" width="96" height="34" rx="9" fill="#f97316"/>
+      <text x="72" y="77" text-anchor="middle" font-size="17" font-weight="bold" fill="#ffffff">坑点</text>
+      <rect x="24" y="102" width="512" height="88" rx="12" fill="#ffffff" stroke="#f97316" stroke-width="2"/>
+      <text x="44" y="132" font-size="15" fill="#7c2d12">把代码拆成几百个小 chunk、几十张小图——</text>
+      <text x="44" y="160" font-size="15" fill="#7c2d12">请求调度开销与缓存粒度反而更劣化。</text>
+      <rect x="24" y="210" width="420" height="116" rx="12" fill="#ecfdf5" stroke="#10b981" stroke-width="2"/>
+      <text x="44" y="240" font-size="16" font-weight="bold" fill="#059669">稳叔总结</text>
+      <text x="44" y="268" font-size="15" fill="#065f46">少加载、早加载、按需加载。</text>
+      <text x="44" y="294" font-size="15" fill="#065f46">先减少量，再优化时序。</text>
+      <use href="#uncle" transform="translate(486,352) scale(0.72)"/>
+      <use href="#ben" transform="translate(536,352) scale(0.7)"/>
+      <text x="24" y="344" font-size="12" fill="#64748b">本格对应第 3 章 1~8 节 ｜ 详细讲解见 EP.03.md</text>
+    </g>
+    <path d="M0,34 L0,16 Q0,0 16,0 L544,0 Q560,0 560,16 L560,34 Z" fill="#e2e8f0"/>
+    <text x="18" y="24" font-size="16" font-weight="bold" fill="#0f172a">第 4 格 · 坑点与稳叔总结</text>
+    <rect width="560" height="360" rx="16" fill="none" stroke="#0f172a" stroke-width="2"/>
+  </g>
+</svg>

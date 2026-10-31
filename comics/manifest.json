@@ -1,0 +1,39 @@
+{
+  "series": "性能小镇 · 前端性能优化漫画",
+  "version": "2.0.0",
+  "canvas": {
+    "width": 1200,
+    "height": 840
+  },
+  "panels": {
+    "count": 4,
+    "width": 560,
+    "height": 360
+  },
+  "characters": [
+    "小奔",
+    "稳叔"
+  ],
+  "parts": [
+    { "file": "01-overview.md", "label": "第 1 章 · 性能优化总览与心智模型" },
+    { "file": "02-core-web-vitals.md", "label": "第 2 章 · Core Web Vitals 核心指标详解" },
+    { "file": "03-loading.md", "label": "第 3 章 · 加载性能优化" },
+    { "file": "04-rendering.md", "label": "第 4 章 · 渲染性能优化" },
+    { "file": "05-runtime.md", "label": "第 5 章 · 运行时性能：主线程、内存与泄漏" },
+    { "file": "06-vue.md", "label": "第 6 章 · Vue 专项优化方案" },
+    { "file": "07-react.md", "label": "第 7 章 · React 专项优化方案" },
+    { "file": "08-tools.md", "label": "第 8 章 · 性能检测工具完全指南" },
+    { "file": "09-production.md", "label": "第 9 章 · 生产环境落地实践" }
+  ],
+  "episodes": [
+    { "ep": 1, "slug": "EP.01", "title": "小镇的早高峰", "part": "01-overview.md" },
+    { "ep": 2, "slug": "EP.02", "title": "快递签收的三门课", "part": "02-core-web-vitals.md" },
+    { "ep": 3, "slug": "EP.03", "title": "餐厅备菜大作战", "part": "03-loading.md" },
+    { "ep": 4, "slug": "EP.04", "title": "装修队的血泪史", "part": "04-rendering.md" },
+    { "ep": 5, "slug": "EP.05", "title": "仓库整理惊魂", "part": "05-runtime.md" },
+    { "ep": 6, "slug": "EP.06", "title": "Vue 后厨的智慧", "part": "06-vue.md" },
+    { "ep": 7, "slug": "EP.07", "title": "React 后厨的调度艺术", "part": "07-react.md" },
+    { "ep": 8, "slug": "EP.08", "title": "性能体检中心", "part": "08-tools.md" },
+    { "ep": 9, "slug": "EP.09", "title": "工厂质检上线记", "part": "09-production.md" }
+  ]
+}
